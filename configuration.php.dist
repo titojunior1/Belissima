@@ -1,0 +1,19 @@
+<?php
+
+/* URL e CHAVE DE ACESSO KPL */
+
+define ('KPL_WSDL', '');
+define ('KPL_KEY', '');
+
+define ('VTEX_WSDL', '');
+define ('VTEX_USUARIO', '');
+define ('VTEX_SENHA', '');
+
+define ('VTEX_API_URL', '');
+define ('VTEX_API_KEY', '');
+define ('VTEX_API_TOKEN', '');
+
+define('PATH_SISTEMA', realpath(dirname(__FILE__)) . '/');
+define('PATH_INCLUDES', PATH_SISTEMA . 'includes/');
+define('PATH_INCLUDES_ANTIGO', PATH_SISTEMA . 'html/includes/');
+define('PATH_CONFIG', PATH_SISTEMA . 'config/');

@@ -1,0 +1,59 @@
+{
+  "name": "totalexpress/wms-treelog",
+  "description": "WMS - Warehouse Management System",
+  "license": "proprietary",
+  "prefer-stable": true,
+  "minimum-stability": "dev",
+  "config": {
+    "process-timeout": 7200,
+    "preferred-install": "dist",
+    "discard-changes": true,
+    "optimize-autoloader": true
+  },
+  "require": {
+    "php": ">=5.6",
+    "ext-pcntl": "*",
+    "deployer/deployer": "^3.3",
+    "doctrine/dbal": "^2.5",
+    "monolog/monolog": "^1.20",
+    "mtdowling/cron-expression": "^1.1",
+    "php-di/php-di": "^5.3",
+    "psr/log": "^1.0",
+    "robmorgan/phinx": "^0.5.3",
+    "silex/silex": "^2.0",
+    "silex/web-profiler": "^2.0",
+    "symfony/asset": "^3.1",
+    "symfony/browser-kit": "^3.1",
+    "symfony/class-loader": "^3.1",
+    "symfony/config": "^3.1",
+    "symfony/console": "^3.1",
+    "symfony/css-selector": "^3.1",
+    "symfony/debug": "^3.1",
+    "symfony/event-dispatcher": "^3.1",
+    "symfony/filesystem": "^3.1",
+    "symfony/finder": "^3.1",
+    "symfony/form": "^3.1",
+    "symfony/monolog-bridge": "^3.1",
+    "symfony/process": "^3.1",
+    "symfony/security": "^3.1",
+    "symfony/translation": "^3.1",
+    "symfony/twig-bridge": "^3.1",
+    "symfony/validator": "^3.1",
+    "twig/twig": "^1.24",
+    "zendframework/zendpdf": "^2.0",
+    "zendframework/zend-barcode": "^2.6"
+  },
+  "require-dev": {
+    "codeception/codeception": "^2.1",
+    "phpunit/phpunit": "~4.8"
+  },
+  "autoload": {
+    "psr-0": { "": "src/" },
+    "psr-4": {
+      "Wms\\": [
+        "src/Wms",
+        "tests/unit/Wms"
+      ]
+    }
+  }
+}
