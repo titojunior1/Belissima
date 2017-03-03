@@ -7,12 +7,12 @@
  * 
  */
 
-class Model_Verden_Kpl_Precos extends Model_Verden_Kpl_KplWebService {
+class Model_Belissima_Kpl_Precos extends Model_Belissima_Kpl_KplWebService {
 	
 	/*
-	 * Instancia Webservice Magento
+	 * Instancia Webservice Vtex
 	*/
-	private $_magento;
+	private $_vtex;
 	
 	/*
 	 * Instancia Webservice KPL
@@ -28,7 +28,7 @@ class Model_Verden_Kpl_Precos extends Model_Verden_Kpl_KplWebService {
 	function __construct() {
 		
 		if (empty ( $this->_kpl )) {
-			$this->_kpl = new Model_Verden_Kpl_KplWebService (  );
+			$this->_kpl = new Model_Belissima_Kpl_KplWebService (  );
 		}
 	
 	}
@@ -38,17 +38,32 @@ class Model_Verden_Kpl_Precos extends Model_Verden_Kpl_KplWebService {
 	 * Método para atualização de preço dos produtos	 
 	 * @throws RuntimeException
 	 */
-	private function _atualizaPreco ( $dados_precos ) {
+	private function _atualizaPrecoRest ( $dados_precos ) {
 				
-        $idProduto = $dados_precos['product_id'];
-		$produto =  array(
-							'price' => $dados_precos ['PrecoTabela'],
-							'special_price' => $dados_precos ['PrecoPromocional'],
-							'special_from_date' => $dados_precos ['DataInicioPromocao'],
-							'special_to_date' => $dados_precos ['DataTerminoPromocao'],
-						); 
+		$data = array(
+            array(
+					'itemId' => $dados_precos['CodigoProduto'],
+					'salesChannel' => '1',
+					'price' => $dados_precos['PrecoPromocional'],
+					'listPrice' => $dados_precos['PrecoTabela'],
+					'validFrom' => $dados_precos['DataInicioPromocao'],
+					'validTo' => $dados_precos['DataTerminoPromocao'],
+			)
+        );
 
-		$this->_magento->atualizaProduto($idProduto, $produto);
+        $url = sprintf($this->_url, 'logistics/pvt/inventory/warehouseitems/setbalance');
+        $headers = array(
+            'Content-Type' => 'application/json',
+        	'Accept' => 'application/json',
+        	'X-VTEX-API-AppKey' => $this->_key,
+        	'X-VTEX-API-AppToken' => $this->_token	
+        );
+
+        $request = Requests::post($url, $headers, json_encode($data));
+
+        if (! $request->success) {
+            throw new RuntimeException('Falha na comunicação com o webservice. [' . $request->body . ']');
+        }
 	
 	}
 
@@ -100,13 +115,13 @@ class Model_Verden_Kpl_Precos extends Model_Verden_Kpl_KplWebService {
 				$mes=substr($dataInicioPromo,2,2);
 				$ano=substr($dataInicioPromo,4,4);
 				$dataInicioPromo = $dia.'/'.$mes.'/'.$ano;
-				$array_precos [0] ['DataInicioPromocao'] = $dataInicioPromo;
+				$array_precos [0] ['DataInicioPromocao'] = $dataInicioPromo . 'T' . $horaInicioPromo;
 				list($dataFimPromo, $horaFimPromo) = explode(' ', $request ['DadosPreco'] ['DataTerminoPromocao'] );
 				$dia=substr($dataFimPromo,0,2);
 				$mes=substr($dataFimPromo,2,2);
 				$ano=substr($dataFimPromo,4,4);
 				$dataFimPromo = $dia.'/'.$mes.'/'.$ano;
-				$array_precos [0] ['DataTerminoPromocao'] = $dataFimPromo;
+				$array_precos [0] ['DataTerminoPromocao'] = $dataFimPromo . 'T' . $horaFimPromo;
 			}			
 			$array_precos [0] ['DescontoMaximoProduto'] = $request ['DadosPreco'] ['DescontoMaximoProduto'];
 			$array_precos [0] ['CodigoProdutoParceiro'] = $request ['DadosPreco'] ['CodigoProdutoParceiro'];
@@ -128,13 +143,13 @@ class Model_Verden_Kpl_Precos extends Model_Verden_Kpl_KplWebService {
 					$mes=substr($dataInicioPromo,2,2);
 					$ano=substr($dataInicioPromo,4,4);
 					$dataInicioPromo = $dia.'/'.$mes.'/'.$ano;
-					$array_precos [$i] ['DataInicioPromocao'] = $dataInicioPromo;
+					$array_precos [$i] ['DataInicioPromocao'] = $dataInicioPromo . 'T' . $horaInicioPromo;
 					list($dataFimPromo, $horaFimPromo) = explode(' ', $d ['DataTerminoPromocao']);
 					$dia=substr($dataFimPromo,0,2);
 					$mes=substr($dataFimPromo,2,2);
 					$ano=substr($dataFimPromo,4,4);
 					$dataFimPromo = $dia.'/'.$mes.'/'.$ano;
-					$array_precos [$i] ['DataTerminoPromocao'] = $dataFimPromo;
+					$array_precos [$i] ['DataTerminoPromocao'] = $dataFimPromo . 'T' . $horaFimPromo;
 				}				
 				$array_precos [$i] ['DescontoMaximoProduto'] = $d ['DescontoMaximoProduto'];
 				$array_precos [$i] ['CodigoProdutoParceiro'] = $d ['CodigoProdutoParceiro'];
@@ -148,8 +163,8 @@ class Model_Verden_Kpl_Precos extends Model_Verden_Kpl_KplWebService {
 		echo "Precos encontrados para integracao: " . $qtdPrecos . PHP_EOL;
 		echo PHP_EOL;
 		
-		echo "Conectando ao WebService Magento... " . PHP_EOL;
-		$this->_magento = new Model_Verden_Magento_Precos();
+		echo "Conectando ao WebService Vtex... " . PHP_EOL;
+		$this->_vtex = new Model_Belissima_Vtex_Preco();
 		echo "Conectado!" . PHP_EOL;
 		echo PHP_EOL;
 		
@@ -168,15 +183,14 @@ class Model_Verden_Kpl_Precos extends Model_Verden_Kpl_KplWebService {
 				try {
 					echo PHP_EOL;
 					echo "Buscando cadastro do produto " . $dados_precos['CodigoProduto'] . PHP_EOL;
-					$produto = $this->_magento->buscaProduto($dados_precos['CodigoProduto']);
+					$produto = 1;//$this->_magento->buscaProduto($dados_precos['CodigoProduto']);
 					if ( !empty ( $produto ) ) {
 						echo "Atualizando Preco " . $dados_precos['CodigoProduto'] . PHP_EOL;
 						echo "Preco Tabela: R$" . $dados_precos['PrecoTabela'] . PHP_EOL;
 						echo "Preco Promocional: R$" . $dados_precos['PrecoPromocional'] . PHP_EOL;
 						echo "Data Inicio: " . $dados_precos['DataInicioPromocao'] . PHP_EOL;
-						echo "Data Fim: " . $dados_precos['DataTerminoPromocao'] . PHP_EOL;
-						$dados_precos['product_id'] = $produto; // ID do Produto na Loja Magento
-						$this->_atualizaPreco( $dados_precos );
+						echo "Data Fim: " . $dados_precos['DataTerminoPromocao'] . PHP_EOL;						
+						$this->_atualizaPrecoRest( $dados_precos );
 						echo "Preco atualizado. " . PHP_EOL;
 						
 					}else{

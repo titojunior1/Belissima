@@ -104,7 +104,7 @@ class Model_Belissima_Kpl_EstoqueKpl extends Model_Belissima_Kpl_KplWebService {
 					if ( !empty ( $produto ) ) {
 						echo "Atualizando Estoque " . $dados_estoque['CodigoProduto'] . PHP_EOL;
 						echo "Quantidade disponivel " . $dados_estoque['SaldoDisponivel'] . PHP_EOL;
-						$this->_vtex->atualizaArmazemSkuRest('1_1', $dados_estoque['CodigoProduto'], $dados_estoque['SaldoDisponivel'], $data_hora);
+						$this->_vtex->atualizaArmazemSkuRest('1_1', $dados_estoque['CodigoProduto'], $dados_estoque['SaldoDisponivel']);
 						echo "Estoque atualizado. " . PHP_EOL;
 					}else{
 						throw new RuntimeException( 'Produto nao encontrado' );

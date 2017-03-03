@@ -86,7 +86,7 @@ class Model_Belissima_Vtex_Estoque {
             )
         );
 
-        //$url = sprintf($this->_url, 'faturaPedidos', $codigoLoja);
+        $url = sprintf($this->_url, 'logistics/pvt/inventory/warehouseitems/setbalance');
         $headers = array(
             'Content-Type' => 'application/json',
         	'Accept' => 'application/json',
@@ -94,7 +94,7 @@ class Model_Belissima_Vtex_Estoque {
         	'X-VTEX-API-AppToken' => $this->_token	
         );
 
-        $request = Requests::post($this->_url, $headers, json_encode($data));
+        $request = Requests::post($url, $headers, json_encode($data));
 
         if (! $request->success) {
             throw new RuntimeException('Falha na comunicação com o webservice. [' . $request->body . ']');
