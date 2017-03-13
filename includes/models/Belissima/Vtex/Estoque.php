@@ -20,10 +20,19 @@ class Model_Belissima_Vtex_Estoque {
 	 */
 	public $_client;
 	
+	/*
+	 *  URL para integração via REST VTEX
+	*/
 	private $_url;
 	
+	/*
+	 *  Token para integração via REST VTEX
+	*/
 	private $_token;
 	
+	/*
+	 *  Chave para integração via REST VTEX
+	*/
 	private $_key;
 	
 	/**

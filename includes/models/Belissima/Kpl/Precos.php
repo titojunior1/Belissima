@@ -19,6 +19,21 @@ class Model_Belissima_Kpl_Precos extends Model_Belissima_Kpl_KplWebService {
 	*/
 	private $_kpl;
 	
+	/*
+	 *  URL para integração via REST VTEX
+	 */
+	private $_url;
+	
+	/*
+	 *  Token para integração via REST VTEX
+	*/
+	private $_token;
+	
+	/*
+	 *  Chave para integração via REST VTEX
+	*/
+	private $_key;
+	
 	/**
 	 * 
 	 * construtor.
@@ -30,6 +45,9 @@ class Model_Belissima_Kpl_Precos extends Model_Belissima_Kpl_KplWebService {
 		if (empty ( $this->_kpl )) {
 			$this->_kpl = new Model_Belissima_Kpl_KplWebService (  );
 		}
+		$this->_url = VTEX_API_URL;
+		$this->_key = VTEX_API_KEY;
+		$this->_token = VTEX_API_TOKEN;
 	
 	}
 
@@ -51,7 +69,7 @@ class Model_Belissima_Kpl_Precos extends Model_Belissima_Kpl_KplWebService {
 			)
         );
 
-        $url = sprintf($this->_url, 'logistics/pvt/inventory/warehouseitems/setbalance');
+        $url = sprintf($this->_url, 'pricing/pvt/price-sheet');
         $headers = array(
             'Content-Type' => 'application/json',
         	'Accept' => 'application/json',
@@ -163,10 +181,9 @@ class Model_Belissima_Kpl_Precos extends Model_Belissima_Kpl_KplWebService {
 		echo "Precos encontrados para integracao: " . $qtdPrecos . PHP_EOL;
 		echo PHP_EOL;
 		
-		echo "Conectando ao WebService Vtex... " . PHP_EOL;
-		$this->_vtex = new Model_Belissima_Vtex_Preco();
-		echo "Conectado!" . PHP_EOL;
-		echo PHP_EOL;
+// 		echo "Conectando ao WebService Vtex... " . PHP_EOL;
+// 		$this->_vtex = new Model_Belissima_Vtex_Preco();
+// 		echo "Conectado!" . PHP_EOL;
 		
 		// Percorrer array de preços
 		foreach ( $array_precos as $indice => $dados_precos ) {

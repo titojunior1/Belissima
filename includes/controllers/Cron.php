@@ -150,7 +150,7 @@ class Controller_Cron {
 		// verificar se o cronjob existe
 		$cronjob = array_shift ( $arg );
 
-		$classe_completa = 'Model_Verden_Cron_' . $classe;
+		$classe_completa = 'Model_Belissima_Cron_' . $classe;
 		
         if(!class_exists($classe_completa)) {
             $classe_completa = $classe;

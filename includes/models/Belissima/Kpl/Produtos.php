@@ -237,14 +237,9 @@ class Model_Belissima_Kpl_Produtos extends Model_Belissima_Kpl_KplWebService {
 					$produto = false;
 					if ( $produto == false ) {
 						echo "Adicionando produto " . $dados_produtos['SKU'] . " na loja Magento" . PHP_EOL;
-						$this->_adicionaProduto ( $dados_produtos );
-						$this->_adicionaSku($dados_produtos);
-						echo "Produto adicionado. " . PHP_EOL;						
-					} else {
-						echo "Atualizando produto " . $dados_produtos['SKU'] . " na loja Magento" . PHP_EOL;
-						$dados_produtos['product_id'] = $produto; // ID do Produto na Loja Magento
-						$this->_atualizaProduto ( $dados_produtos );
-						echo "Produto atualizado. " . PHP_EOL;
+						//$this->_adicionaProduto ( $dados_produtos );
+						//$this->_adicionaSku($dados_produtos);
+						echo "Produto adicionado. " . PHP_EOL;
 					}
 					
 					//devolver o protocolo do produto
