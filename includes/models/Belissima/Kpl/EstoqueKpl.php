@@ -123,9 +123,6 @@ class Model_Belissima_Kpl_EstoqueKpl extends Model_Belissima_Kpl_KplWebService {
 			}
 		}		
 		
-		// finaliza sessão Magento
-		$this->_magento->_encerraSessao();
-		
 		if(is_array($array_erro)){
 			$array_retorno = $array_erro;
 		}

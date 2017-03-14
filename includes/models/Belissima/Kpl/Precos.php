@@ -214,7 +214,7 @@ class Model_Belissima_Kpl_Precos extends Model_Belissima_Kpl_KplWebService {
 						throw new RuntimeException( 'Produto não encontrado' );
 					} 
 										
-					$this->_kpl->confirmarPrecosDisponiveis ( $dados_precos ['ProtocoloPreco'] );
+					//$this->_kpl->confirmarPrecosDisponiveis ( $dados_precos ['ProtocoloPreco'] );
 					echo "Protocolo Preco: {$dados_precos ['ProtocoloPreco']} enviado com sucesso" . PHP_EOL;		
 
 				} catch ( Exception $e ) {
@@ -225,9 +225,6 @@ class Model_Belissima_Kpl_Precos extends Model_Belissima_Kpl_KplWebService {
 			
 			}
 		}		
-		
-		// finaliza sessão Magento
-		$this->_magento->_encerraSessao();
 		
 		if(is_array($array_erro)){
 			$array_retorno = $array_erro;
