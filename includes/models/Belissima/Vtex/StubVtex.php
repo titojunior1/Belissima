@@ -69,16 +69,28 @@ class Model_Belissima_Vtex_StubVtex {
 		}
 		
 		try {
+			
 			$this->_ws = $ws;
 			$this->_login = $login;
 			$this->_pass = $pass;
-			// conecta nusoap
-			#$this->_webservice = new nusoap_client ( $this->_ws, true );
-			$this->_webservice = new nusoap_client ( $this->_ws, true, false, false, false, false, 120, 120 );
-			$this->_webservice->_debug_flag = 1;
-			$this->_webservice->soap_defencoding = 'UTF-8';
-			// adiciona as credencias
-			$this->_webservice->setCredentials ( $this->_login, $this->_pass );
+			
+			$options = array(
+					'soap_version'=>SOAP_1_1,
+					'trace'=>true,
+					'exceptions'=>true,
+					'login' => $this->_login,
+					'password' => $this->_pass
+					//'uri'=>'http://webservice-belissimabeta.vtexcommerce.com.br/service.svc?wsdl',
+					//'binding'=> 'basicHttpBinding',
+					//'style'=>SOAP_RPC,
+					//'use'=>SOAP_ENCODED,
+					//'encoding'=>'UTF-8',
+					//'cache_wsdl'=>WSDL_CACHE_NONE,
+					//'connection_timeout'=>15,
+			);			
+			
+			$this->_webservice = new SoapClient($this->_ws, $options );
+			
 		} catch ( Exception $e ) {
 			throw new Exception ( 'Erro ao conectar no WebService' );
 		}
@@ -102,8 +114,8 @@ class Model_Belissima_Vtex_StubVtex {
 	 */
 	private function _wsCall($action, $parans) {
 		try {
+			$result = $this->_webservice->__soapCall($action, $parans );
 			
-			$result = $this->_webservice->call ( $action, $parans );
 			if (! $result) {
 				throw new ErrorException ( 'Erro na Execução do Webservice' );
 			}
@@ -254,19 +266,35 @@ class Model_Belissima_Vtex_StubVtex {
 	}
 	
 	/**
-	 * Insere um Produto Pai
-	 * @param int $idProduct Id do produto
+	 * Insere/Atualiza um Produto Pai
+	 * @param array $dadosProduto dados do produto
 	 * @return retorna mensagem em caso de erro ou array de dados se estiver certo
 	 */
 	public function ProductInsertUpdate($dadosProduto) {
 		
 		try {
-			return $this->_wsCall ( 'ProductInsertUpdate', array ('productVO' => $dadosProduto ) );
+			return $this->_wsCall ( 'ProductInsertUpdate', array ( array ('productVO' => $dadosProduto ) ) );
 		} catch ( Exception $e ) {
 			throw new RuntimeException ( $e->getMessage () );
 		}
 		
 	}
+	
+	/**
+	 * Insere/Atualizao um Produto Filho
+	 * @param array $dadosProduto dados do produto
+	 * @return retorna mensagem em caso de erro ou array de dados se estiver certo
+	 */
+	public function StockKeepingUnitInsertUpdate($dadosProduto) {
+	
+		try {
+			return $this->_wsCall ( 'StockKeepingUnitInsertUpdate', array ( array ('stockKeepingUnitVO' => $dadosProduto ) ) );
+		} catch ( Exception $e ) {
+			throw new RuntimeException ( $e->getMessage () );
+		}
+	
+	}
+	
 	/**
 	 * Retorna informações de um determinado skus 
 	 * @param int $idSku Id do Sku

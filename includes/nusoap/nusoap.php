@@ -4133,7 +4133,6 @@ class nusoap_server extends nusoap_base {
 			    $return_val = $this->wsdl->serializeRPCParameters($this->methodname,'output',$opParams);
 			    $this->appendDebug($this->wsdl->getDebug());
 			    $this->wsdl->clearDebug();
-//			    print_r($this->wsdl); exit();
 				if($errstr = $this->wsdl->getError()){
 					$this->debug('got wsdl error: '.$errstr);
 					$this->fault('SOAP-ENV:Server', 'unable to serialize result');

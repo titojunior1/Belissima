@@ -15,13 +15,13 @@ class Model_Belissima_Vtex_Produto {
 	/**
 	 *
 	 * Objeto Vtex
-	 * @var Model_Wms_Vtex_Vtex
+	 * @var Model_Belissima_Vtex_Vtex
 	 */
 	private $_vtex;
 
 	/**
 	 * Variavel  de Objeto da Classe StubVtex.
-	 * @var Model_Wms_Vtex_StubVtex
+	 * @var Model_Belissima_Vtex_StubVtex
 	 */
 	public $_client;
 
@@ -40,13 +40,12 @@ class Model_Belissima_Vtex_Produto {
 	 * @param string $id_vtex Id do Produto no VTEX
 	 * @return retorna o dados do produto_pai
 	 */
-	public function adicionarProdutoPai ( $dadosProduto ) {
+	public function enviaProdutoPai ( $dadosProduto ) {
 
 		try {
 			$result = $this->_client->ProductInsertUpdate($dadosProduto);
 			return $result;
 		} catch ( Exception $e ) {
-			$this->_vtex->setErroNovo ( array ( "Id" => $produto_temp ['RefId'], "Metodo" => "_adicionarProdutoPai", "DescricaoErro" => $e->getMessage () ), "Produto_Pai" );
 			throw new Exception ( $e->getMessage () );
 		}
 	}
@@ -55,103 +54,21 @@ class Model_Belissima_Vtex_Produto {
 	 * Importa um determinado sku
 	 * @param Array $sku_dados DTO de produto filho
 	 */
-	public function adicionarProdutoFilho ( $sku_dados ) {
+	public function enviaProdutoFilho ( $sku_dados ) {
 
 		if ( ! is_array ( $sku_dados ) ) {
 			throw new Exception ( 'Dados do SKU inválidos' );
+		}		
+
+		try {
+
+			$result = $this->_client->StockKeepingUnitInsertUpdate( $sku_dados );
+			return $result;
+	
+		} catch ( Exception $e ) {
+			throw new Exception ( $e->getMessage () );
 		}
 
-		$db = Db_Factory::getDbWms ();
-		$prod_custo = $db->EscapeString ( $sku_dados ['CostPrice'] );
-
-		if ( empty ( $sku_dados ['ManufacturerCode'] ) ) {
-			// valida o código do mandriva
-			throw new Exception ( 'Código do mandriva não informado' );
-		}
-
-		if ( strlen ( $sku_dados ['ManufacturerCode'] ) > 10 ) {
-			// valida o código do mandriva
-			throw new Exception ( 'Código do madriva maior do que o esperado' );
-		}
-
-		if ( ! in_array ( $sku_dados ['ManufacturerCode'], $this->_array_produtos_pai ) ) {
-
-			//consultar vtex para trazer ProductId do Pai
-			$produto_pai_vtex = $this->_client->ProductGetByRefId ( ltrim ( $sku_dados ['ManufacturerCode'], '0' ) );
-			if ( empty ( $produto_pai_vtex ['ProductGetByRefIdResult'] ) ) {
-				$produto_pai_vtex = $this->_client->ProductGet ( ltrim ( $sku_dados ['ManufacturerCode'], '0' ) );
-				if ( empty ( $produto_pai_vtex ['ProductGet'] ) ) {
-					throw new DomainException ( "Produto Pai {$sku_dados ['ManufacturerCode']} não encontrado na Vtex" );
-				}
-			}
-
-			if ( empty ( $produto_pai_vtex ['ProductGetResult'] ) ) {
-				$produto_pai_temp = $produto_pai_vtex ['ProductGetByRefIdResult'];
-			} else {
-				$produto_pai_temp = $produto_pai_vtex ['ProductGetResult'];
-			}
-
-			$id_produto_pai = ltrim ( $sku_dados ['ManufacturerCode'], '0' );
-
-			$produto ['prod_id_extra_1'] = $produto_pai_temp ['Id'];
-
-			try {
-				// busca pelo produto pai
-				$produto_pai = $this->buscaProdutoPai ( $id_produto_pai, $prod_custo );
-
-				if ( empty ( $produto_pai ) ) {
-					// se não houver produto pai cadastrado, adiciona o pai
-					$produto_pai = $this->_adicionarProdutoPai ( $produto_pai_temp, $prod_custo );
-					echo "Produto Pai {$sku_dados['ManufacturerCode']} adicionado pela importação de filho - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
-				} else {
-
-					$produto_pai = $this->_atualizaProdutoPai ( $produto_pai ['prod_id'], $produto_pai_temp );
-					echo "Produto Pai {$sku_dados['ManufacturerCode']} atualizado pela importação de filho - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
-				}
-
-		// atualizar status pai
-			} catch ( Exception $e ) {
-				throw new Exception ( $e->getMessage () );
-			}
-			if ( count ( $this->_array_produtos_pai ) == 1000 ) {
-				$this->_array_produtos_pai [0] = $sku_dados ['ManufacturerCode'];
-			} else {
-				$this->_array_produtos_pai [] = $sku_dados ['ManufacturerCode'];
-
-			}
-
-		} else {
-			$produto_pai = $this->consultarDadosProdutosPai ( $sku_dados ['ManufacturerCode'] );
-		}
-
-		if ( strlen ( $sku_dados ['Id'] ) <= 7 ) {
-			// não importar: decidido durantes os testes com Rafael/Vivian/Camila, em 30/7/12
-			return;
-		}
-		$produto ['prod_peso'] = $db->EscapeString ( number_format ( $sku_dados ['WeightKg'] / 1000, 2, '.', '' ) );
-		$produto ['prod_ean_proprio'] = $sku_dados ['Id'];
-		$produto ['prod_id_parent'] = $produto_pai ['prod_id'];
-		$produto ['prod_nome'] = $db->EscapeString ( $sku_dados ['Name'] );
-		$produto ['prod_descricao'] = $db->EscapeString ( $produto_pai ['prod_descricao'] );
-		$produto ['prod_sku'] = $produto_pai ['prod_sku'];
-		$produto ['prod_ncm'] = $produto_pai ['prod_ncm'];
-
-		$prod_altura = $db->EscapeString ( $sku_dados ['Height'] );
-		$prod_largura = $db->EscapeString ( $sku_dados ['Width'] );
-		$prod_tamanho = $db->EscapeString ( $sku_dados ['Length'] );
-		$prod_part_number = $db->EscapeString ( $produto_pai ['prod_part_number'] );
-		$prod_valor = $db->EscapeString ( $sku_dados ['Price'] );
-		$prod_id_extra_2 = $db->EscapeString ( $sku_dados ['RefId'] );
-
-		$sql = "INSERT INTO produtos (cli_id, amb_id, prod_alt, prod_comp, prod_larg, prod_controle, prod_descricao, prod_minimo, prod_nome, prod_part_number,
-					prod_peso, prod_sku, prod_valor, prod_custo, prod_risco, prod_rotat, prod_class, prod_id_parent, prod_ean_proprio, prod_ncm,prod_id_extra_2)
-					VALUES ({$this->_cli_id}, 1, '{$prod_altura}', '{$prod_tamanho}', '{$prod_largura}', 1, '{$produto ['prod_descricao']}', 1,
-					'{$produto ['prod_nome']}', '{$prod_part_number}', '{$produto ['prod_peso']}', '{$produto ['prod_sku']}', '{$prod_valor}', '{$prod_custo}', 1, 1, 'A',
-					{$produto ['prod_id_parent']}, '{$produto ['prod_ean_proprio']}', '{$produto ['prod_ncm']}','{$prod_id_extra_2}')";
-		$res = $db->Execute ( $sql );
-		if ( ! $res ) {
-			throw new RuntimeException ( "Erro sistêmico ao inserir produto filho" );
-		}
 	}
 
 	/**

@@ -132,13 +132,13 @@ class Model_Belissima_Kpl_Precos extends Model_Belissima_Kpl_KplWebService {
 				$dia=substr($dataInicioPromo,0,2);
 				$mes=substr($dataInicioPromo,2,2);
 				$ano=substr($dataInicioPromo,4,4);
-				$dataInicioPromo = $dia.'/'.$mes.'/'.$ano;
+				$dataInicioPromo = $ano.'-'.$mes.'-'.$dia;
 				$array_precos [0] ['DataInicioPromocao'] = $dataInicioPromo . 'T' . $horaInicioPromo;
 				list($dataFimPromo, $horaFimPromo) = explode(' ', $request ['DadosPreco'] ['DataTerminoPromocao'] );
 				$dia=substr($dataFimPromo,0,2);
 				$mes=substr($dataFimPromo,2,2);
 				$ano=substr($dataFimPromo,4,4);
-				$dataFimPromo = $dia.'/'.$mes.'/'.$ano;
+				$dataFimPromo = $ano.'-'.$mes.'-'.$dia;
 				$array_precos [0] ['DataTerminoPromocao'] = $dataFimPromo . 'T' . $horaFimPromo;
 			}			
 			$array_precos [0] ['DescontoMaximoProduto'] = $request ['DadosPreco'] ['DescontoMaximoProduto'];
@@ -160,13 +160,13 @@ class Model_Belissima_Kpl_Precos extends Model_Belissima_Kpl_KplWebService {
 					$dia=substr($dataInicioPromo,0,2);
 					$mes=substr($dataInicioPromo,2,2);
 					$ano=substr($dataInicioPromo,4,4);
-					$dataInicioPromo = $dia.'/'.$mes.'/'.$ano;
+					$dataInicioPromo = $ano.'-'.$mes.'-'.$dia;
 					$array_precos [$i] ['DataInicioPromocao'] = $dataInicioPromo . 'T' . $horaInicioPromo;
 					list($dataFimPromo, $horaFimPromo) = explode(' ', $d ['DataTerminoPromocao']);
 					$dia=substr($dataFimPromo,0,2);
 					$mes=substr($dataFimPromo,2,2);
 					$ano=substr($dataFimPromo,4,4);
-					$dataFimPromo = $dia.'/'.$mes.'/'.$ano;
+					$dataFimPromo = $ano.'-'.$mes.'-'.$dia;
 					$array_precos [$i] ['DataTerminoPromocao'] = $dataFimPromo . 'T' . $horaFimPromo;
 				}				
 				$array_precos [$i] ['DescontoMaximoProduto'] = $d ['DescontoMaximoProduto'];
@@ -214,7 +214,7 @@ class Model_Belissima_Kpl_Precos extends Model_Belissima_Kpl_KplWebService {
 						throw new RuntimeException( 'Produto não encontrado' );
 					} 
 										
-					//$this->_kpl->confirmarPrecosDisponiveis ( $dados_precos ['ProtocoloPreco'] );
+					$this->_kpl->confirmarPrecosDisponiveis ( $dados_precos ['ProtocoloPreco'] );
 					echo "Protocolo Preco: {$dados_precos ['ProtocoloPreco']} enviado com sucesso" . PHP_EOL;		
 
 				} catch ( Exception $e ) {

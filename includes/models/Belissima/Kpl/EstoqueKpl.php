@@ -110,7 +110,7 @@ class Model_Belissima_Kpl_EstoqueKpl extends Model_Belissima_Kpl_KplWebService {
 						throw new RuntimeException( 'Produto nao encontrado' );
 					} 
 										
-					//$this->_kpl->ConfirmarEstoquesDisponiveis ( $dados_estoque ['ProtocoloEstoque'] );
+					$this->_kpl->ConfirmarEstoquesDisponiveis ( $dados_estoque ['ProtocoloEstoque'] );
 					echo "Protocolo Estoque: {$dados_estoque ['ProtocoloEstoque']} enviado com sucesso" . PHP_EOL;
 					echo PHP_EOL;				
 

@@ -33,46 +33,60 @@ class Model_Belissima_Kpl_Produtos extends Model_Belissima_Kpl_KplWebService {
 	
 	/**
 	 * 
-	 * Adicionar produto.
+	 * Adicionar produto Pai.
 	 * @param array $dados_produtos
 	 * @throws Exception
 	 * @throws RuntimeException
 	 */
-	private function _adicionaProduto ( $dados_produtos ) {		
+	private function _enviaProduto ( $dados_produtos ) {
 		
-		$novoProduto =  array(
-							'Name' => $dados_produtos ['Nome'],
-							'Description' => $dados_produtos ['Descricao'],
-							'DescriptionShort' => $dados_produtos ['Descricao'],
-							'IsActive' => true,				
-							'IsVisible' => true,							
-							'ProductId' => $dados_produtos ['SKU'],		
-							'CategoryId' => $dados_produtos ['Categoria'],
-							'BrandId' => $dados_produtos ['CodigoMarca']							
-						); 
-
-		$this->_vtex->adicionarProdutoPai($novoProduto);
+		$request =  array(
+				'BrandId' => '2000000',
+				'CategoryId' => $dados_produtos ['Categoria'],
+				'DepartmentId' => $dados_produtos ['CodigoFamilia'],
+				'Description' => $dados_produtos ['Descricao'],
+				'DescriptionShort' => $dados_produtos ['Descricao'],
+				'IsActive' => 'true',
+				'IsVisible' => 'true',
+				'ListStoreId' => array( 'int' => '1'),
+				'MetaTagDescription' => $dados_produtos ['Descricao'],
+				'Name' => $dados_produtos ['Nome'],
+				'RefId' => $dados_produtos ['PartNumber'],
+				'Id' => $dados_produtos ['PartNumber'],
+				'Title' => $dados_produtos ['NomeProdutoReduzido']				
+		);	
+		
+		$this->_vtex->enviaProdutoPai($request);
 	}
 	
 	/**
 	 *
-	 * Adicionar produto.
+	 * Adicionar produto filho.
 	 * @param array $dados_produtos
 	 * @throws Exception
 	 * @throws RuntimeException
 	 */
-	private function _adicionaSku ( $dados_produtos ) {
+	private function _enviaSku ( $dados_produtos ) {
 		
-		$novoProduto =  array(
+		$produto =  array(
+				'Height' => $dados_produtos ['Altura'],
+				'Width' => '2',
+				'WeightKg' => '2',
+				'IsActive' => 'true',
+				'IsAvaiable' => 'true',
+				'IsKit' => 'false',
+				'Length' => $dados_produtos ['Comprimento'],
+				'ModalId' => '1',
 				'Name' => $dados_produtos ['Nome'],
+				'ProductName' => $dados_produtos ['Nome'],				
+				'ProductId' => $dados_produtos ['CodigoProduto'],
+				'RefId' => $dados_produtos ['CodigoProdutoPai'],								
 				'Description' => $dados_produtos ['Descricao'],
 				'DescriptionShort' => $dados_produtos ['Descricao'],
-				'CubicWeight' => $dados_produtos ['Peso'],
-				'Height' => $dados_produtos ['Altura'],
-				'ProductId' => $dados_produtos ['CodigoProdutoPai'],
+				'CubicWeight' => $dados_produtos ['Peso']				
 		);
 	
-		$this->_vtex->adicionarProdutoFilho($novoProduto);	
+		$this->_vtex->enviaProdutoFilho($produto);	
 	}
 
 	/**
@@ -153,7 +167,7 @@ class Model_Belissima_Kpl_Produtos extends Model_Belissima_Kpl_KplWebService {
 			$array_produtos [0] ['Comprimento'] = $request ['DadosProdutos'] ['Comprimento'];
 			$array_produtos [0] ['Peso'] = $request ['DadosProdutos'] ['Peso'];
 			$array_produtos [0] ['PartNumber'] = $request ['DadosProdutos'] ['CodigoProdutoAbacos'];
-			$array_produtos [0] ['SKU'] = $request ['DadosProdutos'] ['CodigoProduto'];
+			$array_produtos [0] ['CodigoProduto'] = $request ['DadosProdutos'] ['CodigoProduto'];
 			$array_produtos [0] ['EanProprio'] = $request ['DadosProdutos'] ['CodigoBarras'];
 			$array_produtos [0] ['EstoqueMinimo'] = $request ['DadosProdutos'] ['QtdeMinimaEstoque'];
 			//$array_produtos [0] ['ValorVenda'] = '0.00';
@@ -162,6 +176,8 @@ class Model_Belissima_Kpl_Produtos extends Model_Belissima_Kpl_KplWebService {
 			$array_produtos [0] ['CodigoProdutoPai'] = isset($request ['DadosProdutos'] ['CodigoProdutoPai']) ? $request ['DadosProdutos'] ['CodigoProdutoPai']: '';
 			$array_produtos [0] ['Unidade'] = isset($request ['DadosProdutos'] ['Unidade']) ? $request ['DadosProdutos'] ['Unidade']: '';
 			$array_produtos [0] ['CodigoMarca'] = $request ['DadosProdutos'] ['CodigoMarca'];
+			$array_produtos [0] ['NomeProdutoReduzido'] = $request ['DadosProdutos'] ['NomeProdutoReduzido'];
+			$array_produtos [0] ['CodigoFamilia'] = $request ['DadosProdutos'] ['CodigoFamilia'];
 			
 			// verifica se produto é pai ou filho
 			if ( strstr( $request ['DadosProdutos'] ['CodigoProduto'], '-' ) == true ){
@@ -183,7 +199,7 @@ class Model_Belissima_Kpl_Produtos extends Model_Belissima_Kpl_KplWebService {
 				$array_produtos [$i] ['Comprimento'] = $d ['Comprimento'];
 				$array_produtos [$i] ['Peso'] = $d ['Peso'];
 				$array_produtos [$i] ['PartNumber'] = $d ['CodigoProdutoAbacos'];
-				$array_produtos [$i] ['SKU'] = $d ['CodigoProduto'];
+				$array_produtos [$i] ['CodigoProduto'] = $d ['CodigoProduto'];
 				$array_produtos [$i] ['EanProprio'] = $d ['CodigoBarras'];
 				$array_produtos [$i] ['EstoqueMinimo'] = $d ['QtdeMinimaEstoque'];
 				//$array_produtos [$i] ['ValorVenda'] = '0.00';				
@@ -192,8 +208,9 @@ class Model_Belissima_Kpl_Produtos extends Model_Belissima_Kpl_KplWebService {
 				$array_produtos [$i] ['CodigoProdutoPai'] = isset($d ['CodigoProdutoPai']) ? $d ['CodigoProdutoPai']: '';
 				$array_produtos [$i] ['Unidade'] = isset($d ['Unidade']) ? $d ['Unidade']: '';
 				$array_produtos [$i] ['CodigoMarca'] = $d ['CodigoMarca'];
-				
-				
+				$array_produtos [$i] ['NomeProdutoReduzido'] = $d ['NomeProdutoReduzido'];
+				$array_produtos [$i] ['CodigoFamilia'] = $d ['CodigoFamilia'];
+								
 				// verifica se produto é pai ou filho
 				if ( strstr( $d ['CodigoProduto'], '-' ) == true ){
 					$array_produtos [$i] ['Visibilidade'] = 1; // Não exibir pois é produto Filho
@@ -223,8 +240,8 @@ class Model_Belissima_Kpl_Produtos extends Model_Belissima_Kpl_KplWebService {
 			$incluir_produto = false;
 			// validar campos obrigatórios
 			
-			if ( empty ( $dados_produtos ['Nome'] ) || empty ( $dados_produtos ['Descricao'] ) || empty ( $dados_produtos ['PartNumber'] ) || empty ( $dados_produtos ['SKU'] ) || empty ( $dados_produtos ['EanProprio'] ) ) {
-				echo "Produto {$dados_produtos['SKU']}: Dados obrigatórios não preenchidos" . PHP_EOL;
+			if ( empty ( $dados_produtos ['Nome'] ) || empty ( $dados_produtos ['Descricao'] ) || empty ( $dados_produtos ['PartNumber'] ) || empty ( $dados_produtos ['CodigoProduto'] ) || empty ( $dados_produtos ['EanProprio'] ) ) {
+				echo "Produto {$dados_produtos['CodigoProduto']}: Dados obrigatórios não preenchidos" . PHP_EOL;
 				$array_erro [$indice] = "Produto {$dados_produtos['SKU']}: Dados obrigatórios não preenchidos" . PHP_EOL;
 				$erros_produtos ++;
 			}
@@ -237,8 +254,8 @@ class Model_Belissima_Kpl_Produtos extends Model_Belissima_Kpl_KplWebService {
 					$produto = false;
 					if ( $produto == false ) {
 						echo "Adicionando produto " . $dados_produtos['SKU'] . " na loja Magento" . PHP_EOL;
-						//$this->_adicionaProduto ( $dados_produtos );
-						//$this->_adicionaSku($dados_produtos);
+						$this->_enviaProduto ( $dados_produtos );
+						$this->_enviaSku( $dados_produtos );
 						echo "Produto adicionado. " . PHP_EOL;
 					}
 					
