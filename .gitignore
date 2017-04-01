@@ -5,4 +5,4 @@ scripts
 apache-logs
 flags
 configuration.php
-/vendor/bin
+/vendor
