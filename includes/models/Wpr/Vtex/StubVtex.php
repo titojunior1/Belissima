@@ -4,7 +4,7 @@
  * Classe para trabalhar com o Webservice da VTEX (Stub de Serviço) 
  *
  */
-class Model_Belissima_Vtex_StubVtex {
+class Model_Wpr_Vtex_StubVtex {
 	/**
 	 * Endereço do WebService.
 	 *

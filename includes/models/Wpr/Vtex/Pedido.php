@@ -5,7 +5,7 @@
  * @author David Soares
  *
  */
-class Model_Wms_Vtex_Pedido {
+class Model_Wpr_Vtex_Pedido {
 	
 	/**
 	 * Id do Cliente.
@@ -74,7 +74,7 @@ class Model_Wms_Vtex_Pedido {
 		$this->_empwh_id = $empwh_id;
 		if ( empty ( $this->_vtex ) ) {
 			// Gera objeto de conexão WebService
-			$this->_vtex = Model_Wms_Vtex_Vtex::getVtex ( $cli_id );
+			$this->_vtex = Model_Wpr_Vtex_Vtex::getVtex ( $cli_id );
 			$this->_client = $this->_vtex->_client;
 		}
 	}
@@ -136,8 +136,8 @@ class Model_Wms_Vtex_Pedido {
 	private function _importarPedido ( $dados_pedido ) {
 
 		try {
-			if ( ! $this->_model_produto instanceof Model_Wms_Vtex_Produto ) {
-				$this->_model_produto = new Model_Wms_Vtex_Produto ( $this->_cli_id );
+			if ( ! $this->_model_produto instanceof Model_Wpr_Vtex_Produto ) {
+				$this->_model_produto = new Model_Wpr_Vtex_Produto ( $this->_cli_id );
 			}
 			$var_erro = 0;
 			$dados_item = NULL;

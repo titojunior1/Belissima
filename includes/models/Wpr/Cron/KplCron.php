@@ -5,7 +5,7 @@
  * @author Tito Junior <titojunior1@gmail.com>
  * 
  */
-class Model_Belissima_Cron_KplCron {
+class Model_Wpr_Cron_KplCron {
 	
 	/**
 	 * 
@@ -36,7 +36,7 @@ class Model_Belissima_Cron_KplCron {
 		ini_set ( 'default_socket_timeout', 120 );		
 			
 		if ( empty ( $this->_kpl ) ) {
-			$this->_kpl = new Model_Belissima_Kpl_KplWebService();
+			$this->_kpl = new Model_Wpr_Kpl_KplWebService();
 		}
 		echo "- importando estoques disponiveis do cliente Verden - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
 
@@ -50,7 +50,7 @@ class Model_Belissima_Cron_KplCron {
 				echo "Nao existem estoques disponiveis para integracao" . PHP_EOL;
 			} else {
 				
-				$kpl_estoques = new Model_Belissima_Kpl_EstoqueKpl();
+				$kpl_estoques = new Model_Wpr_Kpl_EstoqueKpl();
 				$retorno = $kpl_estoques->ProcessaEstoqueWebservice ( $estoques ['EstoquesDisponiveisResult'] ['Rows'] );
 				if(is_array($retorno)){
 					// ERRO					
@@ -78,7 +78,7 @@ class Model_Belissima_Cron_KplCron {
 		ini_set ( 'memory_limit', '512M' );
 			
 		if ( empty ( $this->_kpl ) ) {
-			$this->_kpl = new Model_Belissima_Kpl_KplWebService();
+			$this->_kpl = new Model_Wpr_Kpl_KplWebService();
 		}
 		echo "- importando precos do cliente Verden - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
 	
@@ -92,7 +92,7 @@ class Model_Belissima_Cron_KplCron {
 				echo "Nao existem precos disponiveis para integracao" . PHP_EOL;
 			} else {
 					
-				$kpl_preços = new Model_Belissima_Kpl_Precos();
+				$kpl_preços = new Model_Wpr_Kpl_Precos();
 				$retorno = $kpl_preços->ProcessaPrecosWebservice( $precos ['PrecosDisponiveisResult'] ['Rows'] );
 				if(is_array($retorno))
 				{
@@ -121,7 +121,7 @@ class Model_Belissima_Cron_KplCron {
 		
 		// Solicita Pedidos Saida Disponíveis
 			if ( empty ( $this->_kpl ) ) {
-				$this->_kpl = new Model_Verden_Kpl_KplWebService();
+				$this->_kpl = new Model_Wpr_Kpl_KplWebService();
 			}
 			
 			echo "- importando pedidos de saída do cliente Verden - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
@@ -135,7 +135,7 @@ class Model_Belissima_Cron_KplCron {
 					echo "Nao existem pedidos de saida disponiveis para integracao ".PHP_EOL;
 
 				}else{
-					$kpl = new Model_Verden_Kpl_Pedido();
+					$kpl = new Model_Wpr_Kpl_Pedido();
 					$retorno = $kpl->ProcessaArquivoSaidaWebservice ( $pedidos_disponiveis ['PedidosDisponiveisResult'] );
 						if(is_array($retorno)){
 							// gravar logs de erro						
@@ -165,7 +165,7 @@ class Model_Belissima_Cron_KplCron {
 		ini_set ( 'default_socket_timeout', 120 );
 			
 		if ( empty ( $this->_kpl ) ) {
-			$this->_kpl = new Model_Belissima_Kpl_KplWebService();
+			$this->_kpl = new Model_Wpr_Kpl_KplWebService();
 		}
 		echo "- importando produtos do cliente Belissima - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
 
@@ -182,7 +182,7 @@ class Model_Belissima_Cron_KplCron {
 				echo "Nao existem produtos disponiveis para integracao" . PHP_EOL;
 			} else {
 				
-				$kpl_produtos = new Model_Belissima_Kpl_Produtos();
+				$kpl_produtos = new Model_Wpr_Kpl_Produtos();
 					$retorno = $kpl_produtos->ProcessaProdutosWebservice ( $produtos ['ProdutosDisponiveisResult'] ['Rows'] );
 					if(is_array($retorno))
 					{

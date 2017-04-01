@@ -7,7 +7,7 @@
  * @author Tito Junior 
  * 
  */
-class Model_Belissima_Kpl_Produtos extends Model_Belissima_Kpl_KplWebService {
+class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 	
 	/*
 	 * Instancia Webservice KPL
@@ -26,7 +26,7 @@ class Model_Belissima_Kpl_Produtos extends Model_Belissima_Kpl_KplWebService {
 	function __construct() {
 		
 		if (empty ( $this->_kpl )) {
-			$this->_kpl = new Model_Belissima_Kpl_KplWebService();
+			$this->_kpl = new Model_Wpr_Kpl_KplWebService();
 		}
 	
 	}
@@ -87,57 +87,6 @@ class Model_Belissima_Kpl_Produtos extends Model_Belissima_Kpl_KplWebService {
 		);
 	
 		$this->_vtex->enviaProdutoFilho($produto);	
-	}
-
-	/**
-	 * 
-	 * Método para atualização de produtos
-	 * @param array $dados_produtos
-	 * @throws RuntimeException
-	 */
-	private function _atualizaProduto ( $dados_produtos ) {
-
-		$idProduto = $dados_produtos['product_id'];
-		$produto =  array(
-							'name' => $dados_produtos ['Nome'],
-							'description' => $dados_produtos ['Descricao'],
-							'short_description' => $dados_produtos ['Descricao'],
-							'weight' => $dados_produtos ['Peso'],
-							'status' => '1',
-							'url_key' => $dados_produtos ['Nome'],
-							'visibility' => $dados_produtos ['Visibilidade'],
-							//'price' => $dados_produtos ['ValorVenda'],
-							//'special_price' => $dados_produtos ['ValorCusto'],
-							'tax_class_id' => 1,
-							'meta_title' => $dados_produtos ['Nome']
-						); 
-
-		$this->_magento->atualizaProduto($idProduto, $produto);
-	
-	}
-
-	/**
-	 * 
-	 * Buscar Produto.
-	 * @param string $sku
-	 * @throws InvalidArgumentException
-	 * @throws RuntimeException
-	 */
-	private function buscaProduto ( $sku ) {
-
-		$sku = trim ( $sku );
-		if ( empty ( $sku ) ) {
-			throw new InvalidArgumentException ( 'SKU do produto inválido' );
-		}
-		
-		if ( !$this->_magento ){
-			$this->_magento = new Model_Verden_Magento_Produtos();
-		}
-		
-		$retorno = $this->_magento->buscaProduto( $sku );
-
-		return $retorno;
-	
 	}
 
 	/**
@@ -228,7 +177,7 @@ class Model_Belissima_Kpl_Produtos extends Model_Belissima_Kpl_KplWebService {
 		
 		
 		echo "Conectando ao WebService Vtex... " . PHP_EOL;
-		$this->_vtex = new Model_Belissima_Vtex_Produto();
+		$this->_vtex = new Model_Wpr_Vtex_Produto();
 		echo "Conectado!" . PHP_EOL;
 		echo PHP_EOL;
 		
@@ -253,7 +202,7 @@ class Model_Belissima_Kpl_Produtos extends Model_Belissima_Kpl_KplWebService {
 					//$produto = $this->buscaProduto ( $dados_produtos ['SKU'] );
 					$produto = false;
 					if ( $produto == false ) {
-						echo "Adicionando produto " . $dados_produtos['SKU'] . " na loja Magento" . PHP_EOL;
+						echo "Adicionando/atualizando produto " . $dados_produtos['SKU'] . " na loja Vtex" . PHP_EOL;
 						$this->_enviaProduto ( $dados_produtos );
 						$this->_enviaSku( $dados_produtos );
 						echo "Produto adicionado. " . PHP_EOL;

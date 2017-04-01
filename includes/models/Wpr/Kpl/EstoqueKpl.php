@@ -7,7 +7,7 @@
  *
  */
 
-class Model_Belissima_Kpl_EstoqueKpl extends Model_Belissima_Kpl_KplWebService {	
+class Model_Wpr_Kpl_EstoqueKpl extends Model_Wpr_Kpl_KplWebService {	
 	
 	/**
 	 * Variavel  de Objeto da Classe Kpl.
@@ -25,7 +25,7 @@ class Model_Belissima_Kpl_EstoqueKpl extends Model_Belissima_Kpl_KplWebService {
 	public function __construct() {		
 		
 		if (empty ( $this->_kpl )) {
-			$this->_kpl = new Model_Belissima_Kpl_KplWebService ();
+			$this->_kpl = new Model_Wpr_Kpl_KplWebService ();
 		}
 	
 	}
@@ -82,7 +82,7 @@ class Model_Belissima_Kpl_EstoqueKpl extends Model_Belissima_Kpl_KplWebService {
 		echo PHP_EOL;
 		
 		echo "Conectando ao WebService Magento... " . PHP_EOL;
-		$this->_vtex = new Model_Belissima_Vtex_Estoque();
+		$this->_vtex = new Model_Wpr_Vtex_Estoque();
 		echo "Conectado!" . PHP_EOL;
 		echo PHP_EOL;
 		

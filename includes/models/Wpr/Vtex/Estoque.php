@@ -4,7 +4,7 @@
  * Classe de gerenciamento de atualização de estoque com a VTEX
  *
  */
-class Model_Belissima_Vtex_Estoque {
+class Model_Wpr_Vtex_Estoque {
 	
 	/**
 	 * 
@@ -44,7 +44,7 @@ class Model_Belissima_Vtex_Estoque {
 	public function __construct() {
 		if (empty ( $this->_vtex )) {
 			// Gera objeto de conexão WebService
-			$this->_vtex = Model_Belissima_Vtex_Vtex::getVtex();
+			$this->_vtex = Model_Wpr_Vtex_Vtex::getVtex();
 			$this->_client = $this->_vtex->_client;
 			$this->_url = VTEX_API_URL;
 			$this->_key = VTEX_API_KEY;

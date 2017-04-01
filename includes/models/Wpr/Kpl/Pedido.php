@@ -8,7 +8,7 @@
  * 
  */
 
-final class Model_Verden_Kpl_Pedido extends Model_Verden_Kpl_KplWebService {
+final class Model_Wpr_Kpl_Pedido extends Model_Wpr_Kpl_KplWebService {
 	
 	/**
 	 * Caracteres especiais
@@ -23,7 +23,7 @@ final class Model_Verden_Kpl_Pedido extends Model_Verden_Kpl_KplWebService {
 	function __construct () {
 		
 		if (empty ( $this->_kpl )) {
-			$this->_kpl = new Model_Verden_Kpl_KplWebService ();
+			$this->_kpl = new Model_Wpr_Kpl_KplWebService ();
 		}			
 	}
 

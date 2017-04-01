@@ -5,7 +5,7 @@
  * @author Tito Junior <titojunior1@gmail.com>
  * 
  */
-class Model_Belissima_Cron_VtexCron {
+class Model_Wpr_Cron_VtexCron {
 	
 	/**
 	 * 
@@ -36,7 +36,7 @@ class Model_Belissima_Cron_VtexCron {
 		ini_set ( 'default_socket_timeout', 120 );
 			
 		if ( empty ( $this->_kpl ) ) {
-			$this->_kpl = new Model_Verden_Kpl_KplWebService();
+			$this->_kpl = new Model_Wpr_Kpl_KplWebService();
 		}
 		echo "- importando produtos do cliente Verden - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
 
@@ -53,7 +53,7 @@ class Model_Belissima_Cron_VtexCron {
 				echo "Nao existem produtos disponiveis para integracao" . PHP_EOL;
 			} else {
 				
-				$kpl_produtos = new Model_Verden_Kpl_Produtos();
+				$kpl_produtos = new Model_Wpr_Kpl_Produtos();
 					$retorno = $kpl_produtos->ProcessaProdutosWebservice ( $produtos ['ProdutosDisponiveisResult'] ['Rows'] );
 					if(is_array($retorno))
 					{

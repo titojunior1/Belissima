@@ -8,7 +8,7 @@
  * 
  */
 
-class Model_Belissima_Kpl_KplWebService {
+class Model_Wpr_Kpl_KplWebService {
 	
 	/**
 	 * Endereço do WebService.

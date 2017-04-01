@@ -7,7 +7,7 @@
  * 
  */
 
-class Model_Belissima_Kpl_Precos extends Model_Belissima_Kpl_KplWebService {
+class Model_Wpr_Kpl_Precos extends Model_Wpr_Kpl_KplWebService {
 	
 	/*
 	 * Instancia Webservice Vtex
@@ -43,7 +43,7 @@ class Model_Belissima_Kpl_Precos extends Model_Belissima_Kpl_KplWebService {
 	function __construct() {
 		
 		if (empty ( $this->_kpl )) {
-			$this->_kpl = new Model_Belissima_Kpl_KplWebService (  );
+			$this->_kpl = new Model_Wpr_Kpl_KplWebService (  );
 		}
 		$this->_url = VTEX_API_URL;
 		$this->_key = VTEX_API_KEY;

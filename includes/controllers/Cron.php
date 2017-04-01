@@ -16,7 +16,7 @@ class Controller_Cron {
 	 * Array com extensoes de arquivos a serem verificadas
 	 * @var array
 	 */
-	protected static $_extensoes = array('CadastraProdutosKpl', 'CadastraPrecosKpl');
+	//protected static $_extensoes = array('CadastraProdutosKpl', 'CadastraPrecosKpl');
 
 	/**
 	 * Exibe a ajuda básica do controller.
