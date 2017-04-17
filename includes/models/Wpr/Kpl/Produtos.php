@@ -312,7 +312,7 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 				try {
 					echo PHP_EOL;
 					echo "Buscando cadastro do produto " . $dados_produtos ['CodigoProduto'] . PHP_EOL;
-					$produto = $this->buscaProduto ( $dados_produtos ['CodigoProdutoPai'] );
+					$produto = $this->buscaProduto ( $dados_produtos ['CodigoProdutoPai'] );					
 					if ( $produto->ProductGetByRefIdResult != null ) {
 						echo "Adicionando/atualizando produto " . $dados_produtos['CodigoProduto'] . " na loja Vtex" . PHP_EOL;
 						$dados_produtos['IdProdutoPai'] = $produto->ProductGetByRefIdResult->Id;

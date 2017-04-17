@@ -75,7 +75,7 @@ class Model_Wpr_Vtex_StubVtex {
 			$this->_pass = $pass;
 			
 			$options = array(
-					'soap_version'=>SOAP_1_1,
+					'soap_version'=>1,
 					'trace'=>true,
 					'exceptions'=>true,
 					'login' => $this->_login,

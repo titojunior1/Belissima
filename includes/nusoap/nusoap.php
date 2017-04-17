@@ -7268,7 +7268,6 @@ class nusoap_client extends nusoap_base  {
 		$this->timeout = $timeout;
 		$this->response_timeout = $response_timeout;
 		$this->portName = $portName;
-
 		$this->debug("ctor wsdl=$wsdl timeout=$timeout response_timeout=$response_timeout");
 		$this->appendDebug('endpoint=' . $this->varDump($endpoint));
 
@@ -7516,7 +7515,7 @@ class nusoap_client extends nusoap_base  {
 				}
 			}
 		}
-	}
+	}	
 
 	/**
 	* check WSDL passed as an instance or pulled from an endpoint
@@ -8172,7 +8171,7 @@ if (!extension_loaded('soap')) {
 	/**
 	 *	For backwards compatiblity, define soapclient unless the PHP SOAP extension is loaded.
 	 */
-	class soapclient extends nusoap_client {
-	}
+ 	class soapclient extends nusoap_client {
+ 	}
 }
 ?>
