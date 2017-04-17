@@ -107,31 +107,6 @@ class Controller_Cron {
 			default :
 				$ajuda = true;
 		}
-		
-		/*
-		// verificar no banco de dados
-		$db = Db_Factory::getDbWms ();
-
-		// verificar se o cron existe no banco de dados
-		$sql = "SELECT cron_id, cron_pid, cron_ultima_execucao, cron_campo1 FROM cron_scripts WHERE cron_classe = '{$classe}'";
-		if (! empty ( $metodo )) {
-		    $sql .= " AND cron_metodo = '" . $db->EscapeString ( $metodo ) . "'";
-		} else {
-		    $sql .= ' AND cron_metodo IS NULL';
-		}
-
-		$res = $db->Execute ( $sql );
-
-		if (! $res || $db->NumRows ( $res ) == 0) {
-		    throw new Exception ( 'Servico nao cadastrado no banco de dados.' );
-		}
-
-		$row = $db->FetchAssoc ( $res );
-		$cron_id = $row ['cron_id'];
-		$pid = $row ['cron_pid'];
-		$ultimaExecucao = $row['cron_ultima_execucao'];
-		$parametros = $row['cron_campo1'];
-		*/
 
 		if (empty ( $metodo )) {
 		    $metodo = 'executar';
@@ -150,13 +125,13 @@ class Controller_Cron {
 		// verificar se o cronjob existe
 		$cronjob = array_shift ( $arg );
 
-		$classe_completa = 'Model_Belissima_Cron_' . $classe;
+		$classe_completa = 'Model_Wpr_Cron_' . $classe;
 		
         if(!class_exists($classe_completa)) {
             $classe_completa = $classe;
 
             if (! class_exists ( $classe_completa )) {
-                throw new Exception ( 'Classe do Cron Job Inexistente!' );
+                throw new Exception ( 'Classe do Cron Job Inexistente! ' . $classe_completa );
             }
         }
 

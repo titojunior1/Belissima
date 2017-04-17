@@ -10,7 +10,7 @@ class Model_Wpr_Cron_KplCron {
 	/**
 	 * 
 	 * Objeto Kpl (instância do webservice kpl)
-	 * @var Model_Verden_Kpl_KplWebService
+	 * @var Model_Wpr_Kpl_KplWebService
 	 */
 	private $_kpl;	
 

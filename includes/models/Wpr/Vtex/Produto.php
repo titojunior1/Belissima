@@ -15,13 +15,13 @@ class Model_Wpr_Vtex_Produto {
 	/**
 	 *
 	 * Objeto Vtex
-	 * @var Model_Belissima_Vtex_Vtex
+	 * @var Model_Wpr_Vtex_Vtex
 	 */
 	private $_vtex;
 
 	/**
 	 * Variavel  de Objeto da Classe StubVtex.
-	 * @var Model_Belissima_Vtex_StubVtex
+	 * @var Model_Wpr_Vtex_StubVtex
 	 */
 	public $_client;
 
@@ -70,6 +70,28 @@ class Model_Wpr_Vtex_Produto {
 		}
 
 	}
+	
+	/**
+	 * busca um determinado RefId
+	 * @param string $refId
+	 */
+	public function buscaCadastroProdutoPai ( $refId ) {
+	
+		if ( ! ctype_digit( $refId ) ) {
+			throw new Exception ( 'Dados do produto inválidos' );
+		}
+	
+		try {
+	
+			$result = $this->_client->ProductGetByRefId($refId);
+			return $result;
+	
+		} catch ( Exception $e ) {
+			throw new Exception ( $e->getMessage () );
+		}
+	
+	}
+	
 	
 	/**
 	 * Inicializa webservice VTEX.

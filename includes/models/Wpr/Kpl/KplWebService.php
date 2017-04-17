@@ -67,7 +67,7 @@ class Model_Wpr_Kpl_KplWebService {
 			$this->_webservice = new nusoap_client ( $this->_ws, true, NULL, NULL, NULL, NULL, 240, 240 );
 			$this->_webservice->_debug_flag = 1;
 			$this->_webservice->soap_defencoding = 'UTF-8';
-			$this->_webservice->decode_utf8 = true;
+			$this->_webservice->decode_utf8 = false;
 			$this->_chave_identificacao = KPL_KEY;
 		
 		} catch ( Exception $e ) {
@@ -453,12 +453,54 @@ class Model_Wpr_Kpl_KplWebService {
 	
 	/**
 	 * Retorna todos os produtos atualizados ou inseridos a partir de uma determinada data
-	 * @param date dateUpdated Data para pesquisa
+	 * @param string $chaveIdentificacao
 	 */
 	public function ProdutosDisponiveis($chaveIdentificacao) {
 		try {
 			// Recebe array com produtos
 			return $this->_wsCall ( 'ProdutosDisponiveis', array ('ChaveIdentificacao' => $chaveIdentificacao ) );
+		} catch ( Exception $e ) {
+			throw new RuntimeException ( $e->getMessage () );
+		}
+	}
+	
+	/**
+	 * Retorna todas as categorias dos produtos
+ 	 * @param string $chaveIdentificacao
+	 */
+	public function categoriasProdutoDisponiveis( $chaveIdentificacao ){
+		try {
+			// Recebe array com categorias
+			$resultado = $this->_wsCall ( 'CategoriasProdutoDisponiveis', array ('ChaveIdentificacao' => $chaveIdentificacao ) );
+			
+			if ( $resultado ['CategoriasProdutoDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003 ) {
+				throw new RuntimeException( "Nao existem categorias disponiveis para integracao" );
+			}else{
+				return $resultado ['CategoriasProdutoDisponiveisResult'] ['Rows'];
+			}
+			
+			
+		} catch ( Exception $e ) {
+			throw new RuntimeException ( $e->getMessage () );
+		}
+	}
+	
+	/**
+	 * Retorna todas as marcas dos produtos
+	 * @param string $chaveIdentificacao
+	 */
+	public function marcasDisponiveis( $chaveIdentificacao ){
+		
+		try {
+			// Recebe array com marcas
+			$resultado = $this->_wsCall ( 'MarcasDisponiveis', array ('ChaveIdentificacao' => $chaveIdentificacao ) );
+				
+			if ( $resultado ['MarcasDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003 ) {
+				throw new RuntimeException( "Nao existem marcas disponiveis para integracao" );
+			}else{
+				return $resultado ['MarcasDisponiveisResult'] ['Rows'];
+			}				
+				
 		} catch ( Exception $e ) {
 			throw new RuntimeException ( $e->getMessage () );
 		}

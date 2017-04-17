@@ -3,9 +3,6 @@
  *
  * Centralizador de configurações, autoload de classes, etc.
  *
- * @package WMS
- * @author Jonas Silveira <jonas.silveira@totalexpress.com.br>
- * @copyright Total Express - www.totalexpress.com.br
  */
 
 // horário brasileiro
@@ -161,7 +158,7 @@ $coreAutoLoader->setNamespaceSeparator('_');
 $coreAutoLoader->register();
 
 // Wms
-$wmsAutoLoader = new SplClassLoader('Belissima', PATH_SISTEMA . 'module');
+$wmsAutoLoader = new SplClassLoader('Wpr', PATH_SISTEMA . 'module');
 $wmsAutoLoader->setNamespaceSeparator('_');
 $wmsAutoLoader->register();
 

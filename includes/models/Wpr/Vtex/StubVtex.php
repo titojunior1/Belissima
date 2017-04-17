@@ -15,7 +15,7 @@ class Model_Wpr_Vtex_StubVtex {
 	/**
 	 * instancia do WebService
 	 *
-	 * @var nusoap_client
+	 * @var SoapClient
 	 */
 	private $_webservice;
 	
@@ -114,7 +114,7 @@ class Model_Wpr_Vtex_StubVtex {
 	 */
 	private function _wsCall($action, $parans) {
 		try {
-			$result = $this->_webservice->__soapCall($action, $parans );
+			$result = $this->_webservice->__soapCall( $action, $parans );
 			
 			if (! $result) {
 				throw new ErrorException ( 'Erro na Execução do Webservice' );
@@ -259,7 +259,7 @@ class Model_Wpr_Vtex_StubVtex {
 			throw new InvalidArgumentException ( 'ID do produto inválido' );
 		}
 		try {
-			return $this->_wsCall ( 'ProductGetByRefId', array ('refId' => $refId ) );
+			return $this->_wsCall ( 'ProductGetByRefId', array ( array ('refId' => $refId ) ) );
 		} catch ( Exception $e ) {
 			throw new RuntimeException ( $e->getMessage () );
 		}
