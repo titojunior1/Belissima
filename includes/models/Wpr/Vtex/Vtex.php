@@ -14,14 +14,14 @@ class Model_Wpr_Vtex_Vtex {
 	
 	/**
 	 * Variavel  de Objeto da Classe StubVtex.
-	 * @var Model_Wms_Vtex_StubVtex
+	 * @var Model_Wpr_Vtex_StubVtex
 	 */
 	public $_client;
 	
 	/**
 	 * 
 	 * Objeto Singleton
-	 * @var Model_Wms_Vtex_Vtex
+	 * @var Model_Wpr_Vtex_Vtex
 	 */
 	private static $_vtex;
 	
@@ -66,6 +66,24 @@ class Model_Wpr_Vtex_Vtex {
 	 */
 	public function setErro($erro, $tipo) {
 		$this->_array_erros [$tipo] [] = $erro;
+	}
+	
+	/**
+	 *
+	 * Trata Objetos DTO, pois caso haja apenas um retorno, não é informado a key do array
+	 * @param Array $array_dto
+	 */
+	public function trataArrayDto($array_dto) {
+		if (! is_array ( $array_dto )) {
+			return NULL;
+		}
+		if (! array_key_exists ( 0, $array_dto )) {
+			// se não achar a chave zero, insere a chave zero
+			$array_tratado [0] = $array_dto;
+		} else {
+			$array_tratado = $array_dto;
+		}
+		return $array_tratado;
 	}
 }
 ?>

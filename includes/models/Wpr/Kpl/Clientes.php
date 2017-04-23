@@ -24,7 +24,7 @@ class Model_Wpr_Kpl_Clientes extends Model_Wpr_Kpl_KplWebService {
 	 */
 	function __construct() {
 		
-		if (empty ( $this->_kpl )) {
+		if ( empty ( $this->_kpl )) {
 			$this->_kpl = new Model_Wpr_Kpl_KplWebService (  );
 		}
 		$this->_chaveIdentificacao = KPL_KEY;

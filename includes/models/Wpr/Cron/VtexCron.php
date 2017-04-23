@@ -27,49 +27,45 @@ class Model_Wpr_Cron_VtexCron {
 
 	/**
 	 * 
-	 * Importa os produtos disponíveis.
+	 * Importa os pedidos disponíveis.
 	 * @throws Exception
 	 */
-	public function CadastraProdutosKpl () {
-
-		ini_set ( 'memory_limit', '512M' );
-		ini_set ( 'default_socket_timeout', 120 );
-			
-		if ( empty ( $this->_kpl ) ) {
-			$this->_kpl = new Model_Wpr_Kpl_KplWebService();
+	public function CadastraPedidosVtex() {
+		
+		
+		$status_pedido_vtex = "CAP"; // baixar pedidos com status CAP: crédito aprovado
+		$qtd_pedidos = '100'; // quantidade limite de pedidos por transmissão
+		
+		
+		// horarios que a Vtex atualiza o Mandriva
+		// Bloqueamos a execução dos crons Vtex neste periodo, pois eles utilizam o próprio webservice para alimentar os dados do mandriva e acabam derrubando nossas conexões
+		$hora_inicial_bloqueio = '21:00:00';
+		$hora_final_bloqueio = '05:00:00';
+		
+		$hora_atual = date('H:i:s');
+		
+		//Após Black Friday, descomentar
+		if($hora_atual >= $hora_inicial_bloqueio || $hora_atual <= $hora_final_bloqueio){
+			return false;
 		}
-		echo "- importando produtos do cliente Verden - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
 
 		try {
-			
-			echo PHP_EOL;
-			echo "Consultando produtos disponiveis para integracao " . PHP_EOL;
-			$chaveIdentificacao = KPL_KEY;
-			$produtos = $this->_kpl->ProdutosDisponiveis ( $chaveIdentificacao );
-			if ( ! is_array ( $produtos ['ProdutosDisponiveisResult'] ) ) {
-				throw new Exception ( 'Erro ao buscar Produtos - ' . $produtos );
-			}
-			if ( $produtos ['ProdutosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003 ) {
-				echo "Nao existem produtos disponiveis para integracao" . PHP_EOL;
-			} else {
-				
-				$kpl_produtos = new Model_Wpr_Kpl_Produtos();
-					$retorno = $kpl_produtos->ProcessaProdutosWebservice ( $produtos ['ProdutosDisponiveisResult'] ['Rows'] );
-					if(is_array($retorno))
-					{
-						// ERRO					
-					}	
-				}
-				
-				echo "- importacao de produtos do cliente Verden realizada com sucesso" . PHP_EOL;
-		
-		} catch ( Exception $e ) {
-			echo "- erros ao importar os produtos do cliente Verden: " . $e->getMessage () . PHP_EOL;
-		}
-		unset ( $this->_kpl );
-		unset ( $chaveIdentificacao );
+			echo "Importando pedidos do cliente" . PHP_EOL;
+			$vtex = new Model_Wpr_Vtex_Pedido();
+			$vtex->importarPedidosStatusQuantidade ( $status_pedido_vtex, $qtd_pedidos );
 
-		echo "- Finalizando cron para cadastrar produtos do Kpl " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
+			$erros_proc = $vtex->getErrosProcessamento ();
+
+			echo "Pedidos do cliente Importados" . PHP_EOL;
+		} catch ( Exception $e ) {
+			$erros_proc = $vtex->getErrosProcessamento ();
+			echo "Erros ao importar os pedidos do cliente {$cli_id}: " . $e->getMessage () . PHP_EOL;
+		}
+		echo PHP_EOL;
+		echo PHP_EOL;
+		
+		unset($vtex);
+		
 	}
 	
 	

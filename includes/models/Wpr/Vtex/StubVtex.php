@@ -206,7 +206,7 @@ class Model_Wpr_Vtex_StubVtex {
 	 */
 	public function OrderGetByStatusByQuantity($statusOrder, $quantidade) {
 		try {
-			return $this->_wsCall ( 'OrderGetByStatusByQuantity', array ('statusOrder' => $statusOrder, 'quantity' => $quantidade ) );
+			return $this->_wsCall ( 'OrderGetByStatusByQuantity', array ( array ('statusOrder' => $statusOrder, 'quantity' => $quantidade ) ) );
 		} catch ( Exception $e ) {
 			throw new RuntimeException ( $e->getMessage () );
 		}

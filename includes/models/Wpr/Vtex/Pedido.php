@@ -2,24 +2,10 @@
 /**
  * 
  * Classe de gerenciamento de Pedidos de Saída com a VTEX
- * @author David Soares
+ * @author Tito Junior
  *
  */
 class Model_Wpr_Vtex_Pedido {
-	
-	/**
-	 * Id do Cliente.
-	 *
-	 * @var int
-	 */
-	private $_cli_id;
-	
-	/**
-	 * Id do Armazém.
-	 *
-	 * @var int
-	 */
-	private $_empwh_id;
 	
 	/**
 	 * 
@@ -43,14 +29,14 @@ class Model_Wpr_Vtex_Pedido {
 	/**
 	 * 
 	 * Objeto Vtex
-	 * @var Model_Wms_Vtex_Vtex
+	 * @var Model_Wpr_Vtex_Vtex
 	 */
 	private $_vtex;
 	
 	/**
 	 * Variavel  de Objeto da Classe StubVtex.
 	 *
-	 * @var Model_Wms_Vtex_StubVtex
+	 * @var Model_Wpr_Vtex_StubVtex
 	 */
 	public $_client;
 
@@ -62,21 +48,152 @@ class Model_Wpr_Vtex_Pedido {
 	 * @param int $cliente Id do Cliente.
 	 * @param int  $armazem Armazem do Cliente.
 	 */
-	public function __construct ( $cli_id, $empwh_id = NULL ) {
+	public function __construct (  ) {
 
-		$cli_id = trim ( $cli_id );
-		if ( ! ctype_digit ( $cli_id ) ) {
-			throw new InvalidArgumentException ( 'ID do Cliente inválido' );
-		}
-		$empwh_id = trim ( $empwh_id );
-		
-		$this->_cli_id = $cli_id;
-		$this->_empwh_id = $empwh_id;
 		if ( empty ( $this->_vtex ) ) {
 			// Gera objeto de conexão WebService
-			$this->_vtex = Model_Wpr_Vtex_Vtex::getVtex ( $cli_id );
+			$this->_vtex = Model_Wpr_Vtex_Vtex::getVtex ();
 			$this->_client = $this->_vtex->_client;
 		}
+	}
+	/**
+	 * Verificar CNPJ
+	 * @param int $cnpj
+	 * @param bool $formatar
+	 * @return string | bool
+	 */
+	public static function validaCnpj($cnpj, $formatar = false) {
+	
+		// remove tudo que não for número
+		$cnpj = self::Numeros ( $cnpj );
+	
+		if ($formatar) {
+			$cnpj_formatado = substr ( $cnpj, 0, 2 ) . '.' . substr ( $cnpj, 2, 3 ) . '.' . substr ( $cnpj, 5, 3 ) . '/' . substr ( $cnpj, 8, 4 ) . '-' . substr ( $cnpj, 12, 2 );
+			return $cnpj_formatado;
+		} else {
+			// cpf falso
+			$array_cnpj_falso = array ( '00000000000000', '11111111111111', '22222222222222', '33333333333333', '44444444444444', '55555555555555', '66666666666666', '77777777777777', '88888888888888', '99999999999999', '12345678912345' );
+	
+			if (empty ( $cnpj ) || strlen ( $cnpj ) != 14 || in_array ( $cnpj, $array_cnpj_falso )) {
+				return false;
+			} else {
+	
+				$rev_cnpj = strrev ( substr ( $cnpj, 0, 12 ) );
+				for($i = 0; $i <= 11; $i ++) {
+					$i == 0 ? $multiplier = 2 : $multiplier;
+					$i == 8 ? $multiplier = 2 : $multiplier;
+					$multiply = ($rev_cnpj [$i] * $multiplier);
+					$sum = $sum + $multiply;
+					$multiplier ++;
+				}
+	
+				$rest = $sum % 11;
+				if ($rest == 0 || $rest == 1) {
+					$dv1 = 0;
+				} else {
+					$dv1 = 11 - $rest;
+				}
+	
+				$sub_cnpj = substr ( $cnpj, 0, 12 );
+				$rev_cnpj = strrev ( $sub_cnpj . $dv1 );
+				unset ( $sum );
+	
+				for($i = 0; $i <= 12; $i ++) {
+					$i == 0 ? $multiplier = 2 : $multiplier;
+					$i == 8 ? $multiplier = 2 : $multiplier;
+					$multiply = ($rev_cnpj [$i] * $multiplier);
+					$sum = $sum + $multiply;
+					$multiplier ++;
+				}
+				$rest = $sum % 11;
+	
+				if ($rest == 0 || $rest == 1) {
+					$dv2 = 0;
+				} else {
+					$dv2 = 11 - $rest;
+				}
+	
+				if ($dv1 == $cnpj [12] && $dv2 == $cnpj [13]) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Verificar CPF
+	 * @param int $cpf
+	 * @param bool $formatar
+	 * @return string | bool
+	 */
+	public static function validaCpf($cpf, $formatar = false) {
+		if ($formatar) {
+	
+			$cpf = self::Numeros ( $cpf );
+			$cpf_formatado = substr ( $cpf, 0, 3 ) . '.' . substr ( $cpf, 3, 3 ) . '.' . substr ( $cpf, 6, 3 ) . '-' . substr ( $cpf, 9, 2 );
+			return $cpf_formatado;
+		} else {
+			// cpf falso
+			$array_cpf_falso = array ( '00000000000', '11111111111', '22222222222', '33333333333', '44444444444', '55555555555', '66666666666', '77777777777', '88888888888', '99999999999', '12345678912' );
+			$dv = 0;
+	
+			// remove tudo que não for número
+			$cpf = self::Numeros ( $cpf );
+	
+			if (empty ( $cpf ) || strlen ( $cpf ) != 11 || in_array ( $cpf, $array_cpf_falso )) {
+				return false;
+			} else {
+	
+				$sub_cpf = substr ( $cpf, 0, 9 );
+	
+				for($i = 0; $i <= 9; $i ++) {
+					$dv += ($sub_cpf [$i] * (10 - $i));
+				}
+	
+				if ($dv == 0) {
+					return false;
+				}
+	
+				$dv = 11 - ($dv % 11);
+	
+				if ($dv > 9) {
+					$dv = 0;
+				}
+	
+				if ($cpf [9] != $dv) {
+					return false;
+				}
+	
+				$dv *= 2;
+	
+				for($i = 0; $i <= 9; $i ++) {
+					$dv += ($sub_cpf [$i] * (11 - $i));
+				}
+	
+				$dv = 11 - ($dv % 11);
+	
+				if ($dv > 9) {
+					$dv = 0;
+				}
+	
+				if ($cpf [10] != $dv) {
+					return false;
+				}
+	
+				return true;
+			}
+		}
+	}
+	
+	/**
+	 * Deixa somente os números
+	 * @param string $var
+	 * @return string
+	 */
+	public static function Numeros($var) {
+		return preg_replace ( '/[^0-9]/i', '', $var );
 	}
 
 	/**
@@ -133,12 +250,186 @@ class Model_Wpr_Vtex_Pedido {
 	 * @param array $dados Array de Dados de pedidos
 	 *
 	 */
-	private function _importarPedido ( $dados_pedido ) {
+	private function _importarPedidos ( $dados_pedido ) {
 
-		try {
-			if ( ! $this->_model_produto instanceof Model_Wpr_Vtex_Produto ) {
-				$this->_model_produto = new Model_Wpr_Vtex_Produto ( $this->_cli_id );
+		echo "Conectando ao WebService Kpl... " . PHP_EOL;
+		$this->_kpl = new Model_Wpr_Kpl_Clientes();
+		echo "Conectado!" . PHP_EOL;
+		echo PHP_EOL;
+		
+		$qtdPedidos = count($dados_pedido);
+		echo "Pedidos encontrados para integracao: " . $qtdPedidos . PHP_EOL;
+			
+		// erros
+		$erro = null;
+		
+		// coleção de erros, no formato $array_erros[$registro][] = erro
+		$array_erros = array ();
+		$array_erro_principal = array ();
+		$array_precos = array ();
+		
+		foreach ( $dados_pedido as $i => $d ) {
+		
+			$dadosCliente = array();
+			$dadosPedido = array();
+				
+			echo PHP_EOL;
+				
+			// formatar CPF
+			$cpfFormatado = $this->Numeros($d->Client->CpfCnpj);
+			echo "Tratando dados para cadastro de cliente codigo: " . $cpfFormatado . PHP_EOL;
+				
+			// formata sexo
+			if ( empty ( $d->Client->Gender ) ){
+				$sexoCliente = 'tseMasculino';
+				$sexoClientePedido = 'M';
+			}else{
+				$sexoCliente = 'tseFeminino';
+				$sexoClientePedido = 'F';
 			}
+				
+			//Manipulando dados para cadastro/atualização de cliente
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Email'] = $d->Client->Email;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['CPFouCNPJ'] = $cpfFormatado;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Codigo'] = $cpfFormatado;
+				
+			//valida se é pessoa PF, caso não é PJ
+			$validaCpf = $this->validaCpf($cpfFormatado);
+			if ( $validaCpf ){
+				$tipoPessoa = 'tpeFisica';
+			}else{
+				$tipoPessoa = 'tpeJuridica';
+			}
+				
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['TipoPessoa']	= $tipoPessoa;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Documento'] = '';
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Nome'] = $d->Address->ReceiverName;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['NomeReduzido'] = $d->Address->ReceiverName;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Sexo'] = $sexoCliente;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['DataNascimento'] = '';
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Telefone'] = substr ( $d->Address->Phone, 5, strlen ( $d->Address->Phone ) );
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Celular'] = '';
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['DataCadastro'] = '';
+				
+			//$infosAdicionaisPedido = $this->_magento->buscaInformacoesAdicionaisPedido($d->increment_id);
+		
+			$cepEntregaFormatado = $this->Numeros($d->Address->ZipCode);
+			$cepCobrancaFormatado = $this->Numeros($d->Address->ZipCode);
+				
+			// Dados do Endereço
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['Logradouro'] = $d->Address->Street;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['NumeroLogradouro'] = $d->Address->Number;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['ComplementoEndereco'] = $d->Address->More;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['Bairro'] = substr ( $d->Address->Neighborhood, 0, 40 );
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['Municipio'] = $d->Address->City;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['Estado'] = $d->Address->State;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['Cep'] = $cepEntregaFormatado;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['TipoLocalEntrega'] = 'tleeDesconhecido'; // informação não vem da magento
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['ReferenciaEndereco'] = '';
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['Pais'] = 'BR';
+			// Dados do Endereço de Cobrança
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['Logradouro'] = $d->Address->Street;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['NumeroLogradouro'] = $d->Address->Number;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['ComplementoEndereco'] = $d->Address->More;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['Bairro'] = substr ( $d->Address->Neighborhood, 0, 40 );
+			
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['Municipio'] = $d->Address->City;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['Estado'] = $d->Address->State;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['Cep'] = $cepCobrancaFormatado;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['TipoLocalEntrega'] = 'tleeDesconhecido';
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['ReferenciaEndereco'] = '';
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['Pais'] = 'BR';
+			// Dados do Endereço de Entrega
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndEntrega'] ['Logradouro'] = $dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['Logradouro'];
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndEntrega'] ['NumeroLogradouro'] = $dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['NumeroLogradouro'];
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndEntrega'] ['ComplementoEndereco'] = $dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['ComplementoEndereco'];
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndEntrega'] ['Bairro'] = $dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['Bairro'];
+			
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndEntrega'] ['Municipio'] = $d->Address->City;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndEntrega'] ['Estado'] = $d->Address->State;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndEntrega'] ['Cep'] = $cepEntregaFormatado;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndEntrega'] ['TipoLocalEntrega'] = 'tleeDesconhecido';
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndEntrega'] ['ReferenciaEndereco'] = '';
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndEntrega'] ['Pais'] = 'BR';
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['ClienteEstrangeiro'] = '';
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['RegimeTributario'] = '';
+			
+			try {
+			
+				echo "Efetuando cadastro/atualizacao de cliente " . $cpfFormatado . PHP_EOL;
+				$this->_kpl->adicionaCliente( $dadosCliente [$i] ['Cliente'] );
+				echo "Cliente adicionado com sucesso " . PHP_EOL;
+			
+			} catch (Exception $e) {
+				echo "Erro ao cadastrar cliente " . $cpfFormatado . ' - ' . $e->getMessage() . PHP_EOL;
+				continue;
+			}
+			
+
+			echo "Tratando dados para cadastro de pedido: " . $d->Id . PHP_EOL;
+			
+			//Seguindo com criação de Pedidos
+			$dadosPedido [$i] ['NumeroDoPedido'] = $d->Id;
+			$dadosPedido [$i] ['EMail'] = $d->Client->Email;
+			$dadosPedido [$i] ['CPFouCNPJ'] = $cpfFormatado;
+			$dadosPedido [$i] ['CodigoCliente'] = $cpfFormatado;
+			//$dadosPedido [$i] ['CondicaoPagamento'] = 'COMPRAS'; //Validar
+			$dadosPedido [$i] ['ValorPedido'] = number_format($d->subtotal, 2, '.', ''); // PENDENTE
+			$dadosPedido [$i] ['ValorFrete'] = number_format($d->shipping_amount, 2, '.', ''); // PENDENTE
+			$dadosPedido [$i] ['ValorDesconto'] = str_replace('-', '', number_format($d->discount_amount, 2, '.', '')); // PENDENTE
+			$dadosPedido [$i] ['ValorEncargos'] = '0.00'; // PENDENTE
+			$dadosPedido [$i] ['ValorEmbalagemPresente'] = '0.00'; // PENDENTE
+			$dadosPedido [$i] ['ValorReceberEntrega'] = '0.00'; // PENDENTE
+			$dadosPedido [$i] ['ValorTrocoEntrega'] = '0.00'; // PENDENTE
+			
+			//Tratamento específico pra data
+			list($data, $hora) = explode('T',  $d->PurchaseDate);
+			list($horaNova, $horaAdicional) = explode('.',  $hora);
+			
+			list($ano, $mes, $dia) = explode('-', $data);
+			$dataFormatada = $dia.$mes.$ano.' '.$horaNova;
+			
+			$dadosPedido [$i] ['DataVenda'] = $dataFormatada;
+
+			$dadosPedido [$i] ['Transportadora'] = $infosAdicionaisPedido->shipping_method;
+			$dadosPedido [$i] ['EmitirNotaSimbolica'] = 0; //Boolean
+			$dadosPedido [$i] ['Lote'] = 1; // Cadastrar um Padrão KPL
+			$dadosPedido [$i] ['DestNome'] = $d->Address->ReceiverName;
+			$dadosPedido [$i] ['DestSexo'] = $sexoClientePedido;
+			$dadosPedido [$i] ['DestEmail'] = $d->Client->Email;
+			$dadosPedido [$i] ['DestTelefone'] = substr ( $d->Address->Phone, 5, strlen ( $d->Address->Phone ) );
+			
+			// Dados do Endereço
+			$dadosPedido [$i] ['DestLogradouro'] = $d->Address->Street;
+			$dadosPedido [$i] ['DestNumeroLogradouro'] = $d->Address->Number;
+			$dadosPedido [$i] ['DestComplementoEndereco'] = $d->Address->More;
+			$dadosPedido [$i] ['DestBairro'] = substr ( $d->Address->Neighborhood, 0, 40 );;
+			
+			$dadosPedido [$i] ['DestMunicipio'] = $d->Address->City;
+			$dadosPedido [$i] ['DestEstado'] = $d->Address->State;
+			$dadosPedido [$i] ['DestCep'] = $d->Address->ZipCode;
+			$dadosPedido [$i] ['DestTipoLocalEntrega'] = 'tleeDesconhecido';
+			$dadosPedido [$i] ['DestPais'] = 'BR';
+			$dadosPedido [$i] ['DestCPF'] = $cpfFormatado;
+			$dadosPedido [$i] ['DestTipoPessoa'] = $tipoPessoa;
+			$dadosPedido [$i] ['DestDocumento'] = $cpfFormatado;
+			$dadosPedido [$i] ['PedidoJaPago'] = 1; //Boolean
+			// 			$dadosPedido [$i] ['DestEstrangeiro'] = '';
+			// 			$dadosPedido [$i] ['DestInscricaoEstadual'] = '';
+			// 			$dadosPedido [$i] ['DestReferencia'] = "";
+			// 			$dadosPedido [$i] ['DataDoPagamento'] = '';
+			// 			$dadosPedido [$i] ['OptouNFPaulista'] = ''; //Necessário verificar essa opção
+			// 			//$dadosPedido [$i] ['CartaoPresenteBrinde'] = 1;
+			
+			
+			
+			
+			
+		}
+		
+		#################### VTEX ABAIXO ###################
+		try {
+			
 			$var_erro = 0;
 			$dados_item = NULL;
 			//$array_temp ['Campanha'] = $dados_pedido ['Campaign'];
@@ -520,19 +811,7 @@ class Model_Wpr_Vtex_Pedido {
 	 */
 	private function _geraMovimentacao () {
 
-		$db = Db_Factory::getDbWms ();
-		if ( empty ( $this->_array_pedidos ) ) {
-			return false;
-		}
 		try {
-			$movimento = new Movimento ( $this->_cli_id, $this->_empwh_id, 'S' );
-			$retorno = $movimento->ProcessaArquivoSaidaWebservice ( $this->_cli_id, $this->_empwh_id, $this->_array_pedidos );
-			
-			$pe_erro = array ();
-			foreach ( $retorno ['ErrosIndividuais'] as $re ) {
-				$pe_erro [] = $re ['Pedido'];
-				$this->_vtex->setErro ( array ( "Id" => $re ['Pedido'], "Metodo" => "_geraMovimentacao", "DescricaoErro" => $re ['DescricaoErro'] ), "Pedido_Saida" );
-			}
 			
 			if ( ! empty ( $this->_array_pedidos ['PedidosSaidaArray'] ) ) {
 				foreach ( $this->_array_pedidos ['PedidosSaidaArray'] as $pedido ) {
@@ -569,11 +848,6 @@ class Model_Wpr_Vtex_Pedido {
 	 */
 	public function importarPedidosStatusQuantidade($status, $quantidade) {
 		
-		$db = Db_Factory::getDbWms ();
-		if (! ctype_digit ( $this->_empwh_id )) {
-			throw new LogicException ( 'ID do Armazem inválido' );
-		}
-		
 		if (empty ( $status )) {
 			throw new InvalidArgumentException ( 'Status inválido' );
 		}
@@ -587,58 +861,27 @@ class Model_Wpr_Vtex_Pedido {
 		} catch ( Exception $e ) {
 			throw new RuntimeException ( 'Erro ao consultar Pedidos por status' );
 		}
-		if (! is_array ( $pedidos )) {
+		if (! is_object( $pedidos )) {
 			throw new DomainException ( 'Nenhum pedido pendente neste status - '. $pedidos );
 		}
 		
-		if (empty ( $pedidos ['OrderGetByStatusByQuantityResult'] )) {
+		if (empty ( $pedidos->OrderGetByStatusByQuantityResult )) {
 			throw new DomainException ( 'Nenhum pedido pendente neste status' );
 		}
 		
-		$dados_pedidos = $this->_vtex->trataArrayDto ( $pedidos ['OrderGetByStatusByQuantityResult'] ['OrderDTO'] );
-		foreach ( $dados_pedidos as $key => $value ) {
-			try {
-				$this->_importarPedido ( $value );
-			} catch ( Exception $e ) {
-				$this->_vtex->setErro ( array ("Id" => $value ['Id'], "Metodo" => "importarPedidosStatusQuantidade", "DescricaoErro" => $e->getMessage () ), "Pedido_Saida" );
-			
-			}
-		}
+		$dados_pedidos = $this->_vtex->trataArrayDto ( $pedidos->OrderGetByStatusByQuantityResult->OrderDTO );
+		
 		try {
-			if ( $this->_cli_id == 60 || $this->_cli_id == 68 ) {
-				
-				foreach ( $this->_pedidos_cliente as $transportadoras => $pedidos_transportadora ) {
-					
-					foreach ( $pedidos_transportadora as $id_estoque => $this->_array_pedidos ) {
-						if ( $id_estoque != 1 ) {
-							$sql = "SELECT empwh_id FROM clientes_warehouse WHERE cli_id=68";
-							$res = $db->Execute ( $sql );
-							if ( ! $res ) {
-								throw new RuntimeException ( 'Erro ao consultar armazém do cliente' );
-							}
-							$row = $db->FetchAssoc ( $res );
-							$this->_empwh_id = $row ['empwh_id'];
-							$this->_cli_id = 68;
-						} else {
-							
-							//$this->_cli_id = 60;
-							$this->_cli_id = 68;
-							$sql = "SELECT empwh_id FROM clientes_warehouse WHERE cli_id={$this->_cli_id}";
-							$res = $db->Execute ( $sql );
-							if ( ! $res ) {
-								throw new RuntimeException ( 'Erro ao consultar armazém do cliente' );
-							}
-							$row = $db->FetchAssoc ( $res );
-							$this->_empwh_id = $row ['empwh_id'];
-						
-						}
-						$this->_geraMovimentacao ();
-					
-					}
-				}
-			} else {
-				$this->_geraMovimentacao ();
-			}
+			$this->_importarPedidos ( $dados_pedidos );
+		} catch ( Exception $e ) {
+			$this->_vtex->setErro ( array ("Id" => $value ['Id'], "Metodo" => "importarPedidosStatusQuantidade", "DescricaoErro" => $e->getMessage () ), "Pedido_Saida" );
+		
+		}
+		
+		
+		try{
+			
+			$this->_geraMovimentacao ();
 			
 			// grava logs de erro se existirem
 			$this->_vtex->gravaLogVtex ();
@@ -751,55 +994,19 @@ class Model_Wpr_Vtex_Pedido {
 			$status = 'ERP';
 		}
 		
-		if ( $status == 'ERP' ) {
-			try {
-				// atualiza status do pedido
-				$retorno_status = $this->_client->OrderChangeStatus ( $order_id, $status );
-				
-				if ( ! $retorno_status == FALSE ) {
-					
-					if ( ! is_array ( $retorno_status ) || (is_array ( $retorno_status ) && ! empty ( $retorno_status ['faultcode'] )) ) {
-						$db = Db_Factory::getDbWms ();
-						// consulta para verificar se o pedido ja foi inserido anteriormente
-						$sql_consulta = "SELECT pedido FROM vtex_pedidos_cancelar WHERE pedido = {$order_id}";
-						$res_consulta = $db->Execute ( $sql_consulta );
-						
-						if ( ! $res_consulta ) {
-							throw new RuntimeException ( 'Erro ao consultar pedido para mudança de status' );
-						}
-						
-						if ( $db->NumRows ( $res_consulta ) == 0 ) {
-							// grava pedidos que não foram alterados
-							$sql_insert = "INSERT INTO vtex_pedidos_cancelar (pedido) VALUES ({$order_id})";
-							$res_insert = $db->Execute ( $sql_insert );
-							
-							if ( ! $res_insert ) {
-								throw new RuntimeException ( 'Erro ao inserir pedido' );
-							}
-						}
-						// lança o erro como exception
-						throw new RuntimeException ( 'Erro ao tentar alterar status do pedido' );
-					}
-				
-				}
+		try {
+			// atualiza status do pedido
+			$retorno_status = $this->_client->OrderChangeStatus ( $order_id, $status );
 			
-			} catch ( Exception $e ) {
-				$this->_vtex->setErro ( array ( "Id" => $order_id, "Metodo" => "_mudarStatusPedido", "DescricaoErro" => $e->getMessage () ), "Pedido_Saida" );
-			}
-		} else {
-			try {
-				// atualiza status do pedido
-				$retorno_status = $this->_client->OrderChangeStatus ( $order_id, $status );
-				
-				if ( ! $retorno_status == FALSE ) {
-					if ( ! is_array ( $retorno_status ) || (is_array ( $retorno_status ) && ! empty ( $retorno_status ['faultcode'] )) ) {
-						throw new RuntimeException ( 'Erro ao tentar alterar status do pedido' );
-					}
+			if ( ! $retorno_status == FALSE ) {
+				if ( ! is_array ( $retorno_status ) || (is_array ( $retorno_status ) && ! empty ( $retorno_status ['faultcode'] )) ) {
+					throw new RuntimeException ( 'Erro ao tentar alterar status do pedido' );
 				}
-			} catch ( Exception $e ) {
-				$this->_vtex->setErro ( array ( "Id" => $order_id, "Metodo" => "_mudarStatusPedido", "DescricaoErro" => $e->getMessage () ), "Pedido_Saida" );
 			}
+		} catch ( Exception $e ) {
+			$this->_vtex->setErro ( array ( "Id" => $order_id, "Metodo" => "_mudarStatusPedido", "DescricaoErro" => $e->getMessage () ), "Pedido_Saida" );
 		}
+		
 	}
 
 	/**

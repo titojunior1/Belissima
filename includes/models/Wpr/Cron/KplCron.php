@@ -190,7 +190,7 @@ class Model_Wpr_Cron_KplCron {
 					}	
 				}
 				
-				echo "- importacao de produtos do cliente Belissima realizada com sucesso" . PHP_EOL;
+			echo "- importacao de produtos do cliente Belissima realizada com sucesso" . PHP_EOL;
 		
 		} catch ( Exception $e ) {
 			echo "- erros ao importar os produtos do cliente Belissima: " . $e->getMessage () . PHP_EOL;
