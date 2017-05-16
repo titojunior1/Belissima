@@ -125,8 +125,8 @@ class Model_Wpr_Kpl_Precos extends Model_Wpr_Kpl_KplWebService {
 			$array_precos [0] ['CodigoProdutoPai'] = $request ['DadosPreco'] ['CodigoProdutoPai'];
 			$array_precos [0] ['CodigoProdutoAbacos'] = $request ['DadosPreco'] ['CodigoProdutoAbacos'];
 			$array_precos [0] ['NomeLista'] = $request ['DadosPreco'] ['NomeLista'];
-			$array_precos [0] ['PrecoTabela'] = $request ['DadosPreco'] ['PrecoTabela'];
-			$array_precos [0] ['PrecoPromocional'] = ( $request ['DadosPreco'] ['PrecoPromocional'] == 0 )? '' : $request ['DadosPreco'] ['PrecoPromocional'];
+			$array_precos [0] ['PrecoTabela'] = number_format($request ['DadosPreco'] ['PrecoTabela'], 1, '.', '');
+			$array_precos [0] ['PrecoPromocional'] = ( $request ['DadosPreco'] ['PrecoPromocional'] == 0 )? '' : number_format($request ['DadosPreco'] ['PrecoPromocional'], 1, '.', '');
 			if ( !empty( $request ['DadosPreco'] ['DataInicioPromocao'] ) && !empty( $request ['DadosPreco'] ['DataTerminoPromocao'] ) ){
 				list($dataInicioPromo, $horaInicioPromo) = explode(' ', $request ['DadosPreco'] ['DataInicioPromocao']);
 				$dia=substr($dataInicioPromo,0,2);
@@ -153,8 +153,8 @@ class Model_Wpr_Kpl_Precos extends Model_Wpr_Kpl_KplWebService {
 				$array_precos [$i] ['CodigoProdutoPai'] = $d ['CodigoProdutoPai'];
 				$array_precos [$i] ['CodigoProdutoAbacos'] = $d ['CodigoProdutoAbacos'];
 				$array_precos [$i] ['NomeLista'] = $d ['NomeLista'];
-				$array_precos [$i] ['PrecoTabela'] = $d ['PrecoTabela'];
-				$array_precos [$i] ['PrecoPromocional'] = ( $d ['PrecoPromocional'] == 0 )? '' : $d ['PrecoPromocional'];
+				$array_precos [$i] ['PrecoTabela'] = number_format($d ['PrecoTabela'], 1, '.', '');;
+				$array_precos [$i] ['PrecoPromocional'] = ( $d ['PrecoPromocional'] == 0 )? '' : number_format($d ['PrecoPromocional'], 1, '.', '');;
 				if ( !empty( $d ['DataInicioPromocao'] ) && !empty( $d ['DataTerminoPromocao'] ) ){
 					list($dataInicioPromo, $horaInicioPromo) = explode(' ', $d ['DataInicioPromocao']);
 					$dia=substr($dataInicioPromo,0,2);

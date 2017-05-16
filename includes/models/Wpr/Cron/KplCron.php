@@ -38,7 +38,7 @@ class Model_Wpr_Cron_KplCron {
 		if ( empty ( $this->_kpl ) ) {
 			$this->_kpl = new Model_Wpr_Kpl_KplWebService();
 		}
-		echo "- importando estoques disponiveis do cliente Verden - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
+		echo "- importando estoques disponiveis do cliente Belissima - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
 
 		try {
 			$chaveIdentificacao = KPL_KEY;
@@ -57,10 +57,10 @@ class Model_Wpr_Cron_KplCron {
 				}	
 			}
 				
-			echo "- importacao de estoque do cliente Verden realizada com sucesso" . PHP_EOL;
+			echo "- importacao de estoque do cliente Belissima realizada com sucesso" . PHP_EOL;
 		
 		} catch ( Exception $e ) {
-			echo "- erros ao importar estoque do cliente Verden: " . $e->getMessage () . PHP_EOL;
+			echo "- erros ao importar estoque do cliente Belissima: " . $e->getMessage () . PHP_EOL;
 		}
 		unset ( $this->_kpl );
 		unset ( $chaveIdentificacao );
@@ -80,7 +80,7 @@ class Model_Wpr_Cron_KplCron {
 		if ( empty ( $this->_kpl ) ) {
 			$this->_kpl = new Model_Wpr_Kpl_KplWebService();
 		}
-		echo "- importando precos do cliente Verden - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
+		echo "- importando precos do cliente Belissima - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
 	
 		try {
 			$chaveIdentificacao = KPL_KEY;
@@ -100,10 +100,10 @@ class Model_Wpr_Cron_KplCron {
 				}
 			}
 	
-			echo "- importacao de precos do cliente Verden realizada com sucesso" . PHP_EOL;
+			echo "- importacao de precos do cliente Belissima realizada com sucesso" . PHP_EOL;
 	
 		} catch ( Exception $e ) {
-			echo "- erros ao importar os precos do cliente Verden: " . $e->getMessage () . PHP_EOL;
+			echo "- erros ao importar os precos do cliente Belissima: " . $e->getMessage () . PHP_EOL;
 		}
 		unset ( $this->_kpl );
 		unset ( $chaveIdentificacao );

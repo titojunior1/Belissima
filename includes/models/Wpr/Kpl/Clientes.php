@@ -64,7 +64,7 @@ class Model_Wpr_Kpl_Clientes extends Model_Wpr_Kpl_KplWebService {
 		if ( $retorno ['InserirPedidoResult'] ['Rows'] ['DadosPedidosResultado'] ['Resultado'] ['Codigo'] == '200002' ){
 			return true;
 		}else{
-			throw new RuntimeException( $retorno ['InserirPedidoResult'] ['Rows'] ['DadosPedidosResultado'] ['Resultado'] ['Descricao'] );
+			throw new RuntimeException( $retorno ['InserirPedidoResult'] ['Rows'] ['DadosPedidosResultado'] ['Resultado'] ['ExceptionMessage'] );
 		}
 	
 	}

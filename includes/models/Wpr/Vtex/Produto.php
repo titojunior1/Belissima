@@ -77,7 +77,7 @@ class Model_Wpr_Vtex_Produto {
 	 */
 	public function buscaCadastroProdutoPai ( $refId ) {
 	
-		if ( ! ctype_digit( $refId ) ) {
+		if ( empty( $refId ) ) {
 			throw new Exception ( 'Dados do produto inválidos' );
 		}
 	

@@ -76,7 +76,7 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 			}
 		}		
 		
-		return 0;	
+		throw new InvalidArgumentException( "Descricao {$descricaoCategoria} de Categoria nao encontrada na KPL" );
 		
 	}
 	
@@ -116,7 +116,8 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 			}
 		}
 	
-		return 0;
+		throw new InvalidArgumentException( "ID {$idMarca} de Marca nao encontrada na KPL" );
+		
 	
 	}
 	
@@ -133,8 +134,6 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 		if ( empty ( $refId ) ) {
 			throw new InvalidArgumentException ( 'RefId do produto inválido' );
 		}
-		
-		$refId = (int) $refId;
 	
 		if ( !$this->_vtex ){
 			$this->_vtex = new Model_Wpr_Vtex_Produto();
@@ -164,9 +163,9 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 				'IsActive' => 'true',
 				'IsVisible' => 'true',
 				'ListStoreId' => array( 'int' => '1' ),
-				'MetaTagDescription' => $dados_produtos ['Descricao'],
+				'MetaTagDescription' => $dados_produtos ['DescricaoTag'],
 				'Name' => $dados_produtos ['Nome'],
-				'RefId' => $dados_produtos ['CodigoProdutoPai'],
+				'RefId' => $dados_produtos ['CodigoProduto'],
 				'Id' => $dados_produtos ['IdProdutoPai'],
 				'Title' => $dados_produtos ['NomeProdutoReduzido']				
 		);	
@@ -187,15 +186,20 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 				'Height' => $dados_produtos ['Altura'],
 				'Width' => $dados_produtos ['Largura'],
 				'WeightKg' => $dados_produtos ['Peso'],
-				'IsActive' => 'true',
-				'IsAvaiable' => 'true',
-				'IsKit' => 'false',
 				'Length' => $dados_produtos ['Comprimento'],
+				'RealHeight' => $dados_produtos ['Altura'],
+				'RealWidth' => $dados_produtos ['Largura'],
+				'RealWeightKg' => $dados_produtos ['Peso'],
+				'RealLength' => $dados_produtos ['Comprimento'],
+				'IsActive' => true,
+				'IsAvaiable' => true,
+				'IsKit' => false,				
 				'ModalId' => '1',
 				'Name' => $dados_produtos ['Nome'],
 				'ProductName' => $dados_produtos ['Nome'],				
-				'ProductId' => $dados_produtos ['CodigoProduto'],
-				'RefId' => $dados_produtos ['CodigoProdutoPai'],								
+				'ProductId' => $dados_produtos ['IdProdutoPai'],
+				//'Id' => $dados_produtos ['CodigoProduto'],
+				'RefId' => $dados_produtos ['CodigoProduto'],								
 				'Description' => $dados_produtos ['Descricao'],
 				'DescriptionShort' => $dados_produtos ['Descricao'],
 				'CubicWeight' => $dados_produtos ['Peso']				
@@ -226,10 +230,10 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 			$array_produtos [0] ['Categoria'] = $this->_getCategoriaProduto( $request ['DadosProdutos'] ['DescricaoSubgrupo'] );
 			$array_produtos [0] ['Nome'] = $request ['DadosProdutos'] ['NomeProduto'];			
 			$array_produtos [0] ['Classificacao'] = isset($request ['DadosProdutos'] ['Classificacao']) ? $request ['DadosProdutos'] ['Classificacao']: '';
-			$array_produtos [0] ['Altura'] = $request ['DadosProdutos'] ['Altura'];
-			$array_produtos [0] ['Largura'] = $request ['DadosProdutos'] ['Largura'];
-			$array_produtos [0] ['Comprimento'] = $request ['DadosProdutos'] ['Comprimento'];
-			$array_produtos [0] ['Peso'] = $request ['DadosProdutos'] ['Peso'];
+			$array_produtos [0] ['Altura'] = number_format($request ['DadosProdutos'] ['Altura'], 2, '.', '');
+			$array_produtos [0] ['Largura'] = number_format($request ['DadosProdutos'] ['Largura'], 2, '.', '');
+			$array_produtos [0] ['Comprimento'] = number_format($request ['DadosProdutos'] ['Comprimento'], 2, '.', '');
+			$array_produtos [0] ['Peso'] = number_format($request ['DadosProdutos'] ['Peso'], 3, '', '');
 			$array_produtos [0] ['PartNumber'] = $request ['DadosProdutos'] ['CodigoProdutoAbacos'];
 			$array_produtos [0] ['CodigoProduto'] = $request ['DadosProdutos'] ['CodigoProduto'];
 			$array_produtos [0] ['EanProprio'] = $request ['DadosProdutos'] ['CodigoBarras'];
@@ -240,6 +244,7 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 			$array_produtos [0] ['CodigoMarca'] = $this->_getMarcaProduto( $request ['DadosProdutos'] ['CodigoMarca'] );
 			$array_produtos [0] ['NomeProdutoReduzido'] = $request ['DadosProdutos'] ['NomeProdutoReduzido'];
 			$array_produtos [0] ['CodigoFamilia'] = $request ['DadosProdutos'] ['CodigoFamilia'];
+			$array_produtos [0] ['DescricaoTag'] = $request ['DadosProdutos'] ['CaracteristicasComplementares'] ['Rows'] ['DadosCaracteristicasComplementares'] ['Texto'];
 			
 			// verifica se produto é pai ou filho
 			if ( strstr( $request ['DadosProdutos'] ['CodigoProduto'], '-' ) == true ){
@@ -256,10 +261,10 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 				$array_produtos [$i] ['Categoria'] = $this->_getCategoriaProduto( $d ['DescricaoSubgrupo'] );				
 				$array_produtos [$i] ['Nome'] = $d ['NomeProduto'];
 				$array_produtos [$i] ['Classificacao'] = isset($d ['Classificacao']) ? $d ['Classificacao']: '';
-				$array_produtos [$i] ['Altura'] = $d ['Altura'];
-				$array_produtos [$i] ['Largura'] = $d ['Largura'];
-				$array_produtos [$i] ['Comprimento'] = $d ['Comprimento'];
-				$array_produtos [$i] ['Peso'] = $d ['Peso'];
+				$array_produtos [$i] ['Altura'] = number_format($d ['Altura'], 2, '.', '');
+				$array_produtos [$i] ['Largura'] = number_format($d ['Largura'], 2, '.', '');
+				$array_produtos [$i] ['Comprimento'] = number_format($d ['Comprimento'], 2, '.', '');
+				$array_produtos [$i] ['Peso'] = number_format($d ['Peso'], 3, '', '');
 				$array_produtos [$i] ['PartNumber'] = $d ['CodigoProdutoAbacos'];
 				$array_produtos [$i] ['CodigoProduto'] = $d ['CodigoProduto'];
 				$array_produtos [$i] ['EanProprio'] = $d ['CodigoBarras'];
@@ -270,6 +275,7 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 				$array_produtos [$i] ['CodigoMarca'] = $this->_getMarcaProduto( $d ['CodigoMarca'] );
 				$array_produtos [$i] ['NomeProdutoReduzido'] = $d ['NomeProdutoReduzido'];
 				$array_produtos [$i] ['CodigoFamilia'] = $d ['CodigoFamilia'];
+				$array_produtos [$i] ['DescricaoTag'] = $d ['CaracteristicasComplementares'] ['Rows'] ['DadosCaracteristicasComplementares'] ['Texto'];
 								
 				// verifica se produto é pai ou filho
 				if ( strstr( $d ['CodigoProduto'], '-' ) == true ){
@@ -310,20 +316,31 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 			if ( $erros_produtos == 0 ) {
 				
 				try {
-					echo PHP_EOL;
-					echo "Buscando cadastro do produto " . $dados_produtos ['CodigoProduto'] . PHP_EOL;
-					$produto = $this->buscaProduto ( $dados_produtos ['CodigoProdutoPai'] );					
-					if ( $produto->ProductGetByRefIdResult != null ) {
-						echo "Adicionando/atualizando produto " . $dados_produtos['CodigoProduto'] . " na loja Vtex" . PHP_EOL;
+					echo PHP_EOL;										
+					if ( empty( $dados_produtos ['CodigoProdutoPai'] ) ){
+						echo "Adicionado/Atualizando produto pai " . $dados_produtos ['CodigoProduto'] . PHP_EOL;						
+						$produto = $this->buscaProduto ( $dados_produtos ['CodigoProduto'] );
 						$dados_produtos['IdProdutoPai'] = $produto->ProductGetByRefIdResult->Id;
 						$this->_enviaProduto ( $dados_produtos );
+					}else{
+						echo "Adicionado/Atualizando produto filho " . $dados_produtos ['CodigoProduto'] . PHP_EOL;
+						$produto = $this->buscaProduto ( $dados_produtos ['CodigoProdutoPai'] );
+						$dados_produtos['IdProdutoPai'] = $produto->ProductGetByRefIdResult->Id;
 						$this->_enviaSku( $dados_produtos );
-						echo "Produto adicionado. " . PHP_EOL;
+// 						echo "Buscando cadastro do produto filho " . $dados_produtos ['CodigoProduto'] . PHP_EOL;
+// 						$produto = $this->buscaProduto ( $dados_produtos ['CodigoProdutoPai'] );
+// 						if ( $produto->ProductGetByRefIdResult != null ) {
+// 							echo "Adicionando/atualizando produto " . $dados_produtos['CodigoProduto'] . " na loja Vtex" . PHP_EOL;
+// 							$dados_produtos['IdProdutoPai'] = $produto->ProductGetByRefIdResult->Id;
+							
+// 						}
+						echo "Produto {$dados_produtos ['CodigoProduto']} adicionado/atualizado. " . PHP_EOL;
 					}
 					
 					//devolver o protocolo do produto
 					$this->_kpl->confirmarProdutosDisponiveis ( $dados_produtos ['ProtocoloProduto'] );
-					echo "Protocolo Produto: {$dados_produtos['ProtocoloProduto']} enviado com sucesso" . PHP_EOL;				
+					echo "Protocolo Produto: {$dados_produtos['ProtocoloProduto']} enviado com sucesso" . PHP_EOL;
+					echo PHP_EOL;
 
 				} catch ( Exception $e ) {
 					echo "Erro ao importar produto {$dados_produtos['CodigoProduto']}: " . $e->getMessage() . PHP_EOL;

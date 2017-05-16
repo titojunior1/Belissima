@@ -79,14 +79,14 @@ class Model_Wpr_Vtex_StubVtex {
 					'trace'=>true,
 					'exceptions'=>true,
 					'login' => $this->_login,
-					'password' => $this->_pass
+					'password' => $this->_pass,
 					//'uri'=>'http://webservice-belissimabeta.vtexcommerce.com.br/service.svc?wsdl',
 					//'binding'=> 'basicHttpBinding',
 					//'style'=>SOAP_RPC,
-					//'use'=>SOAP_ENCODED,
-					//'encoding'=>'UTF-8',
-					//'cache_wsdl'=>WSDL_CACHE_NONE,
-					//'connection_timeout'=>15,
+					'use'=>SOAP_ENCODED,
+					'encoding'=>'UTF-8',
+					'cache_wsdl'=>WSDL_CACHE_NONE,
+					'connection_timeout'=>60,
 			);			
 			
 			$this->_webservice = new SoapClient($this->_ws, $options );
@@ -165,7 +165,7 @@ class Model_Wpr_Vtex_StubVtex {
 			throw new InvalidArgumentException ( 'ID do pedido inválido' );
 		}
 		try {
-			return $this->_wsCall ( 'OrderChangeStatus', array ('idOrder' => $order_id, 'statusOrder' => $status ) );
+			return $this->_wsCall ( 'OrderChangeStatus', array ( array ('idOrder' => $order_id, 'statusOrder' => $status ) ) );
 		} catch ( Exception $e ) {
 			throw new RuntimeException ( $e->getMessage () );
 		}
@@ -220,7 +220,7 @@ class Model_Wpr_Vtex_StubVtex {
 	 */
 	public function OrderGet($id_pedido) {
 		try {
-			return $this->_wsCall ( 'OrderGet', array ('orderId' => $id_pedido ) );
+			return $this->_wsCall ( 'OrderGet', array ( array ('orderId' => $id_pedido ) ) );
 		} catch ( Exception $e ) {
 			throw new RuntimeException ( $e->getMessage () );
 		}
@@ -255,7 +255,7 @@ class Model_Wpr_Vtex_StubVtex {
 	 * @return retorna mensagem em caso de erro ou array de dados se estiver certo
 	 */
 	public function ProductGetByRefId($refId) {
-		if (! ctype_digit ( $refId )) {
+		if ( empty ( $refId )) {
 			throw new InvalidArgumentException ( 'ID do produto inválido' );
 		}
 		try {

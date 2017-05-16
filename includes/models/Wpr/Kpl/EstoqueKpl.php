@@ -81,7 +81,7 @@ class Model_Wpr_Kpl_EstoqueKpl extends Model_Wpr_Kpl_KplWebService {
 		echo "Estoques encontrados para integracao: " . $qtdEstoques . PHP_EOL;
 		echo PHP_EOL;
 		
-		echo "Conectando ao WebService Magento... " . PHP_EOL;
+		echo "Conectando ao WebService Vtex... " . PHP_EOL;
 		$this->_vtex = new Model_Wpr_Vtex_Estoque();
 		echo "Conectado!" . PHP_EOL;
 		echo PHP_EOL;

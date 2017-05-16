@@ -97,7 +97,7 @@ class Model_Wpr_Vtex_Estoque {
 
         $url = sprintf($this->_url, 'logistics/pvt/inventory/warehouseitems/setbalance');
         $headers = array(
-            'Content-Type' => 'application/json',
+            'Content-Type' => 'application/json; charset=utf-8',
         	'Accept' => 'application/json',
         	'X-VTEX-API-AppKey' => $this->_key,
         	'X-VTEX-API-AppToken' => $this->_token	

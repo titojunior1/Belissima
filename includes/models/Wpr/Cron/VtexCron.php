@@ -39,7 +39,7 @@ class Model_Wpr_Cron_VtexCron {
 		
 		// horarios que a Vtex atualiza o Mandriva
 		// Bloqueamos a execução dos crons Vtex neste periodo, pois eles utilizam o próprio webservice para alimentar os dados do mandriva e acabam derrubando nossas conexões
-		$hora_inicial_bloqueio = '21:00:00';
+		$hora_inicial_bloqueio = '23:59:00';
 		$hora_final_bloqueio = '05:00:00';
 		
 		$hora_atual = date('H:i:s');
@@ -53,8 +53,10 @@ class Model_Wpr_Cron_VtexCron {
 			echo "Importando pedidos do cliente" . PHP_EOL;
 			$vtex = new Model_Wpr_Vtex_Pedido();
 			$vtex->importarPedidosStatusQuantidade ( $status_pedido_vtex, $qtd_pedidos );
+			//$vtex->importarPedidoId(607143); // Afiliado
+			//$vtex->importarPedidoId(619385); // Normal
 
-			$erros_proc = $vtex->getErrosProcessamento ();
+			//$erros_proc = $vtex->getErrosProcessamento ();
 
 			echo "Pedidos do cliente Importados" . PHP_EOL;
 		} catch ( Exception $e ) {

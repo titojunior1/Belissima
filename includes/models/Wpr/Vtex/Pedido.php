@@ -1,4 +1,5 @@
 <?php
+use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 /**
  * 
  * Classe de gerenciamento de Pedidos de Saída com a VTEX
@@ -32,6 +33,21 @@ class Model_Wpr_Vtex_Pedido {
 	 * @var Model_Wpr_Vtex_StubVtex
 	 */
 	public $_client;
+	
+	/*
+	 *  URL para integração via REST VTEX
+	*/
+	private $_url;
+	
+	/*
+	 *  Token para integração via REST VTEX
+	*/
+	private $_token;
+	
+	/*
+	 *  Chave para integração via REST VTEX
+	*/
+	private $_key;
 
 	/**
 	 * Construtor.
@@ -46,6 +62,10 @@ class Model_Wpr_Vtex_Pedido {
 			$this->_vtex = Model_Wpr_Vtex_Vtex::getVtex ();
 			$this->_client = $this->_vtex->_client;
 		}
+		
+		$this->_url = VTEX_API_URL;
+		$this->_key = VTEX_API_KEY;
+		$this->_token = VTEX_API_TOKEN;
 	}
 	/**
 	 * Verificar CNPJ
@@ -189,34 +209,32 @@ class Model_Wpr_Vtex_Pedido {
 
 	/**
 	 * 
-	 * Retorna a transportadora, baseada no ID da tabela de frete
-	 * @param int $freight_id
+	 * Retorna a transação do pagamento, baseada no ID do pedido
+	 * @param int $order_id
 	 * @throws InvalidArgumentException
 	 */
-	private function _getTransportadora ( $freight_id ) {
-
-		if ( empty ( $freight_id ) ) {
-			throw new InvalidArgumentException ( 'ID da tabela de frete inválido (' . $freight_id . ')' );
+	private function _getDadosPagamento ( $order_id ) {
+		
+		if (empty($order_id)){
+			throw new InvalidArgumentException( 'IdV3 de pedido inválido ou não informado' );
 		}
 		
-		$db = Db_Factory::getDbWms ();
+		$url = sprintf($this->_url, "oms/pvt/orders/{$order_id}/payment-transaction");
+		$headers = array(
+				'Content-Type' => 'application/json',
+				'Accept' => 'application/json',
+				'X-VTEX-API-AppKey' => $this->_key,
+				'X-VTEX-API-AppToken' => $this->_token
+		);
 		
-		// busca o id da tabela de frete na tabela transportadora_codigos_tabela
-		$sql = "SELECT trans_id_cli FROM transportadora_codigos_tabela tct
-				INNER JOIN transportadora t ON (tct.trans_id = t.trans_id)
-				WHERE transtab_codigo = '{$freight_id}' AND trans_status = 1";
-		
-		$res = $db->Execute ( $sql );
-		if ( ! $res ) {
-			throw new RuntimeException ( 'Erro ao consultar tabela de frete' );
+		$request = Requests::get($url, $headers);
+				
+		if (! $request->success) {
+			throw new RuntimeException('Falha ao obter formas de pagamento. [' . $request->body . ']');
 		}
-		if ( $db->NumRows ( $res ) == 0 ) {
-			return '1'; //código trans_id_cli default da Ri Happy E-commerce
-		}
-		$row = $db->FetchAssoc ( $res );
 		
-		// retorna trans_id_cli
-		return $row ['trans_id_cli'];
+		return json_decode($request->body);
+		
 	}
 
 	/**
@@ -342,12 +360,12 @@ class Model_Wpr_Vtex_Pedido {
 				echo "Erro ao cadastrar cliente " . $cpfFormatado . ' - ' . $e->getMessage() . PHP_EOL;
 				continue;
 			}
-			
 
 			echo "Tratando dados para cadastro de pedido: " . $d->Id . PHP_EOL;
 			
 			//Seguindo com criação de Pedidos
 			$dadosPedido [$i] ['NumeroDoPedido'] = $d->Id;
+			$dadosPedido [$i] ['NumeroDoPedidoV3'] = $d->IdV3;
 			$dadosPedido [$i] ['EMail'] = $d->Client->Email;
 			$dadosPedido [$i] ['CPFouCNPJ'] = $cpfFormatado;
 			$dadosPedido [$i] ['CodigoCliente'] = $cpfFormatado;
@@ -391,17 +409,21 @@ class Model_Wpr_Vtex_Pedido {
 			$dadosPedido [$i] ['DestTipoPessoa'] = $tipoPessoa;
 			$dadosPedido [$i] ['DestDocumento'] = $cpfFormatado;
 			$dadosPedido [$i] ['PedidoJaPago'] = 1; //Boolean
+			$dadosPedido [$i] ['DataDoPagamento'] = $dataFormatada;
 			// 			$dadosPedido [$i] ['DestEstrangeiro'] = '';
 			// 			$dadosPedido [$i] ['DestInscricaoEstadual'] = '';
 			// 			$dadosPedido [$i] ['DestReferencia'] = "";
-			// 			$dadosPedido [$i] ['DataDoPagamento'] = '';
+			// 			
 			// 			$dadosPedido [$i] ['OptouNFPaulista'] = ''; //Necessário verificar essa opção
 			// 			//$dadosPedido [$i] ['CartaoPresenteBrinde'] = 1;			
 			
 			// Itens			
 			$dados_item = $this->_vtex->trataArrayDto ( (array) $d->OrderDeliveries->OrderDeliveryDTO->OrderItems->OrderItemDTO );
-			
+
 			foreach ($dados_item as $it => $item){
+				
+				$item = (object) $item;
+				
 				//Verificar se o item atual é o mesmo sku do item anterior
 				if ($item->ProductId == $dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it -1] ['CodigoProduto']){
 					continue;
@@ -410,9 +432,9 @@ class Model_Wpr_Vtex_Pedido {
 				if ( $item->IsKit == "true" ) {
 					continue;
 				}
-				$valor_total_produtos += (($item->Cost) - (($item->Cost - $item->CostOff) - $item->CupomValue));
+				$valor_total_produtos += (($item->Cost) - ((($item->Cost - $item->CostOff))));
 				$valor_total_frete += $item->ShippingCostOff;
-				$valor_total_desconto = number_format ( ($item->Cost - $item->CostOff) + $item->CupomValue, 2, '.', '' );
+				$valor_total_desconto += number_format ( ($item->Cost - $item->CostOff) + $item->CupomValue, 2, '.', '' );
 				$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['CodigoProduto'] = $item->ItemId;
 				$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['QuantidadeProduto'] = (int) 1;
 				$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['PrecoUnitario'] = number_format ( $item->Cost, 2, '.', '' ); // valor unitário
@@ -421,12 +443,16 @@ class Model_Wpr_Vtex_Pedido {
 				//$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['Brinde'] = '';
 				//$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['ValorReferencia'] = '';
 				//$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['EmbalagemPresente'] = '';
-			}
+			}			
+			$totalPedidoPagamento = ($valor_total_produtos + $valor_total_frete) - $valor_total_desconto;
 			
-			// Tipos de forma de pagamento
-			$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['FormaPagamentoCodigo'] = 'boleto';
-			$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['Valor'] = number_format($valor_total_produtos + $valor_total_frete, 2, '.', '');
-			$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoQtdeParcelas'] = '1';
+			$dados_pagamento = $this->_getDadosPagamento($dadosPedido [$i] ['NumeroDoPedidoV3']);
+			$dadosPagamento = $this->_vtex->trataArrayDto ( (array) $dados_pagamento );
+			
+			// Tipos de forma de pagamento			
+			$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['FormaPagamentoCodigo'] = $dadosPagamento ['0']['payments']['0']->paymentSystemName;
+			$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['Valor'] = number_format( $totalPedidoPagamento, 2, '.', '');
+			$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoQtdeParcelas'] = $dadosPagamento ['0']['payments']['0']->installments;
 			//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['BoletoVencimento'] = ''; // Necessário integrar API pagar.me
 			//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['BoletoNumeroBancario'] = ''; // Necessário integrar API pagar.me
 			//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['DebitoEmContaNumeroBanco'] = 1; // Necessário integrar API pagar.me
@@ -440,18 +466,16 @@ class Model_Wpr_Vtex_Pedido {
 			//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoNSU'] = 1; // Necessário integrar API pagar.me
 			//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoNumeroToken'] = 1; // Necessário integrar API pagar.me
 			//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CodigoTransacaoGateway'] = 1; // Necessário integrar API pagar.me
-			
-			$dadosPedido [$i] ['ValorPedido'] = number_format($valor_total_produtos, 2, '.', '');
+			$dadosPedido [$i] ['ValorPedido'] = number_format( $valor_total_produtos, 2, '.', '');
 			$dadosPedido [$i] ['ValorFrete'] = number_format($valor_total_frete, 2, '.', '');
 			$dadosPedido [$i] ['ValorDesconto'] = number_format($valor_total_desconto, 2, '.', '');
-			
 			try {
 			
 				echo "Importando pedido " . $dadosPedido [$i] ['NumeroDoPedido'] . PHP_EOL;
 				$this->_kpl->cadastraPedido( $dadosPedido );
-				echo "Pedido importado com sucesso" . PHP_EOL;
+				echo "Pedido importado/atualizado com sucesso" . PHP_EOL;
 			
-				echo "Atualizando status de pedido {$dadosPedido [$i] ['NumeroDoPedido']} no ambiente Kpl" . PHP_EOL;
+				echo "Atualizando status de pedido {$dadosPedido [$i] ['NumeroDoPedido']} no ambiente VTEX" . PHP_EOL;
 				$this->_mudarStatusPedido($dadosPedido [$i] ['NumeroDoPedido'], 'ERP');
 				echo "Status atualizado com sucesso" . PHP_EOL;
 			
@@ -502,6 +526,43 @@ class Model_Wpr_Vtex_Pedido {
 		}		
 	
 	}
+	
+	/**
+	 * Importa um determinado pedido
+	 * @param string $idPedido
+	 * @return retorna mensagem em caso de erro
+	 */
+	public function importarPedidoId($idPedido) {
+	
+		if (empty ( $idPedido )) {
+			throw new InvalidArgumentException ( 'Status inválido' );
+		}
+	
+		try {
+			$pedidos = $this->_client->OrderGet($idPedido);
+		} catch ( Exception $e ) {
+			throw new RuntimeException ( 'Erro ao consultar Pedidos por status' );
+		}
+		if (! is_object( $pedidos )) {
+			throw new DomainException ( 'Nenhum pedido encontrado - '. $pedidos );
+		}
+	
+		if ( empty ( $pedidos->OrderGetResult ) ) {
+			throw new DomainException ( 'Nenhum pedido encontrado' );
+		}
+		
+		$pedidos1->OrderGetResult->OrderGetDTO [] = $pedidos->OrderGetResult;
+	
+		$dados_pedidos = $this->_vtex->trataArrayDto ( $pedidos1->OrderGetResult->OrderGetDTO );
+	
+		try {
+			$this->_importarPedidos ( $dados_pedidos );
+		} catch ( Exception $e ) {
+			$this->_vtex->setErro ( array ("Id" => $value ['Id'], "Metodo" => "importarPedidosStatusQuantidade", "DescricaoErro" => $e->getMessage () ), "Pedido_Saida" );
+	
+		}
+	
+	}
 
 	/**
 	 * Muda Status de um Array de ID de pedidos
@@ -510,7 +571,21 @@ class Model_Wpr_Vtex_Pedido {
 	 * @param int $nro_movimento Id do Cliente
 	 */
 	private function _mudarStatusPedido ( $order_id, $status ) {
-
+	
+		/*$url = sprintf($this->_url, "oms/pvt/orders/{$order_id}/changestate/ready-for-handling");
+		$headers = array(
+				'Content-Type' => 'application/json',
+				'Accept' => 'application/json',
+				'X-VTEX-API-AppKey' => $this->_key,
+				'X-VTEX-API-AppToken' => $this->_token
+		);
+	
+		$request = Requests::post($url, $headers);
+	
+		if (! $request->success) {
+			throw new RuntimeException('Falha na comunicação com o webservice. [' . $request->body . ']');
+		}*/
+		
 		if(empty($order_id)){
 			throw new InvalidArgumentException ( 'ID do pedido inválido' );
 		}
@@ -527,8 +602,9 @@ class Model_Wpr_Vtex_Pedido {
 					throw new RuntimeException ( 'Erro ao tentar alterar status do pedido' );
 				}
 			}
-		} catch ( Exception $e ) {
+		} catch ( Exception $e ) {			
 			$this->_vtex->setErro ( array ( "Id" => $order_id, "Metodo" => "_mudarStatusPedido", "DescricaoErro" => $e->getMessage () ), "Pedido_Saida" );
+			throw new RuntimeException ( 'Erro ao tentar alterar status do pedido - ' . $e->getMessage() );
 		}
 		
 	}
