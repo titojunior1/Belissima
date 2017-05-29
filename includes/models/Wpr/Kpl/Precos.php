@@ -60,7 +60,7 @@ class Model_Wpr_Kpl_Precos extends Model_Wpr_Kpl_KplWebService {
 				
 		$data = array(
             array(
-					'itemId' => $dados_precos['CodigoProduto'],
+					'itemId' => $dados_precos['IdProduto'],
 					'salesChannel' => '1',
 					'price' => $dados_precos['PrecoPromocional'],
 					'listPrice' => $dados_precos['PrecoTabela'],
@@ -153,8 +153,8 @@ class Model_Wpr_Kpl_Precos extends Model_Wpr_Kpl_KplWebService {
 				$array_precos [$i] ['CodigoProdutoPai'] = $d ['CodigoProdutoPai'];
 				$array_precos [$i] ['CodigoProdutoAbacos'] = $d ['CodigoProdutoAbacos'];
 				$array_precos [$i] ['NomeLista'] = $d ['NomeLista'];
-				$array_precos [$i] ['PrecoTabela'] = number_format($d ['PrecoTabela'], 1, '.', '');;
-				$array_precos [$i] ['PrecoPromocional'] = ( $d ['PrecoPromocional'] == 0 )? '' : number_format($d ['PrecoPromocional'], 1, '.', '');;
+				$array_precos [$i] ['PrecoTabela'] = $d ['PrecoTabela'];
+				$array_precos [$i] ['PrecoPromocional'] = ( $d ['PrecoPromocional'] == 0 )? '' : $d ['PrecoPromocional'];
 				if ( !empty( $d ['DataInicioPromocao'] ) && !empty( $d ['DataTerminoPromocao'] ) ){
 					list($dataInicioPromo, $horaInicioPromo) = explode(' ', $d ['DataInicioPromocao']);
 					$dia=substr($dataInicioPromo,0,2);
@@ -184,6 +184,11 @@ class Model_Wpr_Kpl_Precos extends Model_Wpr_Kpl_KplWebService {
 // 		echo "Conectando ao WebService Vtex... " . PHP_EOL;
 // 		$this->_vtex = new Model_Belissima_Vtex_Preco();
 // 		echo "Conectado!" . PHP_EOL;
+		echo "Conectando ao WebService Vtex... " . PHP_EOL;
+		$this->_vtex = new Model_Wpr_Vtex_Preco();
+		echo "Conectado!" . PHP_EOL;
+		echo PHP_EOL;
+		
 		
 		// Percorrer array de preços
 		foreach ( $array_precos as $indice => $dados_precos ) {
@@ -200,13 +205,14 @@ class Model_Wpr_Kpl_Precos extends Model_Wpr_Kpl_KplWebService {
 				try {
 					echo PHP_EOL;
 					echo "Buscando cadastro do produto " . $dados_precos['CodigoProduto'] . PHP_EOL;
-					$produto = 1;//$this->_magento->buscaProduto($dados_precos['CodigoProduto']);
-					if ( !empty ( $produto ) ) {
+					$produto = $this->_vtex->buscaCadastroProduto($dados_precos['CodigoProduto']);
+					if ( !empty ( $produto->StockKeepingUnitGetByRefIdResult ) ) {
 						echo "Atualizando Preco " . $dados_precos['CodigoProduto'] . PHP_EOL;
 						echo "Preco Tabela: R$" . $dados_precos['PrecoTabela'] . PHP_EOL;
 						echo "Preco Promocional: R$" . $dados_precos['PrecoPromocional'] . PHP_EOL;
 						echo "Data Inicio: " . $dados_precos['DataInicioPromocao'] . PHP_EOL;
-						echo "Data Fim: " . $dados_precos['DataTerminoPromocao'] . PHP_EOL;						
+						echo "Data Fim: " . $dados_precos['DataTerminoPromocao'] . PHP_EOL;
+						$dados_precos['IdProduto'] = $produto->StockKeepingUnitGetByRefIdResult->Id;
 						$this->_atualizaPrecoRest( $dados_precos );
 						echo "Preco atualizado. " . PHP_EOL;
 						

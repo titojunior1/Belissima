@@ -53,6 +53,27 @@ class Model_Wpr_Vtex_Estoque {
 	}
 	
 	/**
+	 * busca um determinado RefId
+	 * @param string $refId
+	 */
+	public function buscaCadastroProduto( $refId ) {
+	
+		if ( empty( $refId ) ) {
+			throw new Exception ( 'Dados do produto inválidos' );
+		}
+	
+		try {
+	
+			$result = $this->_client->StockKeepingUnitGetByRefId($refId);
+			return $result;
+	
+		} catch ( Exception $e ) {
+			throw new Exception ( $e->getMessage () );
+		}
+	
+	}
+	
+	/**
 	 * Atualiza a quantidade de skus no estoque.
 	 * @param string $idestoque Id do Estoque
 	 * @param string $idsku     Ido do Sku

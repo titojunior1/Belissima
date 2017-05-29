@@ -449,23 +449,18 @@ class Model_Wpr_Vtex_Pedido {
 			$dados_pagamento = $this->_getDadosPagamento($dadosPedido [$i] ['NumeroDoPedidoV3']);
 			$dadosPagamento = $this->_vtex->trataArrayDto ( (array) $dados_pagamento );
 			
-			// Tipos de forma de pagamento			
-			$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['FormaPagamentoCodigo'] = $dadosPagamento ['0']['payments']['0']->paymentSystemName;
-			$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['Valor'] = number_format( $totalPedidoPagamento, 2, '.', '');
-			$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoQtdeParcelas'] = $dadosPagamento ['0']['payments']['0']->installments;
-			//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['BoletoVencimento'] = ''; // Necessário integrar API pagar.me
-			//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['BoletoNumeroBancario'] = ''; // Necessário integrar API pagar.me
-			//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['DebitoEmContaNumeroBanco'] = 1; // Necessário integrar API pagar.me
-			//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['DebitoEmContaCodigoAgencia'] = 1; // Necessário integrar API pagar.me
-			//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['DebitoEmContaDVCodigoAgencia'] = 1; // Necessário integrar API pagar.me
-			//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['DebitoEmContaContaCorrente'] = 1; // Necessário integrar API pagar.me
-			//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['DebitoEmContaDVContaCorrente'] = 1; // Necessário integrar API pagar.me
-			//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['PreAutorizadaNaPlataforma'] = 1; // Necessário integrar API pagar.me
-			//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['DebitoEmContaDVContaCorrente'] = 1; // Necessário integrar API pagar.me
-			//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoTID'] = 1; // Necessário integrar API pagar.me
-			//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoNSU'] = 1; // Necessário integrar API pagar.me
-			//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoNumeroToken'] = 1; // Necessário integrar API pagar.me
-			//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CodigoTransacaoGateway'] = 1; // Necessário integrar API pagar.me
+			if($dados_pagamento != null){
+				$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['FormaPagamentoCodigo'] = $dadosPagamento ['0']['payments']['0']->paymentSystemName;
+				$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['Valor'] = number_format( $totalPedidoPagamento, 2, '.', '');
+				$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoQtdeParcelas'] = $dadosPagamento ['0']['payments']['0']->installments;
+			}else{
+				$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['FormaPagamentoCodigo'] = 'AFILIADO';
+				$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['Valor'] = number_format( $totalPedidoPagamento, 2, '.', '');
+				$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoQtdeParcelas'] = '1';
+			}
+			
+			
+			
 			$dadosPedido [$i] ['ValorPedido'] = number_format( $valor_total_produtos, 2, '.', '');
 			$dadosPedido [$i] ['ValorFrete'] = number_format($valor_total_frete, 2, '.', '');
 			$dadosPedido [$i] ['ValorDesconto'] = number_format($valor_total_desconto, 2, '.', '');
@@ -572,7 +567,7 @@ class Model_Wpr_Vtex_Pedido {
 	 */
 	private function _mudarStatusPedido ( $order_id, $status ) {
 	
-		/*$url = sprintf($this->_url, "oms/pvt/orders/{$order_id}/changestate/ready-for-handling");
+		/*$url = sprintf($this->_url, "oms/pvt/orders/{$order_id}/start-handling");
 		$headers = array(
 				'Content-Type' => 'application/json',
 				'Accept' => 'application/json',

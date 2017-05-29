@@ -312,6 +312,22 @@ class Model_Wpr_Vtex_StubVtex {
 	}
 	
 	/**
+	 * Retorna informações de um determinado skus
+	 * @param int $refId Id do Sku
+	 * @return retorna mensagem em caso de erro ou array de dados se estiver certo
+	 */
+	public function StockKeepingUnitGetByRefId($refId) {
+		if (! ctype_digit ( $refId )) {
+			throw new InvalidArgumentException ( 'ID do produto inválido' );
+		}
+		try {
+			return $this->_wsCall ( 'StockKeepingUnitGetByRefId', array ( array ('refId' => $refId ) ) );
+		} catch ( Exception $e ) {
+			throw new RuntimeException ( $e->getMessage () );
+		}
+	}
+	
+	/**
 	 * Retorna todos os skus atualizados ou inseridos a partir de uma determinada data
 	 * @param date dateUpdated Data para pesquisa
 	 */

@@ -54,7 +54,8 @@ class Model_Wpr_Cron_VtexCron {
 			$vtex = new Model_Wpr_Vtex_Pedido();
 			$vtex->importarPedidosStatusQuantidade ( $status_pedido_vtex, $qtd_pedidos );
 			//$vtex->importarPedidoId(607143); // Afiliado
-			//$vtex->importarPedidoId(619385); // Normal
+			//$vtex->importarPedidoId(619385); // PENDENTE INTEGRAÇÃO
+			//$vtex->importarPedidoId(619477);
 
 			//$erros_proc = $vtex->getErrosProcessamento ();
 

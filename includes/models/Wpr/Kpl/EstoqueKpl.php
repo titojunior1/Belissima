@@ -100,11 +100,12 @@ class Model_Wpr_Kpl_EstoqueKpl extends Model_Wpr_Kpl_KplWebService {
 				try {
 					echo PHP_EOL;
 					echo "Buscando cadastro do produto " . $dados_estoque['CodigoProduto'] . PHP_EOL;
-					$produto = 1;//$this->_vtex->buscaProduto($dados_estoque	['CodigoProduto']);
-					if ( !empty ( $produto ) ) {
+					$produto = $this->_vtex->buscaCadastroProduto( $dados_estoque['CodigoProduto'] );
+					if ( !empty ( $produto->StockKeepingUnitGetByRefIdResult ) ) {
 						echo "Atualizando Estoque " . $dados_estoque['CodigoProduto'] . PHP_EOL;
 						echo "Quantidade disponivel " . $dados_estoque['SaldoDisponivel'] . PHP_EOL;
-						$this->_vtex->atualizaArmazemSkuRest('1_1', $dados_estoque['CodigoProduto'], $dados_estoque['SaldoDisponivel']);
+						$dados_estoque['IdProduto'] = $produto->StockKeepingUnitGetByRefIdResult->Id;
+						$this->_vtex->atualizaArmazemSkuRest('1_1', $dados_estoque['IdProduto'], $dados_estoque['SaldoDisponivel']);
 						echo "Estoque atualizado. " . PHP_EOL;
 					}else{
 						throw new RuntimeException( 'Produto nao encontrado' );

@@ -110,6 +110,47 @@ class Model_Wpr_Cron_KplCron {
 	
 		echo "- Finalizando cron para atualizar precos da Kpl" . PHP_EOL;
 	}
+	
+	/**
+	 * Método para atualizar status de pedido da KPL para o Magento
+	 */
+	public function atualizaStatusPedido(){
+	
+		ini_set ( 'memory_limit', '512M' );
+	
+		// Solicita Pedidos Saida Disponíveis
+		if ( empty ( $this->_kpl ) ) {
+			$this->_kpl = new Model_Wpr_Kpl_KplWebService();
+		}
+			
+		echo "- Atualizando status de pedidos de saida do cliente Belissima - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
+		try {
+			$chaveIdentificacao = KPL_KEY;
+			$status_disponiveis = $this->_kpl->statusPedidosDisponiveis($chaveIdentificacao);
+			if ( ! is_array ( $status_disponiveis ['StatusPedidoDisponiveisResult'] ) ) {
+				throw new Exception ( 'Erro ao buscar status dos pedidos' );
+			}
+			if ( $status_disponiveis ['StatusPedidoDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003 ) {
+				echo "Nao existem status disponiveis para integracao ".PHP_EOL;
+	
+			}else{
+				$kpl = new Model_Wpr_Kpl_StatusPedido();
+				$retorno = $kpl->ProcessaStatusWebservice( $status_disponiveis ['StatusPedidoDisponiveisResult'] ['Rows'] );
+				if(is_array($retorno)){
+					// gravar logs de erro
+					$this->_log->gravaLogErros($retorno);
+				}
+			}
+	
+			echo "- importacao de status de pedidos do cliente Belissima realizada com sucesso " . PHP_EOL;
+	
+		} catch ( Exception $e ) {
+			echo "- erros ao importar os status de pedidos de saída do cliente Belissima: " . $e->getMessage () . PHP_EOL;
+		}
+		unset ( $this->_kpl );
+	
+		echo "- Finalizando cron para atualizar status de pedidos de saída da Kpl do cliente Belissima " . PHP_EOL;
+	}
 
 	/**
 	 * 
