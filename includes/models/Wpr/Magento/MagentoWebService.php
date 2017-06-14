@@ -1,0 +1,309 @@
+<?php
+//use Assert\InvalidArgumentException;
+/**
+ * 
+ * Classe para trabalhar com o Webservice da Magento(Stub de Serviço)
+ * Importante sempre finalizar a sessão ( método finalizaSessao )após utilizar a classe
+ * @author    Tito Junior
+ * 
+ */
+
+class Model_Wpr_Magento_MagentoWebService {
+	
+	/**
+	 * Endereço do WebService.
+	 *
+	 * @var string
+	 */
+	private $_ws;
+	
+	/**
+	 * 
+	 * Usuário de identificação do cliente na Magento.
+	 * @var string
+	 */
+	private $_usuario;
+	
+	/**
+	 *
+	 * Senha de identificação do cliente na Magento.
+	 * @var string
+	 */
+	private $_senha;
+	
+	/**
+	 * instância do WebService
+	 *
+	 * @var string
+	 */
+	private $_webservice;
+
+	/**
+	 * Sessão do Webservice
+	 */
+	private $_session;
+	
+	/**
+	 * valida se sessão do Webservice foi iniciada
+	 */
+	private $_session_valid = false;
+	
+	/**
+	 * Array de Mensagens de Erros.
+	 *
+	 * @var array
+	 */
+	private $_array_erros = array ();
+	
+	/**
+	 * Habilita função de Debug.
+	 *
+	 * @var boolean
+	 */
+	private $_debug = false;
+	
+	/**
+	 * Array de Mensagens de Debug.
+	 *
+	 * @var array
+	 */
+	private $_debugMSG = array ();
+	
+	/**
+	 * Construtor.
+	 * @param string $ws Endereço do Webservice.
+	 * @param string $login Login de Conexão do Webservice.
+	 * @param string $pass Senha de Conexão do Webservice.
+	 */
+	public function __construct( $ws, $login, $pass ) {
+			
+		$this->_ws = $ws;
+		$this->_usuario = $login;
+		$this->_senha = $pass;
+			
+		try {
+			
+			// conecta com o SoapClient
+			$this->_webservice = new SoapClient ( $this->_ws );			
+			$this->_webservice->soap_defencoding = 'UTF-8';
+			$this->_webservice->decode_utf8 = true;			
+			
+		} catch ( Exception $e ) {
+			throw new Exception ( 'Erro ao conectar no WebService da Magento' );
+		}
+	}	
+	
+	/**
+	 * Adiciona mensagem de erro ao array
+	 * @param String $mensagem Mensagem de Erro
+	 */
+	private function _Erro($mensagem) {
+		$msg = "Data:" . date ( "d/m/Y H:i:s" ) . " <br>" . $mensagem;
+		$this->_array_erros [] = $msg;
+		throw new Exception ( $msg );
+	}
+	
+	private function _iniciaSessao(){
+		
+		try {
+			echo PHP_EOL;
+			echo "Iniciando Sessao " . PHP_EOL	;
+			echo PHP_EOL;
+			$this->_session = $this->_webservice->login ($this->_usuario, $this->_senha);
+			$this->_session_valid = true;
+			
+		}catch ( Exception $e ) {
+			$this->_session_valid = false;
+			throw new Exception ( 'Erro ao iniciar sessao no WebService' );
+		}
+		
+	}
+	
+	public function _encerraSessao(){
+	
+		try {
+			echo PHP_EOL;
+			echo "Encerrando Sessao " . PHP_EOL	;
+			echo PHP_EOL;
+			$this->_session = $this->_webservice->endSession ( $this->_session );
+			$this->_session_valid = false;
+				
+		}catch ( Exception $e ) {			
+			throw new Exception ( 'Erro ao finalizar sessão no WebService' );
+		}
+	
+	}
+	
+	public function buscaClientesDisponiveis( $complexFilter ){
+	
+		if($this->_session_valid == false){
+			$this->_iniciaSessao();
+		}
+		
+		if (! is_array( $complexFilter ) ){
+			throw new InvalidArgumentException( 'Filtro informado inválido' );
+		}
+	
+		try {
+	
+			$result = $this->_webservice->customerCustomerList($this->_session, $complexFilter);
+			return $result;
+	
+		} catch ( Exception $e ) {
+			throw new RuntimeException( 'Erro ao consultar clientes disponíveis' . ' - ' . $e->getMessage() );
+		}	
+	
+	}
+	
+	public function buscaPedidosDisponiveis( $complexFilter ){
+	
+		if($this->_session_valid == false){
+			$this->_iniciaSessao();
+		}
+	
+		if (! is_array( $complexFilter ) ){
+			throw new InvalidArgumentException( 'Filtro informado inválido' );
+		}
+	
+		try {
+	
+			return $result = $this->_webservice->salesOrderList($this->_session, $complexFilter);
+	
+		} catch ( Exception $e ) {
+			throw new RuntimeException( 'Erro ao consultar pedidos disponiveis' . ' - ' . $e->getMessage() );
+		}
+	
+	}
+	
+	public function buscaInformacoesAdicionaisPedido( $idPedido ){
+	
+		if($this->_session_valid == false){
+			$this->_iniciaSessao();
+		}
+	
+		if ( empty( $idPedido ) ){
+			throw new InvalidArgumentException( 'ID de Pedido inválido' );
+		}
+	
+		try {
+	
+			$result = $this->_webservice->salesOrderInfo($this->_session, $idPedido);
+			return $result;
+	
+		} catch ( Exception $e ) {
+			throw new RuntimeException( 'Erro ao consultar pedido' . ' - ' . $e->getMessage() );
+		}
+	
+	}
+	
+	public function cadastraProduto( $sku, $produto ){
+		
+		if($this->_session_valid == false){
+			$this->_iniciaSessao();	
+		}
+		
+		try {			
+		
+			// get attribute set
+			$attributeSets = $this->_webservice->catalogProductAttributeSetList($this->_session);
+			$attributeSet = current($attributeSets);
+			
+			$result = $this->_webservice->catalogProductCreate($this->_session, 'simple', $attributeSet->set_id, $sku, $produto);			
+		
+		} catch ( Exception $e ) {
+			throw new RuntimeException( 'Erro ao cadastrar Produto ' . $sku . ' - ' . $e->getMessage() );
+		}
+		
+		return $result;
+		
+	}
+	
+	public function atualizaProduto( $idProduto, $produto ){
+	
+		if($this->_session_valid == false){
+			$this->_iniciaSessao();
+		}
+	
+		try {			
+				
+			$result = $this->_webservice->catalogProductUpdate( $this->_session, $idProduto, $produto );
+	
+		} catch (Exception $e) {
+			throw new RuntimeException( 'Erro ao atualizar Produto ID ' . $idProduto . ' - ' . $e->getMessage() );
+		}
+	
+		return $result;
+	
+	}
+	
+	public function buscaProduto( $sku ){
+	
+		if($this->_session_valid == false){
+			$this->_iniciaSessao();
+		}
+	
+		try {
+	
+			$result = $this->_webservice->catalogProductInfo( $this->_session, $sku, null, null, 'sku' );
+			return $result->product_id;
+			
+		} catch (Exception $e) {
+			return false;
+			//throw new RuntimeException( 'Erro ao buscar Produto ID ' . $sku . ' - ' . $e->getMessage() );
+		}
+	}
+	
+	public function atualizaEstoqueProduto( $idProduto, $produto ){
+		
+		if($this->_session_valid == false){
+			$this->_iniciaSessao();
+		}
+		
+		try {
+		
+			$result = $this->_webservice->catalogInventoryStockItemUpdate( $this->_session, $idProduto, $produto );
+				
+		} catch (SoapFault $e) {
+			return false;
+		}
+		
+	}
+	/**
+	 * Método para atualização de status de pedido
+	 * @param unknown $idProduto
+	 * @param unknown $produto
+	 * @return boolean
+	 */
+	public function atualizaStatusPedido( $idPedido, $status, $comentarioStatus){
+	
+		if($this->_session_valid == false){
+			$this->_iniciaSessao();
+		}
+	
+		try {
+	
+			$result = $this->_webservice->salesOrderAddComment( $this->_session, $idPedido, $status, $comentarioStatus );
+	
+		} catch (SoapFault $e) {
+			return false;
+		}
+	
+	}
+	
+	public function atualizaStatusPedidoemSeparacao( $idPedido ){
+	
+		if($this->_session_valid == false){
+			$this->_iniciaSessao();
+		}
+	
+		try {
+	
+			return $result = $this->_webservice->salesOrderHold( $this->_session, $idPedido );
+			
+		} catch (SoapFault $e) {
+			return false;
+		}
+	
+	}
+	
+}	

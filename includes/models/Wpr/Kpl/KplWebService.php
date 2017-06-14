@@ -54,13 +54,11 @@ class Model_Wpr_Kpl_KplWebService {
 	
 	/**
 	 * Construtor.
-	 * @param string $ws Endereço do Webservice.
-	 * @param string $login Login de Conexão do Webservice.
-	 * @param string $pass Senha de Conexão do Webservice.
+	 * @param string $ws Endereço do Webservice.	 
 	 */
-	public function __construct() {
+	public function __construct($ws, $key) {
 			
-		$this->_ws = KPL_WSDL;
+		$this->_ws = $ws;
 			
 		try {
 			// conecta nusoap
@@ -68,7 +66,7 @@ class Model_Wpr_Kpl_KplWebService {
 			$this->_webservice->_debug_flag = 1;
 			$this->_webservice->soap_defencoding = 'UTF-8';
 			$this->_webservice->decode_utf8 = false;
-			$this->_chave_identificacao = KPL_KEY;
+			$this->_chave_identificacao = $key;
 		
 		} catch ( Exception $e ) {
 			throw new Exception ( 'Erro ao conectar no WebService da KPL' );

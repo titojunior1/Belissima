@@ -7,7 +7,7 @@
  *
  */
 
-class Model_Wpr_Kpl_EstoqueKpl extends Model_Wpr_Kpl_KplWebService {	
+class Model_Wpr_Kpl_EstoqueKplVetorScan extends Model_Wpr_Kpl_KplWebService {	
 	
 	/**
 	 * Variavel  de Objeto da Classe Kpl.
@@ -15,8 +15,6 @@ class Model_Wpr_Kpl_EstoqueKpl extends Model_Wpr_Kpl_KplWebService {
 	 * @var Model_Wms_kpl
 	 */
 	public $_client;
-	
-	public $_vtex;
 	
 	/**
 	 * Construtor.
@@ -28,6 +26,23 @@ class Model_Wpr_Kpl_EstoqueKpl extends Model_Wpr_Kpl_KplWebService {
 			$this->_kpl = new Model_Wpr_Kpl_KplWebService ( $ws, $key );
 		}
 	
+	}
+	
+	/**
+	 * Método que faz a atualização do estoque de um produto
+	 */
+	private function _atualizaEstoque( $dados_estoque ){
+		
+		$idProduto = $dados_estoque['product_id'];
+		
+		$produto =  array(
+				'qty' => $dados_estoque ['SaldoDisponivel'],
+				'min_qty' => $dados_estoque ['SaldoMinimo'],
+				'is_in_stock' => 1
+		);
+		
+		$this->_magento->atualizaEstoqueProduto($idProduto, $produto);
+		
 	}
 	
 	/**
@@ -81,8 +96,8 @@ class Model_Wpr_Kpl_EstoqueKpl extends Model_Wpr_Kpl_KplWebService {
 		echo "Estoques encontrados para integracao: " . $qtdEstoques . PHP_EOL;
 		echo PHP_EOL;
 		
-		echo "Conectando ao WebService Vtex... " . PHP_EOL;
-		$this->_vtex = new Model_Wpr_Vtex_Estoque( $dadosCliente['VTEX_API_URL'],$dadosCliente['VTEX_API_KEY'], $dadosCliente['VTEX_API_TOKEN'] );
+		echo "Conectando ao WebService Magento... " . PHP_EOL;
+		$this->_magento = new Model_Wpr_Magento_Precos( $dadosCliente['MAGENTO_WSDL'],$dadosCliente['MAGENTO_USUARIO'], $dadosCliente['MAGENTO_SENHA'] );
 		echo "Conectado!" . PHP_EOL;
 		echo PHP_EOL;
 		
@@ -100,12 +115,11 @@ class Model_Wpr_Kpl_EstoqueKpl extends Model_Wpr_Kpl_KplWebService {
 				try {
 					echo PHP_EOL;
 					echo "Buscando cadastro do produto " . $dados_estoque['CodigoProduto'] . PHP_EOL;
-					$produto = $this->_vtex->buscaCadastroProduto( $dados_estoque['CodigoProduto'] );
-					if ( !empty ( $produto->StockKeepingUnitGetByRefIdResult ) ) {
+					$produto = $this->_magento->buscaProduto($dados_estoque	['CodigoProduto']);
+					if ( !empty ( $produto ) ) {
 						echo "Atualizando Estoque " . $dados_estoque['CodigoProduto'] . PHP_EOL;
-						echo "Quantidade disponivel " . $dados_estoque['SaldoDisponivel'] . PHP_EOL;
-						$dados_estoque['IdProduto'] = $produto->StockKeepingUnitGetByRefIdResult->Id;
-						$this->_vtex->atualizaArmazemSkuRest('1_1', $dados_estoque['IdProduto'], $dados_estoque['SaldoDisponivel']);
+						$dados_estoque['product_id'] = $produto; // ID do Produto na Loja Magento
+						$this->_atualizaEstoque( $dados_estoque );
 						echo "Estoque atualizado. " . PHP_EOL;
 					}else{
 						throw new RuntimeException( 'Produto nao encontrado' );
@@ -123,6 +137,9 @@ class Model_Wpr_Kpl_EstoqueKpl extends Model_Wpr_Kpl_KplWebService {
 			
 			}
 		}		
+		
+		// finaliza sessão Magento
+		$this->_magento->_encerraSessao();
 		
 		if(is_array($array_erro)){
 			$array_retorno = $array_erro;

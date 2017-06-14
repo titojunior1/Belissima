@@ -53,6 +53,7 @@ class Model_Wpr_Cron_VtexCron {
 			echo "Importando pedidos do cliente" . PHP_EOL;
 			$vtex = new Model_Wpr_Vtex_Pedido();
 			$vtex->importarPedidosStatusQuantidade ( $status_pedido_vtex, $qtd_pedidos );
+			//$vtex->importarPedidoId(500079); // Kutiz
 			//$vtex->importarPedidoId(607143); // Afiliado
 			//$vtex->importarPedidoId(619385); // PENDENTE INTEGRAÇÃO
 			//$vtex->importarPedidoId(619477);

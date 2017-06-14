@@ -31,11 +31,11 @@ class Model_Wpr_Vtex_Vtex {
 	 * @param string $login Login de Conexão do Webservice.
 	 * @param string $pass Senha de Conexão do Webservice.
 	 */
-	private function __construct() {
+	private function __construct( $ws, $login, $pass ) {
 		
 		try {
 			// Gera objeto de conexão WebService
-			$this->_client = new Model_Wpr_Vtex_StubVtex ( VTEX_WSDL, VTEX_USUARIO, VTEX_SENHA );
+			$this->_client = new Model_Wpr_Vtex_StubVtex ( $ws, $login, $pass );
 		} catch ( Exception $e ) {
 			throw new Exception ( $e->getMessage () );
 		}
@@ -44,13 +44,16 @@ class Model_Wpr_Vtex_Vtex {
 	/**
 	 * 
 	 * Garante a instancia única desta classe
+	 * @param string $ws Endereço do Webservice.
+	 * @param string $login Login de Conexão do Webservice.
+	 * @param string $pass Senha de Conexão do Webservice. 
 	 * @throws Exception
 	 */
-	public static function getVtex() {
+	public static function getVtex( $ws, $login, $pass ) {
 		if (self::$_vtex instanceof Model_Wpr_Vtex_Vtex === false) {
 			
 			try {
-				$vtex = new Model_Wpr_Vtex_Vtex();
+				$vtex = new Model_Wpr_Vtex_Vtex( $ws, $login, $pass );
 				
 				self::$_vtex = $vtex;
 			} catch ( Exception $e ) {

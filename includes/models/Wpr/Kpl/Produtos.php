@@ -34,14 +34,17 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 	 * 
 	 * construtor.	 
 	 */
-	function __construct() {
+	function __construct($ws, $key) {
+		
+		$this->_ws = $ws;
+		$this->_key = $key; 
 		
 		if (empty ( $this->_kpl )) {
-			$this->_kpl = new Model_Wpr_Kpl_KplWebService();
+			$this->_kpl = new Model_Wpr_Kpl_KplWebService( $this->_ws, $this->_key );
 		}
 		
-		$this->_categorias = $this->_kpl->categoriasProdutoDisponiveis(KPL_KEY);
-		$this->_marcas = $this->_kpl->marcasDisponiveis(KPL_KEY);
+		$this->_categorias = $this->_kpl->categoriasProdutoDisponiveis( $this->_key );
+		$this->_marcas = $this->_kpl->marcasDisponiveis( $this->_key );
 		
 	
 	}
@@ -76,7 +79,8 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 			}
 		}		
 		
-		throw new InvalidArgumentException( "Descricao {$descricaoCategoria} de Categoria nao encontrada na KPL" );
+		return 0;
+		//throw new InvalidArgumentException( "Descricao {$descricaoCategoria} de Categoria nao encontrada na KPL" );
 		
 	}
 	
@@ -115,8 +119,9 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 				return $marca['CodigoExternoMarca'];
 			}
 		}
-	
-		throw new InvalidArgumentException( "ID {$idMarca} de Marca nao encontrada na KPL" );
+		
+		return 0;
+		//throw new InvalidArgumentException( "ID {$idMarca} de Marca nao encontrada na KPL" );
 		
 	
 	}
@@ -199,7 +204,8 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 				'ProductName' => $dados_produtos ['Nome'],				
 				'ProductId' => $dados_produtos ['IdProdutoPai'],
 				//'Id' => $dados_produtos ['CodigoProduto'],
-				'RefId' => $dados_produtos ['CodigoProduto'],								
+				'RefId' => $dados_produtos ['CodigoProduto'],	
+				'StockKeepingUnitEans' => array( 'StockKeepingUnitEanDTO' => array( 'Ean' => $dados_produtos ['CodigoBarras'] ) ),
 				'Description' => $dados_produtos ['Descricao'],
 				'DescriptionShort' => $dados_produtos ['Descricao'],
 				'CubicWeight' => $dados_produtos ['Peso']				
@@ -213,8 +219,9 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 	 * Processar cadastro de produtos via webservice.
 	 * @param string $guid
 	 * @param array $request
+	 * @param array $dadosCliente Contém informações de integração do cliente
 	 */
-	function ProcessaProdutosWebservice ( $request ) {
+	function ProcessaProdutosWebservice ( $request, $dadosCliente ) {
 
 		// produtos
 		$erro = null;
@@ -245,6 +252,7 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 			$array_produtos [0] ['NomeProdutoReduzido'] = $request ['DadosProdutos'] ['NomeProdutoReduzido'];
 			$array_produtos [0] ['CodigoFamilia'] = $request ['DadosProdutos'] ['CodigoFamilia'];
 			$array_produtos [0] ['DescricaoTag'] = $request ['DadosProdutos'] ['CaracteristicasComplementares'] ['Rows'] ['DadosCaracteristicasComplementares'] ['Texto'];
+			$array_produtos [0] ['CodigoBarras'] = $request ['DadosProdutos'] ['CodigoBarras'];
 			
 			// verifica se produto é pai ou filho
 			if ( strstr( $request ['DadosProdutos'] ['CodigoProduto'], '-' ) == true ){
@@ -276,6 +284,7 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 				$array_produtos [$i] ['NomeProdutoReduzido'] = $d ['NomeProdutoReduzido'];
 				$array_produtos [$i] ['CodigoFamilia'] = $d ['CodigoFamilia'];
 				$array_produtos [$i] ['DescricaoTag'] = $d ['CaracteristicasComplementares'] ['Rows'] ['DadosCaracteristicasComplementares'] ['Texto'];
+				$array_produtos [$i] ['CodigoBarras'] = $d ['CodigoBarras'];
 								
 				// verifica se produto é pai ou filho
 				if ( strstr( $d ['CodigoProduto'], '-' ) == true ){
@@ -294,7 +303,7 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 		
 		
 		echo "Conectando ao WebService Vtex... " . PHP_EOL;
-		$this->_vtex = new Model_Wpr_Vtex_Produto();
+		$this->_vtex = new Model_Wpr_Vtex_Produto($dadosCliente['VTEX_WSDL'],$dadosCliente['VTEX_USUARIO'], $dadosCliente['VTEX_SENHA']);
 		echo "Conectado!" . PHP_EOL;
 		echo PHP_EOL;
 		
@@ -327,13 +336,6 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 						$produto = $this->buscaProduto ( $dados_produtos ['CodigoProdutoPai'] );
 						$dados_produtos['IdProdutoPai'] = $produto->ProductGetByRefIdResult->Id;
 						$this->_enviaSku( $dados_produtos );
-// 						echo "Buscando cadastro do produto filho " . $dados_produtos ['CodigoProduto'] . PHP_EOL;
-// 						$produto = $this->buscaProduto ( $dados_produtos ['CodigoProdutoPai'] );
-// 						if ( $produto->ProductGetByRefIdResult != null ) {
-// 							echo "Adicionando/atualizando produto " . $dados_produtos['CodigoProduto'] . " na loja Vtex" . PHP_EOL;
-// 							$dados_produtos['IdProdutoPai'] = $produto->ProductGetByRefIdResult->Id;
-							
-// 						}
 						echo "Produto {$dados_produtos ['CodigoProduto']} adicionado/atualizado. " . PHP_EOL;
 					}
 					

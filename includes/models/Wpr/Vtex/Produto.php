@@ -31,8 +31,8 @@ class Model_Wpr_Vtex_Produto {
 	 * @param string $login Login de Conexão do Webservice.
 	 * @param string $pass Senha de Conexão do Webservice.
 	 */
-	public function __construct ( ) {
-		$this->_initVtex ();
+	public function __construct ( $ws, $login, $pass ) {
+		$this->_initVtex ( $ws, $login, $pass );
 	}
 
 	/**
@@ -95,14 +95,17 @@ class Model_Wpr_Vtex_Produto {
 	
 	/**
 	 * Inicializa webservice VTEX.
+	 * @param string $ws Endereço do Webservice.
+	 * @param string $login Login de Conexão do Webservice.
+	 * @param string $pass Senha de Conexão do Webservice. 
 	 */
-	protected function _initVtex (  ) {
+	protected function _initVtex ( $ws, $login, $pass ) {
 
 		// Gera objeto de conexão WebService
 		if ( isset ( $this->_vtex ) ) {
 			unset ( $this->_vtex );
 		}
-		$this->_vtex = Model_Wpr_Vtex_Vtex::getVtex();
+		$this->_vtex = Model_Wpr_Vtex_Vtex::getVtex( $ws, $login, $pass );
 		$this->_client = $this->_vtex->_client;
 	}
 }
