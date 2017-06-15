@@ -66,14 +66,7 @@ class Model_Wpr_Cron_VtexCron {
 			try {
 				echo "Importando pedidos do cliente {$cliente}" . PHP_EOL;
 				$vtex = new Model_Wpr_Vtex_Pedido( $dadosCliente['VTEX_WSDL'], $dadosCliente['VTEX_USUARIO'], $dadosCliente['VTEX_SENHA'], $dadosCliente['VTEX_API_URL'], $dadosCliente['VTEX_API_KEY'], $dadosCliente['VTEX_API_TOKEN'] );
-				$vtex->importarPedidosStatusQuantidade ( $status_pedido_vtex, $qtd_pedidos, $dadosCliente );
-				//$vtex->importarPedidoId(500079); // Kutiz
-				//$vtex->importarPedidoId(607143); // Afiliado
-				//$vtex->importarPedidoId(619385); // PENDENTE INTEGRAÇÃO
-				//$vtex->importarPedidoId(619477);
-	
-				//$erros_proc = $vtex->getErrosProcessamento ();
-	
+				$vtex->importarPedidosStatusQuantidade ( $status_pedido_vtex, $qtd_pedidos, $dadosCliente );	
 				echo "Pedidos do cliente Importados" . PHP_EOL;
 			} catch ( Exception $e ) {
 				$erros_proc = $vtex->getErrosProcessamento ();

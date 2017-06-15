@@ -474,7 +474,7 @@ class Model_Wpr_Vtex_Pedido {
 				echo "Pedido importado/atualizado com sucesso" . PHP_EOL;
 			
 				echo "Atualizando status de pedido {$dadosPedido [$i] ['NumeroDoPedido']} no ambiente VTEX" . PHP_EOL;
-				$this->_mudarStatusPedido($dadosPedido [$i] ['NumeroDoPedido'], 'ERP');
+				$this->_mudarStatusPedido($dadosPedido [$i] ['NumeroDoPedidoV3'], 'ERP');
 				echo "Status atualizado com sucesso" . PHP_EOL;
 			
 			} catch (Exception $e) {
@@ -571,7 +571,7 @@ class Model_Wpr_Vtex_Pedido {
 	 */
 	private function _mudarStatusPedido ( $order_id, $status ) {
 	
-		/*$url = sprintf($this->_url, "oms/pvt/orders/{$order_id}/start-handling");
+		$url = sprintf($this->_url, "oms/pvt/orders/{$order_id}/start-handling");
 		$headers = array(
 				'Content-Type' => 'application/json',
 				'Accept' => 'application/json',
@@ -583,9 +583,9 @@ class Model_Wpr_Vtex_Pedido {
 	
 		if (! $request->success) {
 			throw new RuntimeException('Falha na comunicação com o webservice. [' . $request->body . ']');
-		}*/
+		}
 		
-		if(empty($order_id)){
+		/*if(empty($order_id)){
 			throw new InvalidArgumentException ( 'ID do pedido inválido' );
 		}
 		if ( empty ( $status ) ) {
@@ -605,7 +605,7 @@ class Model_Wpr_Vtex_Pedido {
 			$this->_vtex->setErro ( array ( "Id" => $order_id, "Metodo" => "_mudarStatusPedido", "DescricaoErro" => $e->getMessage () ), "Pedido_Saida" );
 			throw new RuntimeException ( 'Erro ao tentar alterar status do pedido - ' . $e->getMessage() );
 		}
-		
+		*/
 	}
 
 	/**
