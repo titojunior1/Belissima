@@ -45,8 +45,6 @@ class Model_Wpr_Cron_VtexCron {
 	 */
 	public function CadastraPedidosVtex() {
 		
-		ini_set('display_errors', FALSE);
-		
 		$status_pedido_vtex = "CAP"; // baixar pedidos com status CAP: crédito aprovado
 		$qtd_pedidos = '100'; // quantidade limite de pedidos por transmissão
 		

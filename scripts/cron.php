@@ -7,7 +7,7 @@
 
 $basePath = realpath(dirname(__FILE__) . '/..');
 require_once $basePath . DIRECTORY_SEPARATOR . 'includes/wpr.php';
-
+ini_set('display_errors', FALSE);
 try {
 	Controller_Cron::executar($_SERVER['argv']);
 } catch (Exception $e) {

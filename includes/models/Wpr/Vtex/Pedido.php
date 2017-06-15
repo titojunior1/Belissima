@@ -163,7 +163,7 @@ class Model_Wpr_Vtex_Pedido {
 				$sub_cpf = substr ( $cpf, 0, 9 );
 	
 				for($i = 0; $i <= 9; $i ++) {
-					$dv += ($sub_cpf [$i] * (10 - $i));
+					$dv += @($sub_cpf [$i] * (10 - $i));
 				}
 	
 				if ($dv == 0) {
@@ -183,7 +183,7 @@ class Model_Wpr_Vtex_Pedido {
 				$dv *= 2;
 	
 				for($i = 0; $i <= 9; $i ++) {
-					$dv += ($sub_cpf [$i] * (11 - $i));
+					$dv += @($sub_cpf [$i] * (11 - $i));
 				}
 	
 				$dv = 11 - ($dv % 11);
