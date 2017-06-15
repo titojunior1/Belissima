@@ -4,4 +4,4 @@
 apache-logs
 flags
 configuration.php
-Wpr/includes/models/Wpr/Clientes/ClientesIntegracao.php
+includes/models/Wpr/Clientes/ClientesIntegracao.php
