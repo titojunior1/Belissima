@@ -45,6 +45,7 @@ class Model_Wpr_Cron_VtexCron {
 	 */
 	public function CadastraPedidosVtex() {
 		
+		ini_set('display_errors', FALSE);
 		
 		$status_pedido_vtex = "CAP"; // baixar pedidos com status CAP: crédito aprovado
 		$qtd_pedidos = '100'; // quantidade limite de pedidos por transmissão
@@ -57,10 +58,10 @@ class Model_Wpr_Cron_VtexCron {
 		
 		$hora_atual = date('H:i:s');
 		
-		//Após Black Friday, descomentar
-// 		if($hora_atual >= $hora_inicial_bloqueio || $hora_atual <= $hora_final_bloqueio){
-// 			return false;
-// 		}
+		
+		if($hora_atual >= $hora_inicial_bloqueio || $hora_atual <= $hora_final_bloqueio){
+			return false;
+		}
 
 		foreach ( $this->_clientes as $cliente => $dadosCliente ) {
 
