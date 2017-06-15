@@ -303,7 +303,7 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 		
 		
 		echo "Conectando ao WebService Vtex... " . PHP_EOL;
-		$this->_vtex = new Model_Wpr_Vtex_Produto($dadosCliente['VTEX_WSDL'],$dadosCliente['VTEX_USUARIO'], $dadosCliente['VTEX_SENHA']);
+		$this->_vtex = new Model_Wpr_Vtex_Produto( $dadosCliente['VTEX_WSDL'],$dadosCliente['VTEX_USUARIO'], $dadosCliente['VTEX_SENHA'] );
 		echo "Conectado!" . PHP_EOL;
 		echo PHP_EOL;
 		

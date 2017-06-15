@@ -54,18 +54,21 @@ class Model_Wpr_Vtex_Pedido {
 	 * @param string $ws Endereço do Webservice.
 	 * @param string $login Login de Conexão do Webservice.
 	 * @param string $pass Senha de Conexão do Webservice.
+	 * @param string $apiUrl Endereço do Webservice.
+	 * @param string $apiKey Login de Conexão do Webservice.
+	 * @param string $apiToken Senha de Conexão do Webservice.
 	 */
-	public function __construct (  ) {
+	public function __construct ( $ws, $login, $pass, $apiUrl, $apiKey, $apiToken ) {
 
 		if ( empty ( $this->_vtex ) ) {
 			// Gera objeto de conexão WebService
-			$this->_vtex = Model_Wpr_Vtex_Vtex::getVtex ();
+			$this->_vtex = Model_Wpr_Vtex_Vtex::getVtex ( $ws, $login, $pass );
 			$this->_client = $this->_vtex->_client;
 		}
 		
-		$this->_url = VTEX_API_URL;
-		$this->_key = VTEX_API_KEY;
-		$this->_token = VTEX_API_TOKEN;
+		$this->_url = $apiUrl;
+		$this->_key = $apiKey;
+		$this->_token = $apiToken;
 	}
 	/**
 	 * Verificar CNPJ
@@ -242,10 +245,10 @@ class Model_Wpr_Vtex_Pedido {
 	 * @param array $dados Array de Dados de pedidos
 	 *
 	 */
-	private function _importarPedidos ( $dados_pedido ) {
+	private function _importarPedidos ( $dados_pedido, $dadosCliente ) {
 
 		echo "Conectando ao WebService Kpl... " . PHP_EOL;
-		$this->_kpl = new Model_Wpr_Kpl_Clientes();
+		$this->_kpl = new Model_Wpr_Kpl_Clientes( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
 		echo "Conectado!" . PHP_EOL;
 		echo PHP_EOL;
 		
@@ -486,9 +489,10 @@ class Model_Wpr_Vtex_Pedido {
 	 * Importa uma determinada quantidade de pedidos que estejam em um determinado status
 	 * @param string $statusOrder Descrição do Status
 	 * @param int 	 $Quantidade  Quantidade de pedidos a ser importado
+	 * @param array $dadosCliente Dados de integração do cliente
 	 * @return retorna mensagem em caso de erro
 	 */
-	public function importarPedidosStatusQuantidade($status, $quantidade) {
+	public function importarPedidosStatusQuantidade($status, $quantidade, $dadosCliente) {
 		
 		if (empty ( $status )) {
 			throw new InvalidArgumentException ( 'Status inválido' );
@@ -514,7 +518,7 @@ class Model_Wpr_Vtex_Pedido {
 		$dados_pedidos = $this->_vtex->trataArrayDto ( $pedidos->OrderGetByStatusByQuantityResult->OrderDTO );
 		
 		try {
-			$this->_importarPedidos ( $dados_pedidos );
+			$this->_importarPedidos ( $dados_pedidos, $dadosCliente );
 		} catch ( Exception $e ) {
 			$this->_vtex->setErro ( array ("Id" => $value ['Id'], "Metodo" => "importarPedidosStatusQuantidade", "DescricaoErro" => $e->getMessage () ), "Pedido_Saida" );
 		

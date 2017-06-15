@@ -22,6 +22,19 @@ class Model_Wpr_Cron_VtexCron {
 
 		echo "- Iniciando Cron para processar integracao com sistema ERP KPL via webservice" . PHP_EOL;
 		
+		// Carrega clientes do banco
+		$this->_clientes = $this->CarregaClientes ();
+		
+	}
+	
+	/**
+	 * Carrega clientes, utilizando clientes_erp
+	 * @return array com Clientes
+	 */
+	public function CarregaClientes() {
+		$clientes = new Model_Wpr_Clientes_ClientesIntegracao ();
+	
+		return $clientes->carregaClientes ();
 	}
 
 
@@ -45,25 +58,29 @@ class Model_Wpr_Cron_VtexCron {
 		$hora_atual = date('H:i:s');
 		
 		//Após Black Friday, descomentar
-		if($hora_atual >= $hora_inicial_bloqueio || $hora_atual <= $hora_final_bloqueio){
-			return false;
-		}
+// 		if($hora_atual >= $hora_inicial_bloqueio || $hora_atual <= $hora_final_bloqueio){
+// 			return false;
+// 		}
 
-		try {
-			echo "Importando pedidos do cliente" . PHP_EOL;
-			$vtex = new Model_Wpr_Vtex_Pedido();
-			$vtex->importarPedidosStatusQuantidade ( $status_pedido_vtex, $qtd_pedidos );
-			//$vtex->importarPedidoId(500079); // Kutiz
-			//$vtex->importarPedidoId(607143); // Afiliado
-			//$vtex->importarPedidoId(619385); // PENDENTE INTEGRAÇÃO
-			//$vtex->importarPedidoId(619477);
+		foreach ( $this->_clientes as $cliente => $dadosCliente ) {
 
-			//$erros_proc = $vtex->getErrosProcessamento ();
-
-			echo "Pedidos do cliente Importados" . PHP_EOL;
-		} catch ( Exception $e ) {
-			$erros_proc = $vtex->getErrosProcessamento ();
-			echo "Erros ao importar os pedidos do cliente {$cli_id}: " . $e->getMessage () . PHP_EOL;
+			try {
+				echo "Importando pedidos do cliente {$cliente}" . PHP_EOL;
+				$vtex = new Model_Wpr_Vtex_Pedido( $dadosCliente['VTEX_WSDL'], $dadosCliente['VTEX_USUARIO'], $dadosCliente['VTEX_SENHA'], $dadosCliente['VTEX_API_URL'], $dadosCliente['VTEX_API_KEY'], $dadosCliente['VTEX_API_TOKEN'] );
+				$vtex->importarPedidosStatusQuantidade ( $status_pedido_vtex, $qtd_pedidos, $dadosCliente );
+				//$vtex->importarPedidoId(500079); // Kutiz
+				//$vtex->importarPedidoId(607143); // Afiliado
+				//$vtex->importarPedidoId(619385); // PENDENTE INTEGRAÇÃO
+				//$vtex->importarPedidoId(619477);
+	
+				//$erros_proc = $vtex->getErrosProcessamento ();
+	
+				echo "Pedidos do cliente Importados" . PHP_EOL;
+			} catch ( Exception $e ) {
+				$erros_proc = $vtex->getErrosProcessamento ();
+				echo "Erros ao importar os pedidos do cliente {$cli_id}: " . $e->getMessage () . PHP_EOL;
+			}
+		
 		}
 		echo PHP_EOL;
 		echo PHP_EOL;

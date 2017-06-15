@@ -1,7 +1,7 @@
 .buildpath
 .project
 .settings
-scripts
 apache-logs
 flags
 configuration.php
+Wpr/includes/models/Wpr/Clientes/ClientesIntegracao.php
