@@ -21,11 +21,14 @@ class Model_Wpr_Magento_Pedidos extends Model_Wpr_Magento_MagentoWebService{
 	/**
 	 *
 	 * construtor.
+	 * @param string $ws Endereço do Webservice.
+	 * @param string $login Login de Conexão do Webservice.
+	 * @param string $pass Senha de Conexão do Webservice. 
 	 */
-	function __construct () {
+	function __construct ( $ws, $login, $pass ) {
 	
 		if (empty ( $this->_magento )) {
-			$this->_magento = new Model_Wpr_Magento_MagentoWebService();
+			$this->_magento = new Model_Wpr_Magento_MagentoWebService( $ws, $login, $pass );
 		}
 		
 	}
@@ -175,10 +178,10 @@ class Model_Wpr_Magento_Pedidos extends Model_Wpr_Magento_MagentoWebService{
 	 * Processar cadastro de clientes via webservice.
 	 * @param array $request
 	 */
-	function ProcessaPedidosWebservice ( $request ) {
+	function ProcessaPedidosWebservice ( $request, $dadosCliente ) {
 				
 		echo "Conectando ao WebService Kpl... " . PHP_EOL;
-		$this->_kpl = new Model_Wpr_Kpl_Clientes();
+		$this->_kpl = new Model_Wpr_Kpl_Clientes( $dadosCliente['KPL_WSDL'], $dadosCliente['KPL_KEY'] );
 		echo "Conectado!" . PHP_EOL;
 		echo PHP_EOL;
 		
