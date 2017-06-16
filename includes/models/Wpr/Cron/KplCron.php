@@ -213,6 +213,7 @@ class Model_Wpr_Cron_KplCron {
 				
 				switch ($cliente) {
 					case 'Belissima' :
+						
 						if (! is_array ( $status_disponiveis ['StatusPedidoDisponiveisResult'] )) {
 							throw new Exception ( 'Erro ao buscar status dos pedidos' );
 						}
@@ -229,14 +230,15 @@ class Model_Wpr_Cron_KplCron {
 						break;
 					
 					case 'VetorScan' :
+						
 						if (! is_array ( $status_disponiveis ['StatusPedidoDisponiveisResult'] )) {
 							throw new Exception ( 'Erro ao buscar status dos pedidos' );
 						}
 						if ($status_disponiveis ['StatusPedidoDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
 							echo "Nao existem status disponiveis para integracao " . PHP_EOL;
 						} else {
-							$kpl = new Model_Wpr_Kpl_StatusPedido ();
-							$retorno = $kpl->ProcessaStatusWebservice ( $status_disponiveis ['StatusPedidoDisponiveisResult'] ['Rows'] );
+							$kpl = new Model_Wpr_Kpl_StatusPedidoVetorScan( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl->ProcessaStatusWebservice ( $status_disponiveis ['StatusPedidoDisponiveisResult'] ['Rows'], $dadosCliente );
 							if (is_array ( $retorno )) {
 								// gravar logs de erro
 								$this->_log->gravaLogErros ( $retorno );
