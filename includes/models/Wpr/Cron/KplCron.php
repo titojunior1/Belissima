@@ -176,8 +176,8 @@ class Model_Wpr_Cron_KplCron {
 							echo "Nao existem precos disponiveis para integracao" . PHP_EOL;
 						} else {
 							
-							$kpl_preços = new Model_Wpr_Kpl_Precos ();
-							$retorno = $kpl_preços->ProcessaPrecosWebservice ( $precos ['PrecosDisponiveisResult'] ['Rows'] );
+							$kpl_preços = new Model_Wpr_Kpl_PrecosVetorScan( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl_preços->ProcessaPrecosWebservice ( $precos ['PrecosDisponiveisResult'] ['Rows'], $dadosCliente );
 							if (is_array ( $retorno )) {
 								// ERRO
 							}

@@ -56,7 +56,7 @@ class Model_Wpr_Kpl_KplWebService {
 	 * Construtor.
 	 * @param string $ws Endereço do Webservice.	 
 	 */
-	public function __construct($ws, $key) {
+	public function __construct( $ws, $key ) {
 			
 		$this->_ws = $ws;
 			

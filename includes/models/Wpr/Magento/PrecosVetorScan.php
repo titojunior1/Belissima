@@ -6,6 +6,6 @@
  * @author Tito Junior
  *
  */
-class Model_Wpr_Magento_Precos extends Model_Wpr_Magento_MagentoWebService{
+class Model_Wpr_Magento_PrecosVetorScan extends Model_Wpr_Magento_MagentoWebService{
 	
 }
