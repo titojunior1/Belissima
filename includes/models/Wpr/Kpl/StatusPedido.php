@@ -24,12 +24,13 @@ class Model_Wpr_Kpl_StatusPedido extends Model_Wpr_Kpl_KplWebService {
 	
 	/**
 	 * Construtor.
-	 *	  
+	 * @param string $ws
+	 * @param String $key	  
 	 */
-	public function __construct() {		
+	public function __construct( $ws, $key ) {		
 		
 		if (empty ( $this->_kpl )) {
-			$this->_kpl = new Model_Wpr_Kpl_KplWebService ();
+			$this->_kpl = new Model_Wpr_Kpl_KplWebService ( $ws, $key );
 		}
 	
 	}	
@@ -89,7 +90,7 @@ class Model_Wpr_Kpl_StatusPedido extends Model_Wpr_Kpl_KplWebService {
 	 * Processar status dos pedidos via webservice.
 	 * @param array $request
 	 */
-	function ProcessaStatusWebservice ( $request ) {
+	function ProcessaStatusWebservice ( $request, $dadosCliente ) {
 
 		$erro = null;
 		
@@ -128,7 +129,7 @@ class Model_Wpr_Kpl_StatusPedido extends Model_Wpr_Kpl_KplWebService {
 		echo PHP_EOL;
 		
 		echo "Conectando ao WebService Vtex... " . PHP_EOL;
-		$this->_vtex = new Model_Wpr_Vtex_Status();
+		$this->_vtex = new Model_Wpr_Vtex_Status( $dadosCliente['VTEX_WSDL'], $dadosCliente['VTEX_USUARIO'], $dadosCliente['VTEX_SENHA'] );
 		echo "Conectado!" . PHP_EOL;
 		echo PHP_EOL;
 		
