@@ -82,7 +82,7 @@ class Model_Wpr_Kpl_EstoqueKpl extends Model_Wpr_Kpl_KplWebService {
 		echo PHP_EOL;
 		
 		echo "Conectando ao WebService Vtex... " . PHP_EOL;
-		$this->_vtex = new Model_Wpr_Vtex_Estoque( $dadosCliente['VTEX_API_URL'],$dadosCliente['VTEX_API_KEY'], $dadosCliente['VTEX_API_TOKEN'] );
+		$this->_vtex = new Model_Wpr_Vtex_Estoque( $dadosCliente['VTEX_WSDL'], $dadosCliente['VTEX_USUARIO'], $dadosCliente['VTEX_SENHA'], $dadosCliente['VTEX_API_URL'], $dadosCliente['VTEX_API_KEY'], $dadosCliente['VTEX_API_TOKEN'] );
 		echo "Conectado!" . PHP_EOL;
 		echo PHP_EOL;
 		

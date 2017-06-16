@@ -70,7 +70,7 @@ class Model_Wpr_Cron_VtexCron {
 				echo "Pedidos do cliente Importados" . PHP_EOL;
 			} catch ( Exception $e ) {
 				$erros_proc = $vtex->getErrosProcessamento ();
-				echo "Erros ao importar os pedidos do cliente {$cli_id}: " . $e->getMessage () . PHP_EOL;
+				echo "Erros ao importar os pedidos do cliente {$cliente}: " . $e->getMessage () . PHP_EOL;
 			}
 		
 		}

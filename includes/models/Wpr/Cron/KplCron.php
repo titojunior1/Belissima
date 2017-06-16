@@ -3,6 +3,7 @@
  *
  *
  *
+ *
  * Cron para processar integração com sistema ERP KPL - Ábacos via webservice
  * @author Tito Junior <titojunior1@gmail.com>
  *        
@@ -10,6 +11,7 @@
 class Model_Wpr_Cron_KplCron {
 	
 	/**
+	 *
 	 *
 	 *
 	 *
@@ -22,6 +24,7 @@ class Model_Wpr_Cron_KplCron {
 	 *
 	 *
 	 *
+	 *
 	 * Array com clientes encontrados
 	 * @var array
 	 */
@@ -30,6 +33,7 @@ class Model_Wpr_Cron_KplCron {
 	/**
 	 * Construtor
 	 * @param
+	 *
 	 *
 	 *
 	 */
@@ -59,12 +63,12 @@ class Model_Wpr_Cron_KplCron {
 		
 		foreach ( $this->_clientes as $cliente => $dadosCliente ) {
 			
-			echo "- importando estoques disponiveis do cliente Belissima - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
+			echo "- importando estoques disponiveis do cliente {$cliente} - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
 			
 			try {
 				
 				echo PHP_EOL;
-				echo "Consultando produtos disponiveis para integracao " . PHP_EOL;
+				echo "Consultando estoques disponiveis para integracao " . PHP_EOL;
 				
 				$this->_kpl = new Model_Wpr_Kpl_KplWebService ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
 				
@@ -98,7 +102,7 @@ class Model_Wpr_Cron_KplCron {
 							echo "Nao existem estoques disponiveis para integracao" . PHP_EOL;
 						} else {
 							
-							$kpl_estoques = new Model_Wpr_Kpl_EstoqueKplVetorScan( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$kpl_estoques = new Model_Wpr_Kpl_EstoqueKplVetorScan ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
 							$retorno = $kpl_estoques->ProcessaEstoqueWebservice ( $estoques ['EstoquesDisponiveisResult'] ['Rows'], $dadosCliente );
 							if (is_array ( $retorno )) {
 								// ERRO					
@@ -107,29 +111,20 @@ class Model_Wpr_Cron_KplCron {
 						break;
 				}
 				
-				echo "- importacao de produtos do cliente {$cliente} realizada com sucesso" . PHP_EOL;
+				echo "- importacao de estoque do cliente {$cliente} realizada com sucesso" . PHP_EOL;
 			} catch ( Exception $e ) {
-				echo "- erros ao importar os produtos do cliente {$cliente}: " . $e->getMessage () . PHP_EOL;
+				echo "- erros ao importar estoque do cliente {$cliente}: " . $e->getMessage () . PHP_EOL;
 			}
 			
 			unset ( $this->_kpl );
 			unset ( $chaveIdentificacao );
 			unset ( $kpl_produtos );
 		}
-		
-		try {
-			
-			echo "- importacao de estoque do cliente Belissima realizada com sucesso" . PHP_EOL;
-		} catch ( Exception $e ) {
-			echo "- erros ao importar estoque do cliente Belissima: " . $e->getMessage () . PHP_EOL;
-		}
-		unset ( $this->_kpl );
-		unset ( $chaveIdentificacao );
-		
 		echo "- Finalizando cron para atualizar estoque do Kpl" . PHP_EOL;
 	}
 
 	/**
+	 *
 	 *
 	 *
 	 *
@@ -139,35 +134,61 @@ class Model_Wpr_Cron_KplCron {
 	public function AtualizaPrecosKpl() {
 		ini_set ( 'memory_limit', '512M' );
 		
-		if (empty ( $this->_kpl )) {
-			$this->_kpl = new Model_Wpr_Kpl_KplWebService ();
-		}
-		echo "- importando precos do cliente Belissima - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
-		
-		try {
-			$chaveIdentificacao = KPL_KEY;
-			$precos = $this->_kpl->PrecosDisponiveis ( $chaveIdentificacao );
-			if (! is_array ( $precos ['PrecosDisponiveisResult'] )) {
-				throw new Exception ( 'Erro ao buscar Preços - ' . $precos );
-			}
-			if ($precos ['PrecosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
-				echo "Nao existem precos disponiveis para integracao" . PHP_EOL;
-			} else {
-				
-				$kpl_preços = new Model_Wpr_Kpl_Precos ();
-				$retorno = $kpl_preços->ProcessaPrecosWebservice ( $precos ['PrecosDisponiveisResult'] ['Rows'] );
-				if (is_array ( $retorno )) {
-					// ERRO
-				}
-			}
+		foreach ( $this->_clientes as $cliente => $dadosCliente ) {
 			
-			echo "- importacao de precos do cliente Belissima realizada com sucesso" . PHP_EOL;
-		} catch ( Exception $e ) {
-			echo "- erros ao importar os precos do cliente Belissima: " . $e->getMessage () . PHP_EOL;
+			echo "- importando precos disponiveis do cliente {$cliente} - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
+			
+			try {
+				
+				$this->_kpl = new Model_Wpr_Kpl_KplWebService ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+
+				$precos = $this->_kpl->PrecosDisponiveis ( $dadosCliente ['KPL_KEY'] );
+				
+				switch ($cliente) {
+						
+					case 'Belissima' :
+				
+							if (! is_array ( $precos ['PrecosDisponiveisResult'] )) {
+								throw new Exception ( 'Erro ao buscar Preços - ' . $precos );
+							}
+							if ($precos ['PrecosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+								echo "Nao existem precos disponiveis para integracao" . PHP_EOL;
+							} else {
+								
+								$kpl_preços = new Model_Wpr_Kpl_Precos ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'], $dadosCliente ['VTEX_API_URL'], $dadosCliente ['VTEX_API_KEY'], $dadosCliente ['VTEX_API_TOKEN']  );
+								$retorno = $kpl_preços->ProcessaPrecosWebservice ( $precos ['PrecosDisponiveisResult'] ['Rows'], $dadosCliente );
+								if (is_array ( $retorno )) {
+									// ERRO
+								}
+							}
+					break;
+					
+					case 'VetorScan' :
+					
+						if (! is_array ( $precos ['PrecosDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar Preços - ' . $precos );
+						}
+						if ($precos ['PrecosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem precos disponiveis para integracao" . PHP_EOL;
+						} else {
+					
+							$kpl_preços = new Model_Wpr_Kpl_Precos ();
+							$retorno = $kpl_preços->ProcessaPrecosWebservice ( $precos ['PrecosDisponiveisResult'] ['Rows'] );
+							if (is_array ( $retorno )) {
+								// ERRO
+							}
+						}
+						break;
+					
+				}	
+				
+				echo "- importacao de precos do cliente Belissima realizada com sucesso" . PHP_EOL;
+			} catch ( Exception $e ) {
+				echo "- erros ao importar os precos do cliente Belissima: " . $e->getMessage () . PHP_EOL;
+			}
+			unset ( $this->_kpl );
+			unset ( $chaveIdentificacao );
 		}
-		unset ( $this->_kpl );
-		unset ( $chaveIdentificacao );
-		
 		echo "- Finalizando cron para atualizar precos da Kpl" . PHP_EOL;
 	}
 
@@ -248,6 +269,7 @@ class Model_Wpr_Cron_KplCron {
 	}
 
 	/**
+	 *
 	 *
 	 *
 	 *

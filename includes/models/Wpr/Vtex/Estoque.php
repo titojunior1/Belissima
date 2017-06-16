@@ -41,14 +41,14 @@ class Model_Wpr_Vtex_Estoque {
 	 * @param string $login Login de Conexão do Webservice.
 	 * @param string $pass Senha de Conexão do Webservice.
 	 */
-	public function __construct( $ws, $login, $pass ) {
+	public function __construct( $ws, $login, $pass, $apiUrl, $apiKey, $apiToken ) {
 		if (empty ( $this->_vtex )) {
 			// Gera objeto de conexão WebService
 			$this->_vtex = Model_Wpr_Vtex_Vtex::getVtex( $ws, $login, $pass );
 			$this->_client = $this->_vtex->_client;
-			$this->_url = $ws;
-			$this->_key = $login;
-			$this->_token = $pass;
+			$this->_url = $apiUrl;
+			$this->_key = $apiKey;
+			$this->_token = $apiToken;
 		}
 	}
 	

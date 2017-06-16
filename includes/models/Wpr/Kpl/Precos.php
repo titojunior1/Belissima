@@ -37,17 +37,17 @@ class Model_Wpr_Kpl_Precos extends Model_Wpr_Kpl_KplWebService {
 	/**
 	 * 
 	 * construtor.
-	 * @param int $cli_id
-	 * @param int $empwh_id
+	 * @param string $ws
+	 * @param String $key
 	 */
-	function __construct() {
+	function __construct( $ws, $key, $apiUrl, $apiKey, $apiToken ) {
 		
 		if (empty ( $this->_kpl )) {
-			$this->_kpl = new Model_Wpr_Kpl_KplWebService (  );
+			$this->_kpl = new Model_Wpr_Kpl_KplWebService ( $ws, $key );
 		}
-		$this->_url = VTEX_API_URL;
-		$this->_key = VTEX_API_KEY;
-		$this->_token = VTEX_API_TOKEN;
+		$this->_url = $apiUrl;
+		$this->_key = $apiKey;
+		$this->_token = $apiToken;
 	
 	}
 
@@ -108,7 +108,7 @@ class Model_Wpr_Kpl_Precos extends Model_Wpr_Kpl_KplWebService {
 	 * @param string $guid
 	 * @param array $request
 	 */
-	function ProcessaPrecosWebservice ( $request ) {
+	function ProcessaPrecosWebservice ( $request, $dadosCliente ) {
 
 		// erros
 		$erro = null;
@@ -185,7 +185,7 @@ class Model_Wpr_Kpl_Precos extends Model_Wpr_Kpl_KplWebService {
 // 		$this->_vtex = new Model_Belissima_Vtex_Preco();
 // 		echo "Conectado!" . PHP_EOL;
 		echo "Conectando ao WebService Vtex... " . PHP_EOL;
-		$this->_vtex = new Model_Wpr_Vtex_Preco();
+		$this->_vtex = new Model_Wpr_Vtex_Preco($dadosCliente['VTEX_WSDL'], $dadosCliente['VTEX_USUARIO'], $dadosCliente['VTEX_SENHA']);
 		echo "Conectado!" . PHP_EOL;
 		echo PHP_EOL;
 		
