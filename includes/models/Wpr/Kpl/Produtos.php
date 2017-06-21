@@ -166,7 +166,7 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 				'Description' => $dados_produtos ['Descricao'],
 				'DescriptionShort' => $dados_produtos ['Descricao'],
 				'IsActive' => true,
-				'IsVisible' => false,
+				'IsVisible' => $dados_produtos['flagExibicao'],
 				'ListStoreId' => array( 'int' => '1' ),
 				'MetaTagDescription' => $dados_produtos ['DescricaoTag'],
 				'Name' => $dados_produtos ['Nome'],
@@ -330,6 +330,11 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 						echo "Adicionado/Atualizando produto pai " . $dados_produtos ['CodigoProduto'] . PHP_EOL;						
 						$produto = $this->buscaProduto ( $dados_produtos ['CodigoProduto'] );
 						$dados_produtos['IdProdutoPai'] = $produto->ProductGetByRefIdResult->Id;
+						if( $dados_produtos['IdProdutoPai'] != null ){
+							$dados_produtos['flagExibicao'] = true;
+						}else{
+							$dados_produtos['flagExibicao'] = false;
+						}
 						$this->_enviaProduto ( $dados_produtos );
 					}else{
 						echo "Adicionado/Atualizando produto filho " . $dados_produtos ['CodigoProduto'] . PHP_EOL;
