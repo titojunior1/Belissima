@@ -449,7 +449,14 @@ class Model_Wpr_Vtex_Pedido {
 			}			
 			$totalPedidoPagamento = ($valor_total_produtos + $valor_total_frete) - $valor_total_desconto;
 			
-			$dados_pagamento = $this->_getDadosPagamento($dadosPedido [$i] ['NumeroDoPedidoV3']);
+			try {					
+				$dados_pagamento = $this->_getDadosPagamento($dadosPedido [$i] ['NumeroDoPedidoV3']);					
+			} catch (Exception $e) {
+				echo "Erro ao obter dados de pagamento " . $dadosPedido [$i] ['NumeroDoPedido'] . ' - ' . $e->getMessage() . PHP_EOL;
+				continue;
+			}
+			
+			
 			$dadosPagamento = $this->_vtex->trataArrayDto ( (array) $dados_pagamento );
 			
 			if($dados_pagamento != null){

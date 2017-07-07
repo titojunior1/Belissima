@@ -7,7 +7,7 @@
  *
  */
 
-class Model_Wpr_Kpl_EstoqueKplVetorScan extends Model_Wpr_Kpl_KplWebService {	
+class Model_Wpr_Kpl_EstoqueKplCreaTech extends Model_Wpr_Kpl_KplWebService {	
 	
 	/**
 	 * Variavel  de Objeto da Classe Kpl.
