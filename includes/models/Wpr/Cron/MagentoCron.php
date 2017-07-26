@@ -148,6 +148,24 @@ class Model_Wpr_Cron_MagentoCron {
 						}
 						
 						break;
+						
+					case 'CreaTech' :
+						
+							if (! is_array ( $pedidos_disponiveis )) {
+								throw new Exception ( 'Erro ao buscar notas de saida' );
+							}
+							if (count ( $pedidos_disponiveis ) == 0) {
+								echo "Nao existem pedidos de saida disponiveis para integracao " . PHP_EOL;
+							} else {
+								$magento = new Model_Wpr_Magento_PedidosCreaTech ( $dadosCliente ['MAGENTO_WSDL'], $dadosCliente ['MAGENTO_USUARIO'], $dadosCliente ['MAGENTO_SENHA'] );
+								$retorno = $magento->ProcessaPedidosWebservice ( $pedidos_disponiveis, $dadosCliente );
+								if (is_array ( $retorno )) {
+									// gravar logs de erro
+									$this->_log->gravaLogErros ( $retorno );
+								}
+							}
+						
+							break;
 				}
 				
 				echo "- importacao de pedidos do cliente {$cliente} realizada com sucesso " . PHP_EOL;

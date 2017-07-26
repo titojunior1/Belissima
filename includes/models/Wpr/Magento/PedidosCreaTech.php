@@ -6,7 +6,7 @@
  * @author Tito Junior
  *
  */
-class Model_Wpr_Magento_PedidosVetorScan extends Model_Wpr_Magento_MagentoWebService{
+class Model_Wpr_Magento_PedidosCreaTech extends Model_Wpr_Magento_MagentoWebService{
 	
 	/*
 	 * Instancia Webservice Magento
@@ -300,7 +300,7 @@ class Model_Wpr_Magento_PedidosVetorScan extends Model_Wpr_Magento_MagentoWebSer
 			
 			//Seguindo com criação de Pedidos
 			$dadosPedido [$i] ['NumeroDoPedido'] = $infosAdicionaisPedido->increment_id;
-			$dadosPedido [$i] ['Email'] = $infosAdicionaisPedido->customer_email;
+			$dadosPedido [$i] ['EMail'] = $infosAdicionaisPedido->customer_email;
 			$dadosPedido [$i] ['CPFouCNPJ'] = $cpfFormatado;
 			$dadosPedido [$i] ['CodigoCliente'] = $cpfFormatado;
 			//$dadosPedido [$i] ['CondicaoPagamento'] = 'COMPRAS'; //Validar			
@@ -371,14 +371,15 @@ class Model_Wpr_Magento_PedidosVetorScan extends Model_Wpr_Magento_MagentoWebSer
 					
 						$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['FormaPagamentoCodigo'] = 'mastershopboletobancario';
 						$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['Valor'] = number_format($infosAdicionaisPedido->payment->amount_ordered, 2, '.', '');
+// 						$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoNumero'] = $infosAdicionaisPedido->payment->cc_number_enc;
+// 						$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoCodigoSeguranca'] = $infosAdicionaisPedido->payment->cc_last4;
+// 						$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoNomeImpresso'] = $infosAdicionaisPedido->payment->cc_owner;
+						//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoQtdeParcelas'] = $infosAdicionaisPedido->payment->installments;
+// 						$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoQtdeParcelas'] = '1';
+// 						$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoCodigoAutorizacao'] = $infosAdicionaisPedido->payment->cc_last4;
+						//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoValidade'] = $infosAdicionaisPedido->payment->cc_exp_month.$infosAdicionaisPedido->payment->cc_exp_year;
 					
 						break;
-				case 'mastershopboletobancario2' :
-						
-					$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['FormaPagamentoCodigo'] = 'mastershopboletobancario';
-					$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['Valor'] = number_format($infosAdicionaisPedido->payment->amount_ordered, 2, '.', '');
-						
-					break;
 			
 				default:
 						

@@ -8,6 +8,7 @@
  *
  *
  *
+ *
  * Cron para processar integração com sistema ERP KPL - Ábacos via webservice
  * @author Tito Junior <titojunior1@gmail.com>
  *        
@@ -15,6 +16,7 @@
 class Model_Wpr_Cron_KplCron {
 	
 	/**
+	 *
 	 *
 	 *
 	 *
@@ -37,6 +39,7 @@ class Model_Wpr_Cron_KplCron {
 	 *
 	 *
 	 *
+	 *
 	 * Array com clientes encontrados
 	 * @var array
 	 */
@@ -45,6 +48,7 @@ class Model_Wpr_Cron_KplCron {
 	/**
 	 * Construtor
 	 * @param
+	 *
 	 *
 	 *
 	 *
@@ -156,6 +160,7 @@ class Model_Wpr_Cron_KplCron {
 	}
 
 	/**
+	 *
 	 *
 	 *
 	 *
@@ -294,6 +299,22 @@ class Model_Wpr_Cron_KplCron {
 							}
 						}
 						break;
+					case 'CreaTech' :
+						
+						if (! is_array ( $status_disponiveis ['StatusPedidoDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar status dos pedidos' );
+						}
+						if ($status_disponiveis ['StatusPedidoDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem status disponiveis para integracao " . PHP_EOL;
+						} else {
+							$kpl = new Model_Wpr_Kpl_StatusPedidoCreaTech ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl->ProcessaStatusWebservice ( $status_disponiveis ['StatusPedidoDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// gravar logs de erro
+								$this->_log->gravaLogErros ( $retorno );
+							}
+						}
+						break;
 				}
 				
 				echo "- importacao de status de pedidos do cliente {$cliente} realizada com sucesso " . PHP_EOL;
@@ -345,6 +366,7 @@ class Model_Wpr_Cron_KplCron {
 	}
 
 	/**
+	 *
 	 *
 	 *
 	 *
@@ -416,7 +438,7 @@ class Model_Wpr_Cron_KplCron {
 						if ($produtos ['ProdutosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
 							echo "Nao existem produtos disponiveis para integracao" . PHP_EOL;
 						} else {
-							$kpl_produtos = new Model_Wpr_Kpl_ProdutosCreaTech( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$kpl_produtos = new Model_Wpr_Kpl_ProdutosCreaTech ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
 							$retorno = $kpl_produtos->ProcessaProdutosWebservice ( $produtos ['ProdutosDisponiveisResult'] ['Rows'], $dadosCliente );
 							if (is_array ( $retorno )) {
 								// ERRO

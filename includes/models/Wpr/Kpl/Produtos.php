@@ -163,8 +163,8 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 				'BrandId' => $dados_produtos ['CodigoMarca'],
 				'CategoryId' => $dados_produtos ['Categoria'],
 				//'DepartmentId' => $dados_produtos ['CodigoFamilia'],
-				'Description' => $dados_produtos ['Descricao'],
-				'DescriptionShort' => $dados_produtos ['Descricao'],
+ 				'Description' => $dados_produtos ['Descricao'],
+// 				'DescriptionShort' => $dados_produtos ['Descricao'],
 				'IsActive' => true,
 				'IsVisible' => $dados_produtos['flagExibicao'],
 				'ListStoreId' => array( 'int' => '1' ),
@@ -201,13 +201,13 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 				'IsKit' => false,				
 				'ModalId' => '1',
 				'Name' => $dados_produtos ['Nome'],
-				'ProductName' => $dados_produtos ['Nome'],				
+// 				'ProductName' => $dados_produtos ['Nome'],				
 				'ProductId' => $dados_produtos ['IdProdutoPai'],
 				//'Id' => $dados_produtos ['CodigoProduto'],
 				'RefId' => $dados_produtos ['CodigoProduto'],	
 				'StockKeepingUnitEans' => array( 'StockKeepingUnitEanDTO' => array( 'Ean' => $dados_produtos ['CodigoBarras'] ) ),
-				'Description' => $dados_produtos ['Descricao'],
-				'DescriptionShort' => $dados_produtos ['Descricao'],
+// 				'Description' => $dados_produtos ['Descricao'],
+// 				'DescriptionShort' => $dados_produtos ['Descricao'],
 				'CubicWeight' => $dados_produtos ['Peso']				
 		);
 	
@@ -330,6 +330,7 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 						echo "Adicionado/Atualizando produto pai " . $dados_produtos ['CodigoProduto'] . PHP_EOL;						
 						$produto = $this->buscaProduto ( $dados_produtos ['CodigoProduto'] );
 						$dados_produtos['IdProdutoPai'] = $produto->ProductGetByRefIdResult->Id;
+						$dados_produtos['Descricao'] = $produto->ProductGetByRefIdResult->Description;
 						if( $dados_produtos['IdProdutoPai'] != null ){
 							$dados_produtos['flagExibicao'] = true;
 						}else{
@@ -339,7 +340,7 @@ class Model_Wpr_Kpl_Produtos extends Model_Wpr_Kpl_KplWebService {
 					}else{
 						echo "Adicionado/Atualizando produto filho " . $dados_produtos ['CodigoProduto'] . PHP_EOL;
 						$produto = $this->buscaProduto ( $dados_produtos ['CodigoProdutoPai'] );
-						$dados_produtos['IdProdutoPai'] = $produto->ProductGetByRefIdResult->Id;
+						$dados_produtos['IdProdutoPai'] = $produto->ProductGetByRefIdResult->Id;						
 						$this->_enviaSku( $dados_produtos );
 						echo "Produto {$dados_produtos ['CodigoProduto']} adicionado/atualizado. " . PHP_EOL;
 					}
