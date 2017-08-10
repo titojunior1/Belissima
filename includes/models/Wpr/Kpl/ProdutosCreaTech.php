@@ -124,7 +124,7 @@ class Model_Wpr_Kpl_ProdutosCreaTech extends Model_Wpr_Kpl_KplWebService {
 	 */
 	private function _adicionaProduto($dados_produtos) {
 		$skuNovoProduto = $dados_produtos ['SKU'];
-		$novoProduto = array ( 'name' => $dados_produtos ['Nome'], 'description' => $dados_produtos ['Descricao'], 'short_description' => $dados_produtos ['Descricao'], 'weight' => $dados_produtos ['Peso'], 'status' => '1', 'url_key' => $dados_produtos ['Nome'], 'visibility' => $dados_produtos ['Visibilidade'], 'price' => $dados_produtos ['ValorVenda'], 'special_price' => $dados_produtos ['ValorCusto'], 'tax_class_id' => 1, 'meta_title' => $dados_produtos ['Nome'] );
+		$novoProduto = array ( 'name' => $dados_produtos ['Nome'], 'weight' => $dados_produtos ['Peso'], 'status' => '1', 'url_key' => $dados_produtos ['Nome'], 'visibility' => $dados_produtos ['Visibilidade'], 'price' => $dados_produtos ['ValorVenda'], 'special_price' => $dados_produtos ['ValorCusto'], 'tax_class_id' => 1, 'meta_title' => $dados_produtos ['Nome'] );
 		
 		$this->_magento->cadastraProduto ( $skuNovoProduto, $novoProduto );
 	}
@@ -138,7 +138,7 @@ class Model_Wpr_Kpl_ProdutosCreaTech extends Model_Wpr_Kpl_KplWebService {
 	 */
 	private function _atualizaProduto($dados_produtos) {
 		$idProduto = $dados_produtos ['product_id'];
-		$produto = array ( 'name' => $dados_produtos ['Nome'], 'description' => $dados_produtos ['Descricao'], 'short_description' => $dados_produtos ['Descricao'], 'weight' => $dados_produtos ['Peso'], 'status' => '1', 'url_key' => $dados_produtos ['Nome'], 'visibility' => $dados_produtos ['Visibilidade'], 
+		$produto = array ( 'name' => $dados_produtos ['Nome'], 'weight' => $dados_produtos ['Peso'], 'status' => '1', 'url_key' => $dados_produtos ['Nome'], 'visibility' => $dados_produtos ['Visibilidade'], 
 				//'price' => $dados_produtos ['ValorVenda'],
 				//'special_price' => $dados_produtos ['ValorCusto'],
 				'tax_class_id' => 1, 'meta_title' => $dados_produtos ['Nome'] );
@@ -266,7 +266,7 @@ class Model_Wpr_Kpl_ProdutosCreaTech extends Model_Wpr_Kpl_KplWebService {
 			// validar campos obrigatórios
 			
 
-			if (empty ( $dados_produtos ['Nome'] ) || empty ( $dados_produtos ['Descricao'] ) || empty ( $dados_produtos ['PartNumber'] ) || empty ( $dados_produtos ['SKU'] ) || empty ( $dados_produtos ['EanProprio'] )) {
+			if (empty ( $dados_produtos ['Nome'] ) || empty ( $dados_produtos ['PartNumber'] ) || empty ( $dados_produtos ['SKU'] ) || empty ( $dados_produtos ['EanProprio'] )) {
 				echo "Produto {$dados_produtos['SKU']}: Dados obrigatórios não preenchidos" . PHP_EOL;
 				$array_erro [$indice] = "Produto {$dados_produtos['SKU']}: Dados obrigatórios não preenchidos" . PHP_EOL;
 				$erros_produtos ++;

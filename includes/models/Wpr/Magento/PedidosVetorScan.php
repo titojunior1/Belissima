@@ -217,29 +217,31 @@ class Model_Wpr_Magento_PedidosVetorScan extends Model_Wpr_Magento_MagentoWebSer
 			}
 			
 			//Manipulando dados para cadastro/atualização de cliente 
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Email'] = $d->customer_email;
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['CPFouCNPJ'] = $cpfFormatado;			
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EMail'] = $d->customer_email;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['CPFouCNPJ'] = $cpfFormatado;
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Codigo'] = $cpfFormatado;
 			
 			//valida se é pessoa PF, caso não é PJ
 			$validaCpf = $this->validaCpf($d->customer_taxvat);
-			if ( $validaCpf ){				
+			if ( $validaCpf ){
 				$tipoPessoa = 'tpeFisica';
 			}else{
 				$tipoPessoa = 'tpeJuridica';
-			}			
-			
+			}
+
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['TipoPessoa']	= $tipoPessoa;		 
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Documento'] = '';
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Documento'] = '';			
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Nome'] = $d->firstname.' '.$d->lastname;
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['NomeReduzido'] = $d->firstname;
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Sexo'] = $sexoCliente;
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['DataNascimento'] = '';
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Telefone'] = $d->telephone;
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Celular'] = '';
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['DataNascimento'] = '';			
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['DataCadastro'] = '';
 			
 			$infosAdicionaisPedido = $this->_magento->buscaInformacoesAdicionaisPedido($d->increment_id);
+			
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Telefone'] = $infosAdicionaisPedido->shipping_address->telephone;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Celular'] = $infosAdicionaisPedido->shipping_address->fax;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['InscricaoEstadual'] = 'ISENTO';
 
 			$cepEntregaFormatado = $this->Numeros($infosAdicionaisPedido->shipping_address->postcode);
 			$cepCobrancaFormatado = $this->Numeros($infosAdicionaisPedido->billing_address->postcode);
@@ -325,6 +327,7 @@ class Model_Wpr_Magento_PedidosVetorScan extends Model_Wpr_Magento_MagentoWebSer
 			$dadosPedido [$i] ['DestSexo'] = $sexoClientePedido;
 			$dadosPedido [$i] ['DestEmail'] = $infosAdicionaisPedido->customer_email;
 			$dadosPedido [$i] ['DestTelefone'] = $infosAdicionaisPedido->shipping_address->telephone;
+			//$dadosPedido [$i] ['DestCelular'] = $infosAdicionaisPedido->shipping_address->fax;
 			
 			// Dados do Endereço
 			list($dadosPedido [$i] ['DestLogradouro'],
@@ -343,8 +346,9 @@ class Model_Wpr_Magento_PedidosVetorScan extends Model_Wpr_Magento_MagentoWebSer
 			$dadosPedido [$i] ['DestTipoPessoa'] = $tipoPessoa;
 			$dadosPedido [$i] ['DestDocumento'] = $cpfFormatado;
 			$dadosPedido [$i] ['PedidoJaPago'] = 1; //Boolean
+			$dadosPedido [$i] ['DestInscricaoEstadual'] = 'ISENTO';
 // 			$dadosPedido [$i] ['DestEstrangeiro'] = '';
-// 			$dadosPedido [$i] ['DestInscricaoEstadual'] = '';
+ 			
 // 			$dadosPedido [$i] ['DestReferencia'] = "";			
 // 			$dadosPedido [$i] ['DataDoPagamento'] = '';
 // 			$dadosPedido [$i] ['OptouNFPaulista'] = ''; //Necessário verificar essa opção
