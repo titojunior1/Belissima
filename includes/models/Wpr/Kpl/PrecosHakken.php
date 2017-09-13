@@ -7,7 +7,7 @@
  * 
  */
 
-class Model_Wpr_Kpl_PrecosCreaTech extends Model_Wpr_Kpl_KplWebService {
+class Model_Wpr_Kpl_PrecosHakken extends Model_Wpr_Kpl_KplWebService {
 	
 	/*
 	 * Instancia Webservice Magento
@@ -149,7 +149,7 @@ class Model_Wpr_Kpl_PrecosCreaTech extends Model_Wpr_Kpl_KplWebService {
 		echo PHP_EOL;
 		
 		echo "Conectando ao WebService Magento... " . PHP_EOL;
-		$this->_magento = new Model_Wpr_Magento_PrecosCreaTech( $dadosCliente ['MAGENTO_WSDL'], $dadosCliente ['MAGENTO_USUARIO'], $dadosCliente ['MAGENTO_SENHA'] );
+		$this->_magento = new Model_Wpr_Magento_PrecosHakken( $dadosCliente ['MAGENTO_WSDL'], $dadosCliente ['MAGENTO_USUARIO'], $dadosCliente ['MAGENTO_SENHA'] );
 		echo "Conectado!" . PHP_EOL;
 		echo PHP_EOL;
 		

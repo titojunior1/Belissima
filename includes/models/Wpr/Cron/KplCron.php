@@ -4,11 +4,6 @@
  *
  *
  *
- *
- *
- *
- *
- *
  * Cron para processar integração com sistema ERP KPL - Ábacos via webservice
  * @author Tito Junior <titojunior1@gmail.com>
  *        
@@ -16,12 +11,6 @@
 class Model_Wpr_Cron_KplCron {
 	
 	/**
-	 *
-	 *
-	 *
-	 *
-	 *
-	 *
 	 *
 	 *
 	 *
@@ -34,26 +23,17 @@ class Model_Wpr_Cron_KplCron {
 	 *
 	 *
 	 *
-	 *
-	 *
-	 *
-	 *
-	 *
-	 *
 	 * Array com clientes encontrados
 	 * @var array
 	 */
 	private $_clientes;
 
 	/**
+	 *
+	 *
+	 *
 	 * Construtor
 	 * @param
-	 *
-	 *
-	 *
-	 *
-	 *
-	 *
 	 *
 	 *
 	 */
@@ -146,6 +126,22 @@ class Model_Wpr_Cron_KplCron {
 							}
 						}
 						break;
+					case 'Hakken' :
+						
+						if (! is_array ( $estoques ['EstoquesDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar Estoque - ' . $estoques );
+						}
+						if ($estoques ['EstoquesDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem estoques disponiveis para integracao" . PHP_EOL;
+						} else {
+							
+							$kpl_estoques = new Model_Wpr_Kpl_EstoqueKplHakken ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl_estoques->ProcessaEstoqueWebservice ( $estoques ['EstoquesDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// ERRO
+							}
+						}
+						break;
 				}
 				
 				echo "- importacao de estoque do cliente {$cliente} realizada com sucesso" . PHP_EOL;
@@ -160,6 +156,9 @@ class Model_Wpr_Cron_KplCron {
 	}
 
 	/**
+	 *
+	 *
+	 *
 	 *
 	 *
 	 *
@@ -237,6 +236,24 @@ class Model_Wpr_Cron_KplCron {
 							}
 						}
 						break;
+					// 					case 'Hakken' :
+					
+
+					// 						if (! is_array ( $precos ['PrecosDisponiveisResult'] )) {
+					// 							throw new Exception ( 'Erro ao buscar Preços - ' . $precos );
+					// 						}
+					// 						if ($precos ['PrecosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+					// 							echo "Nao existem precos disponiveis para integracao" . PHP_EOL;
+					// 						} else {
+					
+
+					// 							$kpl_preços = new Model_Wpr_Kpl_PrecosHakken ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+					// 							$retorno = $kpl_preços->ProcessaPrecosWebservice ( $precos ['PrecosDisponiveisResult'] ['Rows'], $dadosCliente );
+					// 							if (is_array ( $retorno )) {
+					// 								// ERRO
+					// 							}
+					// 						}
+					// 						break;
 				}
 				
 				echo "- importacao de precos do cliente Belissima realizada com sucesso" . PHP_EOL;
@@ -315,6 +332,22 @@ class Model_Wpr_Cron_KplCron {
 							}
 						}
 						break;
+					case 'Hakken' :
+						
+						if (! is_array ( $status_disponiveis ['StatusPedidoDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar status dos pedidos' );
+						}
+						if ($status_disponiveis ['StatusPedidoDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem status disponiveis para integracao " . PHP_EOL;
+						} else {
+							$kpl = new Model_Wpr_Kpl_StatusPedidoHakken ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl->ProcessaStatusWebservice ( $status_disponiveis ['StatusPedidoDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// gravar logs de erro
+								$this->_log->gravaLogErros ( $retorno );
+							}
+						}
+						break;
 				}
 				
 				echo "- importacao de status de pedidos do cliente {$cliente} realizada com sucesso " . PHP_EOL;
@@ -366,6 +399,9 @@ class Model_Wpr_Cron_KplCron {
 	}
 
 	/**
+	 *
+	 *
+	 *
 	 *
 	 *
 	 *
@@ -439,6 +475,23 @@ class Model_Wpr_Cron_KplCron {
 							echo "Nao existem produtos disponiveis para integracao" . PHP_EOL;
 						} else {
 							$kpl_produtos = new Model_Wpr_Kpl_ProdutosCreaTech ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl_produtos->ProcessaProdutosWebservice ( $produtos ['ProdutosDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// ERRO
+							}
+						}
+						
+						break;
+					
+					case 'Hakken' :
+						
+						if (! is_array ( $produtos ['ProdutosDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar Produtos - ' . $produtos );
+						}
+						if ($produtos ['ProdutosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem produtos disponiveis para integracao" . PHP_EOL;
+						} else {
+							$kpl_produtos = new Model_Wpr_Kpl_ProdutosHakken ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
 							$retorno = $kpl_produtos->ProcessaProdutosWebservice ( $produtos ['ProdutosDisponiveisResult'] ['Rows'], $dadosCliente );
 							if (is_array ( $retorno )) {
 								// ERRO

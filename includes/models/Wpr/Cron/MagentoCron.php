@@ -3,6 +3,7 @@
  *
  *
  *
+ *
  * Cron para processar integração com sistema ERP Magento - Magento via webservice
  * @author Tito Junior <titojunior1@gmail.com>
  *        
@@ -10,6 +11,7 @@
 class Model_Wpr_Cron_MagentoCron {
 	
 	/**
+	 *
 	 *
 	 *
 	 *
@@ -24,6 +26,7 @@ class Model_Wpr_Cron_MagentoCron {
 	 *
 	 *
 	 *
+	 *
 	 * Array com clientes encontrados
 	 * @var array
 	 */
@@ -32,6 +35,7 @@ class Model_Wpr_Cron_MagentoCron {
 	/**
 	 * Construtor
 	 * @param
+	 *
 	 *
 	 *
 	 */
@@ -110,14 +114,7 @@ class Model_Wpr_Cron_MagentoCron {
 		$complexFilter = array ( 'complex_filter' => array ( array ( 'key' => 'created_at', 'value' => array ( 'key' => 'gt', 'value' => $timestamp ) ), array ( 'key' => 'status', 'value' => array ( 'key' => 'eq', 'value' => 'processing' ) ) ) );
 		
 		//Filtro para busca específica de pedido
-// 		$complexFilter = array(
-// 		 'complex_filter' => array(
-// 		 		array(
-// 		 				'key' => 'increment_id',
-// 		 				'value' => array('key' => 'eq', 'value' => 100000369)
-// 		 		)
-// 		 )
-// 		);
+		$complexFilter = array ( 'complex_filter' => array ( array ( 'key' => 'increment_id', 'value' => array ( 'key' => 'eq', 'value' => 100000056 ) ) ) );
 		
 		foreach ( $this->_clientes as $cliente => $dadosCliente ) {
 			
@@ -148,24 +145,42 @@ class Model_Wpr_Cron_MagentoCron {
 						}
 						
 						break;
-						
+					
 					case 'CreaTech' :
 						
-							if (! is_array ( $pedidos_disponiveis )) {
-								throw new Exception ( 'Erro ao buscar notas de saida' );
+						if (! is_array ( $pedidos_disponiveis )) {
+							throw new Exception ( 'Erro ao buscar notas de saida' );
+						}
+						if (count ( $pedidos_disponiveis ) == 0) {
+							echo "Nao existem pedidos de saida disponiveis para integracao " . PHP_EOL;
+						} else {
+							$magento = new Model_Wpr_Magento_PedidosCreaTech ( $dadosCliente ['MAGENTO_WSDL'], $dadosCliente ['MAGENTO_USUARIO'], $dadosCliente ['MAGENTO_SENHA'] );
+							$retorno = $magento->ProcessaPedidosWebservice ( $pedidos_disponiveis, $dadosCliente );
+							if (is_array ( $retorno )) {
+								// gravar logs de erro
+								$this->_log->gravaLogErros ( $retorno );
 							}
-							if (count ( $pedidos_disponiveis ) == 0) {
-								echo "Nao existem pedidos de saida disponiveis para integracao " . PHP_EOL;
-							} else {
-								$magento = new Model_Wpr_Magento_PedidosCreaTech ( $dadosCliente ['MAGENTO_WSDL'], $dadosCliente ['MAGENTO_USUARIO'], $dadosCliente ['MAGENTO_SENHA'] );
-								$retorno = $magento->ProcessaPedidosWebservice ( $pedidos_disponiveis, $dadosCliente );
-								if (is_array ( $retorno )) {
-									// gravar logs de erro
-									$this->_log->gravaLogErros ( $retorno );
-								}
-							}
+						}
 						
-							break;
+						break;
+					
+					case 'Hakken' :
+						
+						if (! is_array ( $pedidos_disponiveis )) {
+							throw new Exception ( 'Erro ao buscar notas de saida' );
+						}
+						if (count ( $pedidos_disponiveis ) == 0) {
+							echo "Nao existem pedidos de saida disponiveis para integracao " . PHP_EOL;
+						} else {
+							$magento = new Model_Wpr_Magento_PedidosHakken ( $dadosCliente ['MAGENTO_WSDL'], $dadosCliente ['MAGENTO_USUARIO'], $dadosCliente ['MAGENTO_SENHA'] );
+							$retorno = $magento->ProcessaPedidosWebservice ( $pedidos_disponiveis, $dadosCliente );
+							if (is_array ( $retorno )) {
+								// gravar logs de erro
+								$this->_log->gravaLogErros ( $retorno );
+							}
+						}
+						
+						break;
 				}
 				
 				echo "- importacao de pedidos do cliente {$cliente} realizada com sucesso " . PHP_EOL;

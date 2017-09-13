@@ -196,6 +196,48 @@ class Model_Wpr_Magento_MagentoWebService {
 	
 	}
 	
+	public function buscaDadosCliente( $idCliente ){
+	
+		if($this->_session_valid == false){
+			$this->_iniciaSessao();
+		}
+	
+		if ( empty( $idCliente ) ){
+			throw new InvalidArgumentException( 'ID de Cliente inválido' );
+		}
+	
+		try {
+	
+			$result = $this->_webservice->customerCustomerInfo($this->_session, $idCliente);
+			return $result;
+	
+		} catch ( Exception $e ) {
+			throw new RuntimeException( 'Erro ao consultar cliente' . ' - ' . $e->getMessage() );
+		}
+	
+	}
+	
+	public function buscaDadosEntrega( $idEntrega ){
+	
+		if($this->_session_valid == false){
+			$this->_iniciaSessao();
+		}
+	
+		if ( empty( $idEntrega ) ){
+			throw new InvalidArgumentException( 'ID de Entrega inválido' );
+		}
+	
+		try {
+	
+			$result = $this->_webservice->salesOrderShipmentInfo($this->_session, $idEntrega);
+			return $result;
+	
+		} catch ( Exception $e ) {
+			throw new RuntimeException( 'Erro ao consultar cliente' . ' - ' . $e->getMessage() );
+		}
+	
+	}
+	
 	public function cadastraProduto( $sku, $produto ){
 		
 		if($this->_session_valid == false){

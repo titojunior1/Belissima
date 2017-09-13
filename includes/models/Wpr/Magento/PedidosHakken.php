@@ -6,7 +6,7 @@
  * @author Tito Junior
  *
  */
-class Model_Wpr_Magento_PedidosCreaTech extends Model_Wpr_Magento_MagentoWebService{
+class Model_Wpr_Magento_PedidosHakken extends Model_Wpr_Magento_MagentoWebService{
 	
 	/*
 	 * Instancia Webservice Magento
@@ -223,18 +223,21 @@ class Model_Wpr_Magento_PedidosCreaTech extends Model_Wpr_Magento_MagentoWebServ
 			
 			//valida se é pessoa PF, caso não é PJ
 			$validaCpf = $this->validaCpf($d->customer_taxvat);
-			if ( $validaCpf ){				
+			if ( $validaCpf ){
 				$tipoPessoa = 'tpeFisica';
 			}else{
 				$tipoPessoa = 'tpeJuridica';
-			}			
+			}
 			
+			//$dadosComprador = $this->_magento->buscaDadosCliente($d->customer_id);
+			//$dadosEntrega = $this->_magento->buscaDadosEntrega(638);
+
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['TipoPessoa']	= $tipoPessoa;		 
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Documento'] = '';
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Documento'] = '';			
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Nome'] = $d->firstname.' '.$d->lastname;
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['NomeReduzido'] = $d->firstname;
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Sexo'] = $sexoCliente;
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['DataNascimento'] = '';
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['DataNascimento'] = '';			
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['DataCadastro'] = '';
 			
 			$infosAdicionaisPedido = $this->_magento->buscaInformacoesAdicionaisPedido($d->increment_id);
@@ -302,7 +305,7 @@ class Model_Wpr_Magento_PedidosCreaTech extends Model_Wpr_Magento_MagentoWebServ
 			
 			//Seguindo com criação de Pedidos
 			$dadosPedido [$i] ['NumeroDoPedido'] = $infosAdicionaisPedido->increment_id;
-			$dadosPedido [$i] ['EMail'] = $infosAdicionaisPedido->customer_email;
+			$dadosPedido [$i] ['Email'] = $infosAdicionaisPedido->customer_email;
 			$dadosPedido [$i] ['CPFouCNPJ'] = $cpfFormatado;
 			$dadosPedido [$i] ['CodigoCliente'] = $cpfFormatado;
 			//$dadosPedido [$i] ['CondicaoPagamento'] = 'COMPRAS'; //Validar			
@@ -327,6 +330,7 @@ class Model_Wpr_Magento_PedidosCreaTech extends Model_Wpr_Magento_MagentoWebServ
 			$dadosPedido [$i] ['DestSexo'] = $sexoClientePedido;
 			$dadosPedido [$i] ['DestEmail'] = $infosAdicionaisPedido->customer_email;
 			$dadosPedido [$i] ['DestTelefone'] = $infosAdicionaisPedido->shipping_address->telephone;
+			//$dadosPedido [$i] ['DestCelular'] = $infosAdicionaisPedido->shipping_address->fax;
 			
 			// Dados do Endereço
 			list($dadosPedido [$i] ['DestLogradouro'],
@@ -345,8 +349,9 @@ class Model_Wpr_Magento_PedidosCreaTech extends Model_Wpr_Magento_MagentoWebServ
 			$dadosPedido [$i] ['DestTipoPessoa'] = $tipoPessoa;
 			$dadosPedido [$i] ['DestDocumento'] = $cpfFormatado;
 			$dadosPedido [$i] ['PedidoJaPago'] = 1; //Boolean
+			$dadosPedido [$i] ['DestInscricaoEstadual'] = 'ISENTO';
 // 			$dadosPedido [$i] ['DestEstrangeiro'] = '';
-// 			$dadosPedido [$i] ['DestInscricaoEstadual'] = '';
+ 			
 // 			$dadosPedido [$i] ['DestReferencia'] = "";			
 // 			$dadosPedido [$i] ['DataDoPagamento'] = '';
 // 			$dadosPedido [$i] ['OptouNFPaulista'] = ''; //Necessário verificar essa opção
@@ -369,29 +374,28 @@ class Model_Wpr_Magento_PedidosCreaTech extends Model_Wpr_Magento_MagentoWebServ
 				
 					break;
 					
-				case 'mastershopboletobancario' :
+				case 'banktransfer' :
 					
-						$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['FormaPagamentoCodigo'] = 'mastershopboletobancario';
+						$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['FormaPagamentoCodigo'] = 'banktransfer';
 						$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['Valor'] = number_format($infosAdicionaisPedido->payment->amount_ordered, 2, '.', '');
-// 						$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoNumero'] = $infosAdicionaisPedido->payment->cc_number_enc;
-// 						$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoCodigoSeguranca'] = $infosAdicionaisPedido->payment->cc_last4;
-// 						$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoNomeImpresso'] = $infosAdicionaisPedido->payment->cc_owner;
-						//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoQtdeParcelas'] = $infosAdicionaisPedido->payment->installments;
-// 						$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoQtdeParcelas'] = '1';
-// 						$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoCodigoAutorizacao'] = $infosAdicionaisPedido->payment->cc_last4;
-						//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoValidade'] = $infosAdicionaisPedido->payment->cc_exp_month.$infosAdicionaisPedido->payment->cc_exp_year;
 					
 						break;
+				case 'mastershopboletobancario2' :
+						
+					$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['FormaPagamentoCodigo'] = 'mastershopboletobancario';
+					$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['Valor'] = number_format($infosAdicionaisPedido->payment->amount_ordered, 2, '.', '');
+						
+					break;
 			
 				default:
 						
-					$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['FormaPagamentoCodigo'] = 'COMPRAS'; //COMPRAS PADRAO
+					$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['FormaPagamentoCodigo'] = $infosAdicionaisPedido->payment->method; //COMPRAS PADRAO
 					$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['Valor'] = number_format($infosAdicionaisPedido->payment->amount_ordered, 2, '.', '');
 					$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoNumero'] = $infosAdicionaisPedido->payment->cc_number_enc;
 					$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoCodigoSeguranca'] = $infosAdicionaisPedido->payment->cc_last4;
 					$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoNomeImpresso'] = $infosAdicionaisPedido->payment->cc_owner;
 					$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoQtdeParcelas'] = 1; // Necessário integrar API pagar.me
-					$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoCodigoAutorizacao'] = '123'; // Necessário integrar API pagar.me
+// 					$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoCodigoAutorizacao'] = '123'; // Necessário integrar API pagar.me
 						
 					break;					
 				
