@@ -114,7 +114,7 @@ class Model_Wpr_Cron_MagentoCron {
 		$complexFilter = array ( 'complex_filter' => array ( array ( 'key' => 'created_at', 'value' => array ( 'key' => 'gt', 'value' => $timestamp ) ), array ( 'key' => 'status', 'value' => array ( 'key' => 'eq', 'value' => 'processing' ) ) ) );
 		
 		//Filtro para busca específica de pedido
-		$complexFilter = array ( 'complex_filter' => array ( array ( 'key' => 'increment_id', 'value' => array ( 'key' => 'eq', 'value' => 100000056 ) ) ) );
+		//$complexFilter = array ( 'complex_filter' => array ( array ( 'key' => 'increment_id', 'value' => array ( 'key' => 'eq', 'value' => 100000056 ) ) ) );
 		
 		foreach ( $this->_clientes as $cliente => $dadosCliente ) {
 			
