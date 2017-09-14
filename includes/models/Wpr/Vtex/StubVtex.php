@@ -301,11 +301,11 @@ class Model_Wpr_Vtex_StubVtex {
 	 * @return retorna mensagem em caso de erro ou array de dados se estiver certo
 	 */
 	public function StockKeepingUnitGet($idSku) {
-		if (! ctype_digit ( $idSku )) {
+		if (! is_numeric( $idSku )) {
 			throw new InvalidArgumentException ( 'ID do produto inválido' );
 		}
 		try {
-			return $this->_wsCall ( 'StockKeepingUnitGet', array ('id' => $idSku ) );
+			return $this->_wsCall ( 'StockKeepingUnitGet', array ( array ('id' => $idSku ) ) );
 		} catch ( Exception $e ) {
 			throw new RuntimeException ( $e->getMessage () );
 		}

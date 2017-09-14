@@ -239,6 +239,28 @@ class Model_Wpr_Vtex_Pedido {
 		return json_decode($request->body);
 		
 	}
+	
+	/**
+	 *
+	 * Retorna os dados do produto, baseada no ID do item
+	 * @param int $order_id
+	 * @throws InvalidArgumentException
+	 */
+	private function _getDadosProduto ( $itemId ) {
+	
+		if (empty($itemId)){
+			throw new InvalidArgumentException( 'Id do produto inválido ou não informado' );
+		}
+		
+		$dadosProduto = $this->_vtex->_client->StockKeepingUnitGet($itemId);
+	
+		if ($dadosProduto->StockKeepingUnitGetResult == null) {
+			throw new RuntimeException('Produto nao encontrado');
+		}
+	
+		return $dadosProduto->StockKeepingUnitGetResult;
+	
+	}
 
 	/**
 	 * Processa o array de Pedidos
@@ -438,7 +460,17 @@ class Model_Wpr_Vtex_Pedido {
 				$valor_total_produtos += (($item->Cost) - ((($item->Cost - $item->CostOff))));
 				$valor_total_frete += $item->ShippingCostOff;
 				$valor_total_desconto += number_format ( ($item->Cost - $item->CostOff) + $item->CupomValue, 2, '.', '' );
-				$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['CodigoProduto'] = $item->ItemId;
+				
+				try {
+						
+					$dadosItemProduto = $this->_getDadosProduto($item->ItemId);
+						
+				} catch (Exception $e) {
+					echo "Erro ao buscar Produto " . $item->ItemId . ' - ' . $e->getMessage() . PHP_EOL;
+					continue;
+				}
+								
+				$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['CodigoProduto'] = $dadosItemProduto->RefId;
 				$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['QuantidadeProduto'] = (int) 1;
 				$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['PrecoUnitario'] = number_format ( $item->Cost, 2, '.', '' ); // valor unitário
 				//$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['MensagemPresente'] = $item->gift_message_available;
@@ -454,8 +486,7 @@ class Model_Wpr_Vtex_Pedido {
 			} catch (Exception $e) {
 				echo "Erro ao obter dados de pagamento " . $dadosPedido [$i] ['NumeroDoPedido'] . ' - ' . $e->getMessage() . PHP_EOL;
 				continue;
-			}
-			
+			}			
 			
 			$dadosPagamento = $this->_vtex->trataArrayDto ( (array) $dados_pagamento );
 			
@@ -467,13 +498,12 @@ class Model_Wpr_Vtex_Pedido {
 				$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['FormaPagamentoCodigo'] = 'AFILIADO';
 				$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['Valor'] = number_format( $totalPedidoPagamento, 2, '.', '');
 				$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoQtdeParcelas'] = '1';
-			}
-			
-			
+			}			
 			
 			$dadosPedido [$i] ['ValorPedido'] = number_format( $valor_total_produtos, 2, '.', '');
 			$dadosPedido [$i] ['ValorFrete'] = number_format($valor_total_frete, 2, '.', '');
 			$dadosPedido [$i] ['ValorDesconto'] = number_format($valor_total_desconto, 2, '.', '');
+			
 			try {
 			
 				echo "Importando pedido " . $dadosPedido [$i] ['NumeroDoPedido'] . PHP_EOL;
@@ -538,7 +568,7 @@ class Model_Wpr_Vtex_Pedido {
 	 * @param string $idPedido
 	 * @return retorna mensagem em caso de erro
 	 */
-	public function importarPedidoId($idPedido) {
+	public function importarPedidoId($idPedido, $dadosCliente) {
 	
 		if (empty ( $idPedido )) {
 			throw new InvalidArgumentException ( 'Status inválido' );
@@ -562,7 +592,7 @@ class Model_Wpr_Vtex_Pedido {
 		$dados_pedidos = $this->_vtex->trataArrayDto ( $pedidos1->OrderGetResult->OrderGetDTO );
 	
 		try {
-			$this->_importarPedidos ( $dados_pedidos );
+			$this->_importarPedidos ( $dados_pedidos, $dadosCliente );
 		} catch ( Exception $e ) {
 			$this->_vtex->setErro ( array ("Id" => $value ['Id'], "Metodo" => "importarPedidosStatusQuantidade", "DescricaoErro" => $e->getMessage () ), "Pedido_Saida" );
 	
