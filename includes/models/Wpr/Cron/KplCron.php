@@ -4,6 +4,7 @@
  *
  *
  *
+ *
  * Cron para processar integração com sistema ERP KPL - Ábacos via webservice
  * @author Tito Junior <titojunior1@gmail.com>
  *        
@@ -11,6 +12,7 @@
 class Model_Wpr_Cron_KplCron {
 	
 	/**
+	 *
 	 *
 	 *
 	 *
@@ -23,6 +25,7 @@ class Model_Wpr_Cron_KplCron {
 	 *
 	 *
 	 *
+	 *
 	 * Array com clientes encontrados
 	 * @var array
 	 */
@@ -32,8 +35,10 @@ class Model_Wpr_Cron_KplCron {
 	 *
 	 *
 	 *
+	 *
 	 * Construtor
 	 * @param
+	 *
 	 *
 	 *
 	 */
@@ -168,6 +173,7 @@ class Model_Wpr_Cron_KplCron {
 	 *
 	 *
 	 *
+	 *
 	 * Importa os preços disponíveis.
 	 * @throws Exception
 	 */
@@ -236,24 +242,22 @@ class Model_Wpr_Cron_KplCron {
 							}
 						}
 						break;
-					// 					case 'Hakken' :
-					
-
-					// 						if (! is_array ( $precos ['PrecosDisponiveisResult'] )) {
-					// 							throw new Exception ( 'Erro ao buscar Preços - ' . $precos );
-					// 						}
-					// 						if ($precos ['PrecosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
-					// 							echo "Nao existem precos disponiveis para integracao" . PHP_EOL;
-					// 						} else {
-					
-
-					// 							$kpl_preços = new Model_Wpr_Kpl_PrecosHakken ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
-					// 							$retorno = $kpl_preços->ProcessaPrecosWebservice ( $precos ['PrecosDisponiveisResult'] ['Rows'], $dadosCliente );
-					// 							if (is_array ( $retorno )) {
-					// 								// ERRO
-					// 							}
-					// 						}
-					// 						break;
+					case 'Hakken' :
+						
+						if (! is_array ( $precos ['PrecosDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar Preços - ' . $precos );
+						}
+						if ($precos ['PrecosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem precos disponiveis para integracao" . PHP_EOL;
+						} else {
+							
+							$kpl_preços = new Model_Wpr_Kpl_PrecosHakken ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl_preços->ProcessaPrecosWebservice ( $precos ['PrecosDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// ERRO
+							}
+						}
+						break;
 				}
 				
 				echo "- importacao de precos do cliente Belissima realizada com sucesso" . PHP_EOL;
@@ -399,6 +403,7 @@ class Model_Wpr_Cron_KplCron {
 	}
 
 	/**
+	 *
 	 *
 	 *
 	 *
