@@ -182,6 +182,7 @@ class Model_Wpr_Cron_KplCron {
 		
 		foreach ( $this->_clientes as $cliente => $dadosCliente ) {
 			
+			echo PHP_EOL;
 			echo "- importando precos disponiveis do cliente {$cliente} - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
 			
 			try {
@@ -233,6 +234,7 @@ class Model_Wpr_Cron_KplCron {
 						}
 						if ($precos ['PrecosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
 							echo "Nao existem precos disponiveis para integracao" . PHP_EOL;
+							echo PHP_EOL;
 						} else {
 							
 							$kpl_preços = new Model_Wpr_Kpl_PrecosCreaTech ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );

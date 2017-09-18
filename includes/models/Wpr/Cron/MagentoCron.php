@@ -4,6 +4,7 @@
  *
  *
  *
+ *
  * Cron para processar integração com sistema ERP Magento - Magento via webservice
  * @author Tito Junior <titojunior1@gmail.com>
  *        
@@ -11,6 +12,7 @@
 class Model_Wpr_Cron_MagentoCron {
 	
 	/**
+	 *
 	 *
 	 *
 	 *
@@ -27,6 +29,7 @@ class Model_Wpr_Cron_MagentoCron {
 	 *
 	 *
 	 *
+	 *
 	 * Array com clientes encontrados
 	 * @var array
 	 */
@@ -35,6 +38,7 @@ class Model_Wpr_Cron_MagentoCron {
 	/**
 	 * Construtor
 	 * @param
+	 *
 	 *
 	 *
 	 *
@@ -116,13 +120,14 @@ class Model_Wpr_Cron_MagentoCron {
 		//Filtro para busca específica de pedido
 		//$complexFilter = array ( 'complex_filter' => array ( array ( 'key' => 'increment_id', 'value' => array ( 'key' => 'eq', 'value' => 100000060 ) ) ) );
 		
+
 		foreach ( $this->_clientes as $cliente => $dadosCliente ) {
 			
-			$this->_magento = new Model_Wpr_Magento_MagentoWebService ( $dadosCliente ['MAGENTO_WSDL'], $dadosCliente ['MAGENTO_USUARIO'], $dadosCliente ['MAGENTO_SENHA'] );
-			
-			echo "- importando pedidos de saida do cliente {$cliente} - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
-			
 			try {
+				
+				$this->_magento = new Model_Wpr_Magento_MagentoWebService ( $dadosCliente ['MAGENTO_WSDL'], $dadosCliente ['MAGENTO_USUARIO'], $dadosCliente ['MAGENTO_SENHA'] );
+				
+				echo "- importando pedidos de saida do cliente {$cliente} - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
 				
 				$pedidos_disponiveis = $this->_magento->buscaPedidosDisponiveis ( $complexFilter );
 				
