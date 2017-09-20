@@ -2,6 +2,7 @@
 /**
  *
  *
+ *
  * Cron para processar integração com sistema ERP VTEX - Ábacos via webservice
  * @author Tito Junior <titojunior1@gmail.com>
  *        
@@ -9,6 +10,7 @@
 class Model_Wpr_Cron_VtexCron {
 	
 	/**
+	 *
 	 *
 	 *
 	 * Objeto Kpl (instância do webservice kpl)
@@ -19,6 +21,7 @@ class Model_Wpr_Cron_VtexCron {
 	/**
 	 * Construtor
 	 * @param
+	 *
 	 *
 	 */
 	public function __construct() {
@@ -39,6 +42,7 @@ class Model_Wpr_Cron_VtexCron {
 	}
 
 	/**
+	 *
 	 *
 	 *
 	 * Importa os pedidos disponíveis.
@@ -69,12 +73,28 @@ class Model_Wpr_Cron_VtexCron {
 					echo "- importando pedidos de saida do cliente {$cliente} - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
 					
 					try {
-						echo "Importando pedidos do cliente {$cliente}" . PHP_EOL;
+						
 						$vtex = new Model_Wpr_Vtex_Pedido ( $dadosCliente ['VTEX_WSDL'], $dadosCliente ['VTEX_USUARIO'], $dadosCliente ['VTEX_SENHA'], $dadosCliente ['VTEX_API_URL'], $dadosCliente ['VTEX_API_KEY'], $dadosCliente ['VTEX_API_TOKEN'] );
 						$vtex->importarPedidosStatusQuantidade ( $status_pedido_vtex, $qtd_pedidos, $dadosCliente );
-						echo "Pedidos do cliente Importados" . PHP_EOL;
+						
+						echo "Pedidos do cliente {$cliente} importados - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
 					} catch ( Exception $e ) {
-						$erros_proc = $vtex->getErrosProcessamento ();
+						echo "Erros ao importar os pedidos do cliente {$cliente}: " . $e->getMessage () . PHP_EOL;
+					}
+					
+					break;
+				
+				case 'Up2You' :
+					
+					echo "- importando pedidos de saida do cliente {$cliente} - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
+					
+					try {
+						
+						$vtex = new Model_Wpr_Vtex_Pedido ( $dadosCliente ['VTEX_WSDL'], $dadosCliente ['VTEX_USUARIO'], $dadosCliente ['VTEX_SENHA'], $dadosCliente ['VTEX_API_URL'], $dadosCliente ['VTEX_API_KEY'], $dadosCliente ['VTEX_API_TOKEN'] );
+						$vtex->importarPedidosStatusQuantidade ( $status_pedido_vtex, $qtd_pedidos, $dadosCliente );
+						
+						echo "Pedidos do cliente {$cliente} importados - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
+					} catch ( Exception $e ) {						
 						echo "Erros ao importar os pedidos do cliente {$cliente}: " . $e->getMessage () . PHP_EOL;
 					}
 					

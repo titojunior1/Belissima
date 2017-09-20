@@ -5,6 +5,8 @@
  *
  *
  *
+ *
+ *
  * Cron para processar integração com sistema ERP KPL - Ábacos via webservice
  * @author Tito Junior <titojunior1@gmail.com>
  *        
@@ -12,6 +14,8 @@
 class Model_Wpr_Cron_KplCron {
 	
 	/**
+	 *
+	 *
 	 *
 	 *
 	 *
@@ -26,6 +30,8 @@ class Model_Wpr_Cron_KplCron {
 	 *
 	 *
 	 *
+	 *
+	 *
 	 * Array com clientes encontrados
 	 * @var array
 	 */
@@ -36,8 +42,12 @@ class Model_Wpr_Cron_KplCron {
 	 *
 	 *
 	 *
+	 *
+	 *
 	 * Construtor
 	 * @param
+	 *
+	 *
 	 *
 	 *
 	 *
@@ -147,6 +157,23 @@ class Model_Wpr_Cron_KplCron {
 							}
 						}
 						break;
+					
+					case 'Up2You' :
+						
+						if (! is_array ( $estoques ['EstoquesDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar Estoque - ' . $estoques );
+						}
+						if ($estoques ['EstoquesDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem estoques disponiveis para integracao" . PHP_EOL;
+						} else {
+							
+							$kpl_estoques = new Model_Wpr_Kpl_EstoqueKplUp2You ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl_estoques->ProcessaEstoqueWebservice ( $estoques ['EstoquesDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// ERRO
+							}
+						}
+						break;
 				}
 				
 				echo "- importacao de estoque do cliente {$cliente} realizada com sucesso" . PHP_EOL;
@@ -161,6 +188,8 @@ class Model_Wpr_Cron_KplCron {
 	}
 
 	/**
+	 *
+	 *
 	 *
 	 *
 	 *
@@ -254,6 +283,23 @@ class Model_Wpr_Cron_KplCron {
 						} else {
 							
 							$kpl_preços = new Model_Wpr_Kpl_PrecosHakken ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl_preços->ProcessaPrecosWebservice ( $precos ['PrecosDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// ERRO
+							}
+						}
+						break;
+					
+					case 'Up2You' :
+						
+						if (! is_array ( $precos ['PrecosDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar Preços - ' . $precos );
+						}
+						if ($precos ['PrecosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem precos disponiveis para integracao" . PHP_EOL;
+						} else {
+							
+							$kpl_preços = new Model_Wpr_Kpl_PrecosUp2You ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'], $dadosCliente ['VTEX_API_URL'], $dadosCliente ['VTEX_API_KEY'], $dadosCliente ['VTEX_API_TOKEN'] );
 							$retorno = $kpl_preços->ProcessaPrecosWebservice ( $precos ['PrecosDisponiveisResult'] ['Rows'], $dadosCliente );
 							if (is_array ( $retorno )) {
 								// ERRO
@@ -354,6 +400,23 @@ class Model_Wpr_Cron_KplCron {
 							}
 						}
 						break;
+					
+					case 'Up2You' :
+						
+						if (! is_array ( $status_disponiveis ['StatusPedidoDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar status dos pedidos' );
+						}
+						if ($status_disponiveis ['StatusPedidoDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem status disponiveis para integracao " . PHP_EOL;
+						} else {
+							$kpl = new Model_Wpr_Kpl_StatusPedidoUp2You ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl->ProcessaStatusWebservice ( $status_disponiveis ['StatusPedidoDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// gravar logs de erro
+								$this->_log->gravaLogErros ( $retorno );
+							}
+						}
+						break;
 				}
 				
 				echo "- importacao de status de pedidos do cliente {$cliente} realizada com sucesso " . PHP_EOL;
@@ -367,44 +430,8 @@ class Model_Wpr_Cron_KplCron {
 	}
 
 	/**
-	 * Cadastrar Pedidos Saida do Kpl
-	 */
-	public function CadastraPedidosSaidaKpl() {
-		ini_set ( 'memory_limit', '512M' );
-		
-		// Solicita Pedidos Saida Disponíveis
-		if (empty ( $this->_kpl )) {
-			$this->_kpl = new Model_Wpr_Kpl_KplWebService ();
-		}
-		
-		echo "- importando pedidos de saída do cliente Verden - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
-		try {
-			$chaveIdentificacao = KPL_KEY;
-			$pedidos_disponiveis = $this->_kpl->PedidosDisponiveis ( $chaveIdentificacao );
-			if (! is_array ( $pedidos_disponiveis ['PedidosDisponiveisResult'] )) {
-				throw new Exception ( 'Erro ao buscar notas de saída' );
-			}
-			if ($pedidos_disponiveis ['PedidosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
-				echo "Nao existem pedidos de saida disponiveis para integracao " . PHP_EOL;
-			} else {
-				$kpl = new Model_Wpr_Kpl_Pedido ();
-				$retorno = $kpl->ProcessaArquivoSaidaWebservice ( $pedidos_disponiveis ['PedidosDisponiveisResult'] );
-				if (is_array ( $retorno )) {
-					// gravar logs de erro						
-					$this->_log->gravaLogErros ( $retorno );
-				}
-			}
-			
-			echo "- importacao de pedidos do cliente Verden realizada com sucesso " . PHP_EOL;
-		} catch ( Exception $e ) {
-			echo "- erros ao importar os pedidos de saída do cliente Verden: " . $e->getMessage () . PHP_EOL;
-		}
-		unset ( $this->_kpl );
-		
-		echo "- Finalizando cron para cadastrar pedidos de saída da Kpl do cliente Verden " . PHP_EOL;
-	}
-
-	/**
+	 *
+	 *
 	 *
 	 *
 	 *
@@ -506,6 +533,22 @@ class Model_Wpr_Cron_KplCron {
 						}
 						
 						break;
+						
+					case 'Up2You' :
+						
+							if (! is_array ( $produtos ['ProdutosDisponiveisResult'] )) {
+								throw new Exception ( 'Erro ao buscar Produtos - ' . $produtos );
+							}
+							if ($produtos ['ProdutosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+								echo "Nao existem produtos disponiveis para integracao" . PHP_EOL;
+							} else {
+								$kpl_produtos = new Model_Wpr_Kpl_ProdutosUp2You ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+								$retorno = $kpl_produtos->ProcessaProdutosWebservice ( $produtos ['ProdutosDisponiveisResult'] ['Rows'], $dadosCliente );
+								if (is_array ( $retorno )) {
+									// ERRO
+								}
+							}
+							break;
 				}
 				
 				echo "- importacao de produtos do cliente {$cliente} realizada com sucesso" . PHP_EOL;
