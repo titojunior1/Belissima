@@ -233,7 +233,8 @@ class Model_Wpr_Kpl_ProdutosUp2You extends Model_Wpr_Kpl_KplWebService {
 		if ( ! is_array ( $request ['DadosProdutos'] [0] ) ) {
 					
 			$array_produtos [0] ['ProtocoloProduto'] = $request ['DadosProdutos'] ['ProtocoloProduto'];
-			$array_produtos [0] ['Categoria'] = $this->_getCategoriaProduto( $request ['DadosProdutos'] ['DescricaoSubgrupo'] );
+			//$array_produtos [0] ['Categoria'] = $this->_getCategoriaProduto( $request ['DadosProdutos'] ['DescricaoSubgrupo'] );
+			$array_produtos [0] ['Categoria'] = $request ['DadosProdutos'] ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] ['CodigoExternoCategoria'];
 			$array_produtos [0] ['Nome'] = $request ['DadosProdutos'] ['NomeProduto'];			
 			$array_produtos [0] ['Classificacao'] = isset($request ['DadosProdutos'] ['Classificacao']) ? $request ['DadosProdutos'] ['Classificacao']: '';
 			$array_produtos [0] ['Altura'] = number_format($request ['DadosProdutos'] ['Altura'], 2, '.', '');
@@ -265,7 +266,7 @@ class Model_Wpr_Kpl_ProdutosUp2You extends Model_Wpr_Kpl_KplWebService {
 			foreach ( $request ["DadosProdutos"] as $i => $d ) {				
 				
 				$array_produtos [$i] ['ProtocoloProduto'] = $d ['ProtocoloProduto'];
-				$array_produtos [$i] ['Categoria'] = $this->_getCategoriaProduto( $d ['DescricaoSubgrupo'] );				
+				$array_produtos [$i] ['Categoria'] = ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] ['CodigoExternoCategoria'];				
 				$array_produtos [$i] ['Nome'] = $d ['NomeProduto'];
 				$array_produtos [$i] ['Classificacao'] = isset($d ['Classificacao']) ? $d ['Classificacao']: '';
 				$array_produtos [$i] ['Altura'] = number_format($d ['Altura'], 2, '.', '');
