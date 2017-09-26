@@ -266,7 +266,7 @@ class Model_Wpr_Kpl_ProdutosUp2You extends Model_Wpr_Kpl_KplWebService {
 			foreach ( $request ["DadosProdutos"] as $i => $d ) {				
 				
 				$array_produtos [$i] ['ProtocoloProduto'] = $d ['ProtocoloProduto'];
-				$array_produtos [$i] ['Categoria'] = ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] ['CodigoExternoCategoria'];				
+				$array_produtos [$i] ['Categoria'] = $d ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] ['CodigoExternoCategoria'];				
 				$array_produtos [$i] ['Nome'] = $d ['NomeProduto'];
 				$array_produtos [$i] ['Classificacao'] = isset($d ['Classificacao']) ? $d ['Classificacao']: '';
 				$array_produtos [$i] ['Altura'] = number_format($d ['Altura'], 2, '.', '');
