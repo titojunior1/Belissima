@@ -251,7 +251,7 @@ class Model_Wpr_Kpl_ProdutosUp2You extends Model_Wpr_Kpl_KplWebService {
 			$array_produtos [0] ['CodigoMarca'] = $this->_getMarcaProduto( $request ['DadosProdutos'] ['CodigoMarca'] );
 			$array_produtos [0] ['NomeProdutoReduzido'] = $request ['DadosProdutos'] ['NomeProdutoReduzido'];
 			$array_produtos [0] ['CodigoFamilia'] = $request ['DadosProdutos'] ['CodigoFamilia'];
-			$array_produtos [0] ['DescricaoTag'] = $request ['DadosProdutos'] ['CaracteristicasComplementares'] ['Rows'] ['DadosCaracteristicasComplementares'] ['Texto'];
+			//$array_produtos [0] ['DescricaoTag'] = $request ['DadosProdutos'] ['CaracteristicasComplementares'] ['Rows'] ['DadosCaracteristicasComplementares'] ['Texto'];
 			$array_produtos [0] ['CodigoBarras'] = $request ['DadosProdutos'] ['CodigoBarras'];
 			
 			// verifica se produto é pai ou filho
@@ -283,7 +283,7 @@ class Model_Wpr_Kpl_ProdutosUp2You extends Model_Wpr_Kpl_KplWebService {
 				$array_produtos [$i] ['CodigoMarca'] = $this->_getMarcaProduto( $d ['CodigoMarca'] );
 				$array_produtos [$i] ['NomeProdutoReduzido'] = $d ['NomeProdutoReduzido'];
 				$array_produtos [$i] ['CodigoFamilia'] = $d ['CodigoFamilia'];
-				$array_produtos [$i] ['DescricaoTag'] = $d ['CaracteristicasComplementares'] ['Rows'] ['DadosCaracteristicasComplementares'] ['Texto'];
+				//$array_produtos [$i] ['DescricaoTag'] = $d ['CaracteristicasComplementares'] ['Rows'] ['DadosCaracteristicasComplementares'] ['Texto'];
 				$array_produtos [$i] ['CodigoBarras'] = $d ['CodigoBarras'];
 								
 				// verifica se produto é pai ou filho
