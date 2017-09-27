@@ -124,7 +124,7 @@ class Model_Wpr_Kpl_ProdutosCreaTech extends Model_Wpr_Kpl_KplWebService {
 	 */
 	private function _adicionaProduto($dados_produtos) {
 		$skuNovoProduto = $dados_produtos ['SKU'];
-		$novoProduto = array ( 'name' => $dados_produtos ['Nome'], 'weight' => $dados_produtos ['Peso'], 'status' => '1', 'url_key' => $dados_produtos ['Nome'], 'visibility' => $dados_produtos ['Visibilidade'], 'price' => $dados_produtos ['ValorVenda'], 'special_price' => $dados_produtos ['ValorCusto'], 'tax_class_id' => 1, 'meta_title' => $dados_produtos ['Nome'] );
+		$novoProduto = array ( 'name' => $dados_produtos ['Nome'], 'weight' => $dados_produtos ['Peso'], 'status' => '1', 'url_key' => $dados_produtos ['Nome'], 'visibility' => $dados_produtos ['Visibilidade'], 'price' => $dados_produtos ['ValorVenda'], 'special_price' => $dados_produtos ['ValorCusto'], 'meta_title' => $dados_produtos ['Nome'] );
 		
 		$this->_magento->cadastraProduto ( $skuNovoProduto, $novoProduto );
 	}
@@ -140,8 +140,8 @@ class Model_Wpr_Kpl_ProdutosCreaTech extends Model_Wpr_Kpl_KplWebService {
 		$idProduto = $dados_produtos ['product_id'];
 		$produto = array ( 'name' => $dados_produtos ['Nome'], 'weight' => $dados_produtos ['Peso'], 'status' => '1', 'url_key' => $dados_produtos ['Nome'], 'visibility' => $dados_produtos ['Visibilidade'], 
 				//'price' => $dados_produtos ['ValorVenda'],
-				//'special_price' => $dados_produtos ['ValorCusto'],
-				'tax_class_id' => 1, 'meta_title' => $dados_produtos ['Nome'] );
+				//'special_price' => $dados_produtos ['ValorCusto'],'tax_class_id' => 1,
+				'meta_title' => $dados_produtos ['Nome'] );
 		
 		$this->_magento->atualizaProduto ( $idProduto, $produto );
 	}
