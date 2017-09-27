@@ -308,9 +308,9 @@ class Model_Wpr_Cron_KplCron {
 						break;
 				}
 				
-				echo "- importacao de precos do cliente Belissima realizada com sucesso" . PHP_EOL;
+				echo "- importacao de precos do cliente {$cliente} realizada com sucesso" . PHP_EOL;
 			} catch ( Exception $e ) {
-				echo "- erros ao importar os precos do cliente Belissima: " . $e->getMessage () . PHP_EOL;
+				echo "- erros ao importar os precos do cliente {$cliente}: " . $e->getMessage () . PHP_EOL;
 			}
 			unset ( $this->_kpl );
 			unset ( $kpl_preços );
