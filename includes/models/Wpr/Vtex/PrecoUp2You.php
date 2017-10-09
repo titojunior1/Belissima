@@ -50,7 +50,6 @@ class Model_Wpr_Vtex_Preco {
 	
 	}
 	
-	
 	/**
 	 * Inicializa webservice VTEX.
 	 */

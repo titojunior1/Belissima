@@ -8,7 +8,7 @@ require_once '../includes/wpr.php';
 //$obj->CadastraPedidosVtex();
 
 $obj = new Model_Wpr_Cron_KplCron();
-$obj->CadastraProdutosKpl();
+//$obj->CadastraProdutosKpl();
 $obj->AtualizaPrecosKpl();
 
 // $obj = new Model_Wpr_Cron_MagentoCron();

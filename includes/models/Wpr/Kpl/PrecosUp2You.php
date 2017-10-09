@@ -11,6 +11,7 @@ class Model_Wpr_Kpl_PrecosUp2You extends Model_Wpr_Kpl_KplWebService {
 	
 	/*
 	 * Instancia Webservice Vtex
+	 * @var Model_Wpr_Vtex_Vtex 
 	*/
 	private $_vtex;
 	
@@ -82,23 +83,6 @@ class Model_Wpr_Kpl_PrecosUp2You extends Model_Wpr_Kpl_KplWebService {
         if (! $request->success) {
             throw new RuntimeException('Falha na comunicação com o webservice. [' . $request->body . ']');
         }
-	
-	}
-
-	/**
-	 * 
-	 * Buscar Produto.
-	 * @param string $sku
-	 * @param string $part_number
-	 * @param int $ean_proprio
-	 * @throws InvalidArgumentException
-	 * @throws RuntimeException
-	 */
-	public function buscaProduto ( $sku, $part_number, $ean_proprio ) {		
-		
-		// verificar se o produto existe
-		
-		// BUSCAR PRODUTO MAGENTO		
 	
 	}
 
@@ -206,14 +190,23 @@ class Model_Wpr_Kpl_PrecosUp2You extends Model_Wpr_Kpl_KplWebService {
 					echo PHP_EOL;
 					echo "Buscando cadastro do produto " . $dados_precos['CodigoProduto'] . PHP_EOL;
 					$produto = $this->_vtex->buscaCadastroProduto($dados_precos['CodigoProduto']);
-					if ( !empty ( $produto->StockKeepingUnitGetByRefIdResult ) ) {
+					// Caso não localize a busca do produto filho, tentará através do pai
+					if( empty ( $produto->StockKeepingUnitGetByRefIdResult ) ){
+						$produto = $this->_vtex->buscaCadastroProdutoPai($dados_precos['CodigoProduto']);
+					}					
+					
+					if ( !empty ( $produto->StockKeepingUnitGetByRefIdResult ) || !empty ( $produto->ProductGetByRefIdResult ) ) { 
+						
 						echo "Atualizando Preco " . $dados_precos['CodigoProduto'] . PHP_EOL;
 						echo "Preco Tabela: R$" . $dados_precos['PrecoTabela'] . PHP_EOL;
 						echo "Preco Promocional: R$" . $dados_precos['PrecoPromocional'] . PHP_EOL;
 						echo "Data Inicio: " . $dados_precos['DataInicioPromocao'] . PHP_EOL;
-						echo "Data Fim: " . $dados_precos['DataTerminoPromocao'] . PHP_EOL;
-						$dados_precos['IdProduto'] = $produto->StockKeepingUnitGetByRefIdResult->Id;
+						echo "Data Fim: " . $dados_precos['DataTerminoPromocao'] . PHP_EOL;						
+						$dados_precos['IdProduto'] = ( !empty( $produto->StockKeepingUnitGetByRefIdResult->Id) )? $produto->StockKeepingUnitGetByRefIdResult->Id : $produto->ProductGetByRefIdResult->Id ;
+						echo "Id Produto: " . $dados_precos['IdProduto'] . PHP_EOL;
+						
 						$this->_atualizaPrecoRest( $dados_precos );
+						
 						echo "Preco atualizado. " . PHP_EOL;
 						
 					}else{
@@ -222,6 +215,7 @@ class Model_Wpr_Kpl_PrecosUp2You extends Model_Wpr_Kpl_KplWebService {
 										
 					$this->_kpl->confirmarPrecosDisponiveis ( $dados_precos ['ProtocoloPreco'] );
 					echo "Protocolo Preco: {$dados_precos ['ProtocoloPreco']} enviado com sucesso" . PHP_EOL;		
+					echo PHP_EOL;
 
 				} catch ( Exception $e ) {
 					echo "Erro ao importar preco {$dados_precos['CodigoProduto']}: " . $e->getMessage() . PHP_EOL;
