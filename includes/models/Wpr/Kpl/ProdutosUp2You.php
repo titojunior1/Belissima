@@ -149,6 +149,30 @@ class Model_Wpr_Kpl_ProdutosUp2You extends Model_Wpr_Kpl_KplWebService {
 	}
 	
 	/**
+	 *
+	 * Buscar Produto filho.
+	 * @param string $refId
+	 * @throws InvalidArgumentException
+	 * @throws RuntimeException
+	 */
+	private function buscaProdutoFilho ( $refId ) {
+	
+		$refId = trim ( $refId );
+		if ( empty ( $refId ) ) {
+			throw new InvalidArgumentException ( 'RefId do produto inválido' );
+		}
+	
+		if ( !$this->_vtex ){
+			$this->_vtex = new Model_Wpr_Vtex_Produto();
+		}
+	
+		$retorno = $this->_vtex->buscaCadastroProdutoFilho($refId);
+	
+		return $retorno;
+	
+	}
+	
+	/**
 	 * 
 	 * Adicionar produto Pai.
 	 * @param array $dados_produtos
@@ -162,7 +186,7 @@ class Model_Wpr_Kpl_ProdutosUp2You extends Model_Wpr_Kpl_KplWebService {
 				'CategoryId' => $dados_produtos ['Categoria'],
 				//'DepartmentId' => $dados_produtos ['CodigoFamilia'],
  				'Description' => $dados_produtos ['Descricao'],
-// 				'DescriptionShort' => $dados_produtos ['Descricao'],
+				//'DescriptionShort' => $dados_produtos ['Descricao'],
 				'IsActive' => true,
 				'IsVisible' => $dados_produtos['flagExibicao'],
 				'LinkId' => $dados_produtos ['CodigoProduto'],
@@ -200,9 +224,9 @@ class Model_Wpr_Kpl_ProdutosUp2You extends Model_Wpr_Kpl_KplWebService {
 				'IsKit' => false,				
 				'ModalId' => '1',
 				'Name' => $dados_produtos ['Nome'],
-// 				'ProductName' => $dados_produtos ['Nome'],				
+// 				'ProductName' => $dados_produtos ['Nome'], // TODO CAUE/ERI				
 				'ProductId' => $dados_produtos ['IdProdutoPai'],
-				//'Id' => $dados_produtos ['CodigoProduto'],
+				'Id' => $dados_produtos ['IdProdutoFilho'],
 				'RefId' => $dados_produtos ['CodigoProduto'],	
 				'StockKeepingUnitEans' => array( 'StockKeepingUnitEanDTO' => array( 'Ean' => $dados_produtos ['CodigoBarras'] ) ),
 // 				'Description' => $dados_produtos ['Descricao'],
@@ -340,7 +364,11 @@ class Model_Wpr_Kpl_ProdutosUp2You extends Model_Wpr_Kpl_KplWebService {
 					}else{
 						echo "Adicionado/Atualizando produto filho " . $dados_produtos ['CodigoProduto'] . PHP_EOL;
 						$produto = $this->buscaProduto ( $dados_produtos ['CodigoProdutoPai'] );
-						$dados_produtos['IdProdutoPai'] = $produto->ProductGetByRefIdResult->Id;						
+						$produtoFilho = $this->buscaProdutoFilho( $dados_produtos ['CodigoProduto'] );
+						
+						$dados_produtos['IdProdutoPai'] = $produto->ProductGetByRefIdResult->Id;
+						$dados_produtos['IdProdutoFilho'] = $produtoFilho->StockKeepingUnitGetByRefIdResult->Id;
+											
 						$this->_enviaSku( $dados_produtos );
 						echo "Produto {$dados_produtos ['CodigoProduto']} adicionado/atualizado. " . PHP_EOL;
 					}

@@ -92,6 +92,27 @@ class Model_Wpr_Vtex_Produto {
 	
 	}
 	
+	/**
+	 * busca um determinado RefId
+	 * @param string $refId
+	 */
+	public function buscaCadastroProdutoFilho ( $refId ) {
+	
+		if ( empty( $refId ) ) {
+			throw new Exception ( 'Dados do produto filho inválidos' );
+		}
+	
+		try {
+	
+			$result = $this->_client->StockKeepingUnitGetByRefId($refId);
+			return $result;
+	
+		} catch ( Exception $e ) {
+			throw new Exception ( $e->getMessage () );
+		}
+	
+	}
+	
 	
 	/**
 	 * Inicializa webservice VTEX.

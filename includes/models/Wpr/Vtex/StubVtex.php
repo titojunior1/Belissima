@@ -317,7 +317,7 @@ class Model_Wpr_Vtex_StubVtex {
 	 * @return retorna mensagem em caso de erro ou array de dados se estiver certo
 	 */
 	public function StockKeepingUnitGetByRefId($refId) {
-		if (! ctype_digit ( $refId )) {
+		if ( empty ( $refId )) {
 			throw new InvalidArgumentException ( 'ID do produto inválido' );
 		}
 		try {

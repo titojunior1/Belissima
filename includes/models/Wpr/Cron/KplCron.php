@@ -7,6 +7,8 @@
  *
  *
  *
+ *
+ *
  * Cron para processar integração com sistema ERP KPL - Ábacos via webservice
  * @author Tito Junior <titojunior1@gmail.com>
  *        
@@ -14,6 +16,8 @@
 class Model_Wpr_Cron_KplCron {
 	
 	/**
+	 *
+	 *
 	 *
 	 *
 	 *
@@ -32,6 +36,8 @@ class Model_Wpr_Cron_KplCron {
 	 *
 	 *
 	 *
+	 *
+	 *
 	 * Array com clientes encontrados
 	 * @var array
 	 */
@@ -44,8 +50,12 @@ class Model_Wpr_Cron_KplCron {
 	 *
 	 *
 	 *
+	 *
+	 *
 	 * Construtor
 	 * @param
+	 *
+	 *
 	 *
 	 *
 	 *
@@ -75,6 +85,15 @@ class Model_Wpr_Cron_KplCron {
 	public function AtualizaEstoqueKpl() {
 		ini_set ( 'memory_limit', '512M' );
 		ini_set ( 'default_socket_timeout', 120 );
+		
+		$hora_inicial_bloqueio = '23:59:00';
+		$hora_final_bloqueio = '05:00:00';
+		
+		$hora_atual = date ( 'H:i:s' );
+		
+		if ($hora_atual >= $hora_inicial_bloqueio || $hora_atual <= $hora_final_bloqueio) {
+			return false;
+		}
 		
 		foreach ( $this->_clientes as $cliente => $dadosCliente ) {
 			
@@ -174,6 +193,23 @@ class Model_Wpr_Cron_KplCron {
 							}
 						}
 						break;
+					
+					case 'Verden' :
+						
+						if (! is_array ( $estoques ['EstoquesDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar Estoque - ' . $estoques );
+						}
+						if ($estoques ['EstoquesDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem estoques disponiveis para integracao" . PHP_EOL;
+						} else {
+							
+							$kpl_estoques = new Model_Wpr_Kpl_EstoqueKplVerden ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl_estoques->ProcessaEstoqueWebservice ( $estoques ['EstoquesDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// ERRO
+							}
+						}
+						break;
 				}
 				
 				echo "- importacao de estoque do cliente {$cliente} realizada com sucesso" . PHP_EOL;
@@ -203,11 +239,22 @@ class Model_Wpr_Cron_KplCron {
 	 *
 	 *
 	 *
+	 *
+	 *
 	 * Importa os preços disponíveis.
 	 * @throws Exception
 	 */
 	public function AtualizaPrecosKpl() {
 		ini_set ( 'memory_limit', '512M' );
+		
+		$hora_inicial_bloqueio = '23:59:00';
+		$hora_final_bloqueio = '05:00:00';
+		
+		$hora_atual = date ( 'H:i:s' );
+		
+		if ($hora_atual >= $hora_inicial_bloqueio || $hora_atual <= $hora_final_bloqueio) {
+			return false;
+		}
 		
 		foreach ( $this->_clientes as $cliente => $dadosCliente ) {
 			
@@ -306,6 +353,23 @@ class Model_Wpr_Cron_KplCron {
 							}
 						}
 						break;
+						
+					case 'Verden' :
+						
+						if (! is_array ( $precos ['PrecosDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar Preços - ' . $precos );
+						}
+						if ($precos ['PrecosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem precos disponiveis para integracao" . PHP_EOL;
+						} else {
+							
+							$kpl_preços = new Model_Wpr_Kpl_PrecosVerden ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'], $dadosCliente ['VTEX_API_URL'], $dadosCliente ['VTEX_API_KEY'], $dadosCliente ['VTEX_API_TOKEN'] );
+							$retorno = $kpl_preços->ProcessaPrecosWebservice ( $precos ['PrecosDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// ERRO
+							}
+						}
+						break;
 				}
 				
 				echo "- importacao de precos do cliente {$cliente} realizada com sucesso" . PHP_EOL;
@@ -323,6 +387,15 @@ class Model_Wpr_Cron_KplCron {
 	 */
 	public function atualizaStatusPedido() {
 		ini_set ( 'memory_limit', '512M' );
+		
+		$hora_inicial_bloqueio = '23:59:00';
+		$hora_final_bloqueio = '05:00:00';
+		
+		$hora_atual = date ( 'H:i:s' );
+		
+		if ($hora_atual >= $hora_inicial_bloqueio || $hora_atual <= $hora_final_bloqueio) {
+			return false;
+		}
 		
 		foreach ( $this->_clientes as $cliente => $dadosCliente ) {
 			
@@ -417,6 +490,23 @@ class Model_Wpr_Cron_KplCron {
 							}
 						}
 						break;
+					
+					case 'Verden' :
+						
+						if (! is_array ( $status_disponiveis ['StatusPedidoDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar status dos pedidos' );
+						}
+						if ($status_disponiveis ['StatusPedidoDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem status disponiveis para integracao " . PHP_EOL;
+						} else {
+							$kpl = new Model_Wpr_Kpl_StatusPedidoVerden ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl->ProcessaStatusWebservice ( $status_disponiveis ['StatusPedidoDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// gravar logs de erro
+								$this->_log->gravaLogErros ( $retorno );
+							}
+						}
+						break;
 				}
 				
 				echo "- importacao de status de pedidos do cliente {$cliente} realizada com sucesso " . PHP_EOL;
@@ -445,12 +535,23 @@ class Model_Wpr_Cron_KplCron {
 	 *
 	 *
 	 *
+	 *
+	 *
 	 * Importa os produtos disponíveis.
 	 * @throws Exception
 	 */
 	public function CadastraProdutosKpl() {
 		ini_set ( 'memory_limit', '512M' );
 		ini_set ( 'default_socket_timeout', 120 );
+		
+		$hora_inicial_bloqueio = '23:59:00';
+		$hora_final_bloqueio = '05:00:00';
+		
+		$hora_atual = date ( 'H:i:s' );
+		
+		if ($hora_atual >= $hora_inicial_bloqueio || $hora_atual <= $hora_final_bloqueio) {
+			return false;
+		}
 		
 		foreach ( $this->_clientes as $cliente => $dadosCliente ) {
 			
@@ -533,25 +634,43 @@ class Model_Wpr_Cron_KplCron {
 						}
 						
 						break;
-						
+					
 					case 'Up2You' :
 						
-							if (! is_array ( $produtos ['ProdutosDisponiveisResult'] )) {
-								throw new Exception ( 'Erro ao buscar Produtos - ' . $produtos );
+						if (! is_array ( $produtos ['ProdutosDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar Produtos - ' . $produtos );
+						}
+						if ($produtos ['ProdutosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem produtos disponiveis para integracao" . PHP_EOL;
+						} else {
+							$kpl_produtos = new Model_Wpr_Kpl_ProdutosUp2You ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl_produtos->ProcessaProdutosWebservice ( $produtos ['ProdutosDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// ERRO
 							}
-							if ($produtos ['ProdutosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
-								echo "Nao existem produtos disponiveis para integracao" . PHP_EOL;
-							} else {
-								$kpl_produtos = new Model_Wpr_Kpl_ProdutosUp2You ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
-								$retorno = $kpl_produtos->ProcessaProdutosWebservice ( $produtos ['ProdutosDisponiveisResult'] ['Rows'], $dadosCliente );
-								if (is_array ( $retorno )) {
-									// ERRO
-								}
+						}
+						break;
+						
+					case 'Verden' :
+						
+						if (! is_array ( $produtos ['ProdutosDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar Produtos - ' . $produtos );
+						}
+						if ($produtos ['ProdutosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem produtos disponiveis para integracao" . PHP_EOL;
+						} else {
+							$kpl_produtos = new Model_Wpr_Kpl_ProdutosVerden ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl_produtos->ProcessaProdutosWebservice ( $produtos ['ProdutosDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// ERRO
 							}
-							break;
+						}
+						break;
 				}
 				
+				echo PHP_EOL;
 				echo "- importacao de produtos do cliente {$cliente} realizada com sucesso" . PHP_EOL;
+				
 			} catch ( Exception $e ) {
 				echo "- erros ao importar os produtos do cliente {$cliente}: " . $e->getMessage () . PHP_EOL;
 			}
