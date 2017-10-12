@@ -552,7 +552,14 @@ class Model_Wpr_Vtex_Pedido {
 			throw new DomainException ( 'Nenhum pedido pendente neste status' );
 		}
 		
-		$dados_pedidos = $this->_vtex->trataArrayDto ( $pedidos->OrderGetByStatusByQuantityResult->OrderDTO );
+		if( $pedidos->OrderGetByStatusByQuantityResult->OrderDTO->Id != null ){
+			$pedidos1->OrderGetByStatusByQuantityResult->OrderDTO [] = $pedidos->OrderGetByStatusByQuantityResult->OrderDTO;
+		}else{
+			$pedidos1->OrderGetByStatusByQuantityResult->OrderDTO = $pedidos->OrderGetByStatusByQuantityResult->OrderDTO;
+		}
+		
+		
+		$dados_pedidos = $this->_vtex->trataArrayDto ( $pedidos1->OrderGetByStatusByQuantityResult->OrderDTO );
 		
 		try {
 			$this->_importarPedidos ( $dados_pedidos, $dadosCliente );
