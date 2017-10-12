@@ -50,17 +50,17 @@ class Model_Wpr_Vtex_Vtex {
 	 * @throws Exception
 	 */
 	public static function getVtex( $ws, $login, $pass ) {
-		if (self::$_vtex instanceof Model_Wpr_Vtex_Vtex === false) {
+		if (self::$_vtex[$login] instanceof Model_Wpr_Vtex_Vtex === false) {
 			
 			try {
 				$vtex = new Model_Wpr_Vtex_Vtex( $ws, $login, $pass );
 				
-				self::$_vtex = $vtex;
+				self::$_vtex[$login] = $vtex;
 			} catch ( Exception $e ) {
 				throw new Exception ( $e->getMessage () );
 			}
 		}
-		return self::$_vtex;
+		return self::$_vtex[$login];
 	}
 	
 	/**

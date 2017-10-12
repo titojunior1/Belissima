@@ -59,6 +59,9 @@ class Model_Wpr_Vtex_Preco {
 		if ( isset ( $this->_vtex ) ) {
 			unset ( $this->_vtex );
 		}
+		if ( isset ( $this->_client ) ) {
+			unset ( $this->_client );
+		}
 		$this->_vtex = Model_Wpr_Vtex_Vtex::getVtex( $ws, $login, $pass );
 		$this->_client = $this->_vtex->_client;
 	}
