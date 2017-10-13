@@ -389,7 +389,7 @@ class Model_Wpr_Vtex_Pedido {
 			echo "Tratando dados para cadastro de pedido: " . $d->Id . PHP_EOL;
 			
 			//Seguindo com criação de Pedidos
-			$dadosPedido [$i] ['NumeroDoPedido'] = $d->Id;
+			$dadosPedido [$i] ['NumeroDoPedido'] = $d->IdV3;
 			$dadosPedido [$i] ['NumeroDoPedidoV3'] = $d->IdV3;
 			$dadosPedido [$i] ['EMail'] = $d->Client->Email;
 			$dadosPedido [$i] ['CPFouCNPJ'] = $cpfFormatado;
@@ -484,7 +484,7 @@ class Model_Wpr_Vtex_Pedido {
 			try {					
 				$dados_pagamento = $this->_getDadosPagamento($dadosPedido [$i] ['NumeroDoPedidoV3']);					
 			} catch (Exception $e) {
-				echo "Erro ao obter dados de pagamento " . $dadosPedido [$i] ['NumeroDoPedido'] . ' - ' . $e->getMessage() . PHP_EOL;
+				echo "Erro ao obter dados de pagamento " . $dadosPedido [$i] ['NumeroDoPedidoV3'] . ' - ' . $e->getMessage() . PHP_EOL;
 				continue;
 			}			
 			
@@ -506,16 +506,16 @@ class Model_Wpr_Vtex_Pedido {
 			
 			try {
 			
-				echo "Importando pedido " . $dadosPedido [$i] ['NumeroDoPedido'] . PHP_EOL;
+				echo "Importando pedido " . $dadosPedido [$i] ['NumeroDoPedidoV3'] . PHP_EOL;
 				$this->_kpl->cadastraPedido( $dadosPedido );
 				echo "Pedido importado/atualizado com sucesso" . PHP_EOL;
 			
-				echo "Atualizando status de pedido {$dadosPedido [$i] ['NumeroDoPedido']} no ambiente VTEX" . PHP_EOL;
+				echo "Atualizando status de pedido {$dadosPedido [$i] ['NumeroDoPedidoV3']} no ambiente VTEX" . PHP_EOL;
 				$this->_mudarStatusPedido($dadosPedido [$i] ['NumeroDoPedidoV3'], 'ERP');
 				echo "Status atualizado com sucesso" . PHP_EOL;
 			
 			} catch (Exception $e) {
-				echo "Erro ao importar pedido " . $dadosPedido [$i] ['NumeroDoPedido'] . ' - ' . $e->getMessage() . PHP_EOL;
+				echo "Erro ao importar pedido " . $dadosPedido [$i] ['NumeroDoPedidoV3'] . ' - ' . $e->getMessage() . PHP_EOL;
 				continue;
 			}			
 			
