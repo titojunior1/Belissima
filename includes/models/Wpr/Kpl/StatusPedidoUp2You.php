@@ -149,13 +149,19 @@ class Model_Wpr_Kpl_StatusPedidoUp2You extends Model_Wpr_Kpl_KplWebService {
 					//Tratar status a ser enviado
 					switch ($dados_status['CodigoStatus']){
 						
-						case '8415': //Faturado
+						case '3': //Faturado
 							$dados_status['StatusEnvio'] = 'ETR';
 							echo "Faturando pedido " . $dados_status['NumeroPedido'] . PHP_EOL;
 							$this->_vtex->_atualizaStatusPedido($dados_status);
 							echo "Pedido faturado. " . PHP_EOL;							
 						break;
-						case '6708': // Cancelado
+// 						case '5': //Entregue
+// 							$dados_status['StatusEnvio'] = 'ETR';
+// 							echo "Faturando pedido " . $dados_status['NumeroPedido'] . PHP_EOL;
+// 							$this->_vtex->_atualizaStatusPedido($dados_status);
+// 							echo "Pedido faturado. " . PHP_EOL;
+// 							break;
+						case '6': // Cancelado
 							$dados_status['StatusEnvio'] = 'CAN';
 							$dados_status['ComentarioStatus'] = utf8_decode( $dados_status['MotivoCancelamento'] );
 							echo "Cancelando pedido " . $dados_status['NumeroPedido'] . PHP_EOL;
