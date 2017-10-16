@@ -161,7 +161,7 @@ class Model_Wpr_Vtex_StubVtex {
 	 * @return retorna mensagem em caso de erro ou true se estiver tudo certo. 
 	 */
 	public function OrderChangeStatus($order_id, $status) {
-		if (! ctype_digit ( $order_id )) {
+		if ( empty ( $order_id )) {
 			throw new InvalidArgumentException ( 'ID do pedido inválido' );
 		}
 		try {
