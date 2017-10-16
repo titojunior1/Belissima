@@ -420,7 +420,7 @@ class Model_Wpr_Cron_KplCron {
 							$retorno = $kpl->ProcessaStatusWebservice ( $status_disponiveis ['StatusPedidoDisponiveisResult'] ['Rows'], $dadosCliente );
 							if (is_array ( $retorno )) {
 								// gravar logs de erro
-								$this->_log->gravaLogErros ( $retorno );
+								//$this->_log->gravaLogErros ( $retorno );
 							}
 						}
 						break;
@@ -437,7 +437,7 @@ class Model_Wpr_Cron_KplCron {
 							$retorno = $kpl->ProcessaStatusWebservice ( $status_disponiveis ['StatusPedidoDisponiveisResult'] ['Rows'], $dadosCliente );
 							if (is_array ( $retorno )) {
 								// gravar logs de erro
-								$this->_log->gravaLogErros ( $retorno );
+								//$this->_log->gravaLogErros ( $retorno );
 							}
 						}
 						break;
@@ -453,7 +453,7 @@ class Model_Wpr_Cron_KplCron {
 							$retorno = $kpl->ProcessaStatusWebservice ( $status_disponiveis ['StatusPedidoDisponiveisResult'] ['Rows'], $dadosCliente );
 							if (is_array ( $retorno )) {
 								// gravar logs de erro
-								$this->_log->gravaLogErros ( $retorno );
+								//$this->_log->gravaLogErros ( $retorno );
 							}
 						}
 						break;
@@ -469,7 +469,7 @@ class Model_Wpr_Cron_KplCron {
 							$retorno = $kpl->ProcessaStatusWebservice ( $status_disponiveis ['StatusPedidoDisponiveisResult'] ['Rows'], $dadosCliente );
 							if (is_array ( $retorno )) {
 								// gravar logs de erro
-								$this->_log->gravaLogErros ( $retorno );
+								//$this->_log->gravaLogErros ( $retorno );
 							}
 						}
 						break;
@@ -486,7 +486,7 @@ class Model_Wpr_Cron_KplCron {
 							$retorno = $kpl->ProcessaStatusWebservice ( $status_disponiveis ['StatusPedidoDisponiveisResult'] ['Rows'], $dadosCliente );
 							if (is_array ( $retorno )) {
 								// gravar logs de erro
-								$this->_log->gravaLogErros ( $retorno );
+								//$this->_log->gravaLogErros ( $retorno );
 							}
 						}
 						break;
@@ -503,7 +503,7 @@ class Model_Wpr_Cron_KplCron {
 							$retorno = $kpl->ProcessaStatusWebservice ( $status_disponiveis ['StatusPedidoDisponiveisResult'] ['Rows'], $dadosCliente );
 							if (is_array ( $retorno )) {
 								// gravar logs de erro
-								$this->_log->gravaLogErros ( $retorno );
+								//$this->_log->gravaLogErros ( $retorno );
 							}
 						}
 						break;
