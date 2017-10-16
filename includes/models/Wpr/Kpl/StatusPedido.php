@@ -181,7 +181,7 @@ class Model_Wpr_Kpl_StatusPedido extends Model_Wpr_Kpl_KplWebService {
 		}		
 		
 		// finaliza sessão Magento
-		$this->_magento->_encerraSessao();
+		//$this->_magento->_encerraSessao();
 		
 		if(is_array($array_erro)){
 			$array_retorno = $array_erro;
