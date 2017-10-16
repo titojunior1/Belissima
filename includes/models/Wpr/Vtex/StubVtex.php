@@ -165,7 +165,7 @@ class Model_Wpr_Vtex_StubVtex {
 			throw new InvalidArgumentException ( 'ID do pedido inválido' );
 		}
 		try {
-			return $this->_wsCall ( 'OrderChangeStatus', array ( array ('idOrder' => $order_id, 'statusOrder' => $status ) ) );
+			return $this->_wsCall ( 'OrderChangeStatus', array ( array ('idOrder' => "{$order_id}", 'statusOrder' => $status ) ) );
 		} catch ( Exception $e ) {
 			throw new RuntimeException ( $e->getMessage () );
 		}

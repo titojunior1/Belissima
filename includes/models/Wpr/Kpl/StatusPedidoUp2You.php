@@ -184,10 +184,8 @@ class Model_Wpr_Kpl_StatusPedidoUp2You extends Model_Wpr_Kpl_KplWebService {
 			}
 			
 			unset($dados_status['StatusEnvio']);
-		}		
+		}	
 		
-		// finaliza sessão Magento
-		$this->_magento->_encerraSessao();
 		
 		if(is_array($array_erro)){
 			$array_retorno = $array_erro;
