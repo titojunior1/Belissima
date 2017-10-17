@@ -227,6 +227,20 @@ class Model_Wpr_Vtex_StubVtex {
 	}
 	
 	/**
+	 * Retorna um determinado pedido baseado no IDV3
+	 * @param string $statusOrder Descrição do Status
+	 * @param int 	 $quantidade Quantidade de Pedidos
+	 * @return retorna mensagem em caso de erro ou array de dados se estiver certo
+	 */
+	public function OrderGetV3($id_pedido) {
+		try {
+			return $this->_wsCall ( 'OrderGetV3', array ( array ('orderId' => $id_pedido ) ) );
+		} catch ( Exception $e ) {
+			throw new RuntimeException ( $e->getMessage () );
+		}
+	}
+	
+	/**
 	 * Imprime o array de erros.
 	 */
 	public function PrintErros() {

@@ -1,5 +1,6 @@
 <?php
 
+use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 /**
  * 
  * Classe de gerenciamento de atualização de status de pedido com a Kpl
@@ -86,6 +87,23 @@ class Model_Wpr_Kpl_StatusPedidoUp2You extends Model_Wpr_Kpl_KplWebService {
 	}
 	
 	/**
+	 * Método que faz muda o status de um pedido para faturado
+	 */
+	private function _getNumeroTransacaoPedido ( $idTransacaoPedido ){
+	
+		if ( empty( $idTransacaoPedido ) ){
+			throw new InvalidArgumentException( "Id {$idTransacaoPedido} invalido." );
+		}
+		
+		$result = $this->_vtex->_client->OrderGetV3( $idTransacaoPedido );
+		
+		$idPedido = $result->OrderGetV3Result->Id;
+
+		return $idPedido;
+	
+	}
+	
+	/**
 	 * 
 	 * Processar status dos pedidos via webservice.
 	 * @param array $request
@@ -99,10 +117,15 @@ class Model_Wpr_Kpl_StatusPedidoUp2You extends Model_Wpr_Kpl_KplWebService {
 		$array_erro_principal = array ();
 		$array_status = array ();
 		
+		echo "Conectando ao WebService Vtex... " . PHP_EOL;
+		$this->_vtex = new Model_Wpr_Vtex_Status( $dadosCliente['VTEX_WSDL'], $dadosCliente['VTEX_USUARIO'], $dadosCliente['VTEX_SENHA'] );
+		echo "Conectado!" . PHP_EOL;
+		echo PHP_EOL;
+		
 		if ( ! is_array ( $request ['DadosStatusPedido'] [0] ) ) {
 					
 			$array_status [0] ['ProtocoloStatusPedido'] = $request ['DadosStatusPedido'] ['ProtocoloStatusPedido'];
-			$array_status [0] ['NumeroPedido'] = $request ['DadosStatusPedido'] ['NumeroPedido'];
+			$array_status [0] ['NumeroPedido'] = $this->_getNumeroTransacaoPedido( $request ['DadosStatusPedido'] ['NumeroPedido'] );
 			$array_status [0] ['CodigoStatus'] = $request ['DadosStatusPedido'] ['CodigoStatus'];
 			$array_status [0] ['StatusPedido'] = $request ['DadosStatusPedido'] ['StatusPedido'];
 			$array_status [0] ['CodigoMotivoCancelamento'] = $request ['DadosStatusPedido'] ['CodigoMotivoCancelamento'];
@@ -113,7 +136,7 @@ class Model_Wpr_Kpl_StatusPedidoUp2You extends Model_Wpr_Kpl_KplWebService {
 			foreach ( $request ["DadosStatusPedido"] as $i => $d ) {
 				
 				$array_status [$i] ['ProtocoloStatusPedido'] = $d ['ProtocoloStatusPedido'];
-				$array_status [$i] ['NumeroPedido'] = $d ['NumeroPedido'];
+				$array_status [$i] ['NumeroPedido'] = $this->_getNumeroTransacaoPedido( $d ['NumeroPedido'] );
 				$array_status [$i] ['CodigoStatus'] = $d ['CodigoStatus'];
 				$array_status [$i] ['StatusPedido'] = $d ['StatusPedido'];
 				$array_status [$i] ['CodigoMotivoCancelamento'] = $d ['CodigoMotivoCancelamento'];
@@ -126,11 +149,6 @@ class Model_Wpr_Kpl_StatusPedidoUp2You extends Model_Wpr_Kpl_KplWebService {
 		
 		echo PHP_EOL;
 		echo "Status encontrados para integracao: " . $qtdStatus . PHP_EOL;
-		echo PHP_EOL;
-		
-		echo "Conectando ao WebService Vtex... " . PHP_EOL;
-		$this->_vtex = new Model_Wpr_Vtex_Status( $dadosCliente['VTEX_WSDL'], $dadosCliente['VTEX_USUARIO'], $dadosCliente['VTEX_SENHA'] );
-		echo "Conectado!" . PHP_EOL;
 		echo PHP_EOL;
 		
 		// Percorrer array de preços
