@@ -258,7 +258,13 @@ class Model_Wpr_Kpl_ProdutosUp2You extends Model_Wpr_Kpl_KplWebService {
 					
 			$array_produtos [0] ['ProtocoloProduto'] = $request ['DadosProdutos'] ['ProtocoloProduto'];
 			//$array_produtos [0] ['Categoria'] = $this->_getCategoriaProduto( $request ['DadosProdutos'] ['DescricaoSubgrupo'] );
-			$array_produtos [0] ['Categoria'] = isset($request ['DadosProdutos'] ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] ['CodigoExternoCategoria']) ? $request ['DadosProdutos'] ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] ['CodigoExternoCategoria'] : $request ['DadosProdutos'] ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] [0] ['CodigoExternoCategoria'];
+			
+			$qtdCategorias = count( $request ['DadosProdutos'] ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] );						
+			$array_produtos [0] ['Categoria'] = $request ['DadosProdutos'] ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] [$qtdCategorias - 1] ['CodigoExternoCategoria'];
+			if ($array_produtos [0] ['Categoria'] == null){
+				$array_produtos [0] ['Categoria'] = $request ['DadosProdutos'] ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] ['CodigoExternoCategoria'];
+			}
+			
 			$array_produtos [0] ['Nome'] = $request ['DadosProdutos'] ['NomeProduto'];			
 			$array_produtos [0] ['Classificacao'] = isset($request ['DadosProdutos'] ['Classificacao']) ? $request ['DadosProdutos'] ['Classificacao']: '';
 			$array_produtos [0] ['Altura'] = number_format($request ['DadosProdutos'] ['Altura'], 2, '.', '');
@@ -290,7 +296,10 @@ class Model_Wpr_Kpl_ProdutosUp2You extends Model_Wpr_Kpl_KplWebService {
 			foreach ( $request ["DadosProdutos"] as $i => $d ) {				
 				
 				$array_produtos [$i] ['ProtocoloProduto'] = $d ['ProtocoloProduto'];
-				$array_produtos [$i] ['Categoria'] = isset($d ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] ['CodigoExternoCategoria']) ? $d ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] ['CodigoExternoCategoria'] : $d ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] [0] ['CodigoExternoCategoria'];				
+				
+				$qtdCategorias = count( $d ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] );				
+				$array_produtos [$i] ['Categoria'] = $d ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] [$qtdCategorias - 1] ['CodigoExternoCategoria'];
+								
 				$array_produtos [$i] ['Nome'] = $d ['NomeProduto'];
 				$array_produtos [$i] ['Classificacao'] = isset($d ['Classificacao']) ? $d ['Classificacao']: '';
 				$array_produtos [$i] ['Altura'] = number_format($d ['Altura'], 2, '.', '');
