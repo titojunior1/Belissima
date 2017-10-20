@@ -7,7 +7,7 @@
  * @author Tito Junior
  *        
  */
-class Model_Wpr_Kpl_ProdutosCreaTech extends Model_Wpr_Kpl_KplWebService {
+class Model_Wpr_Kpl_ProdutosVerden extends Model_Wpr_Kpl_KplWebService {
 	
 	/*
 	 * Instancia Webservice KPL
