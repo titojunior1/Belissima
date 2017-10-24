@@ -189,7 +189,7 @@ class Model_Wpr_Kpl_ProdutosUp2You extends Model_Wpr_Kpl_KplWebService {
 				//'DescriptionShort' => $dados_produtos ['Descricao'],
 				'IsActive' => true,
 				'IsVisible' => $dados_produtos['flagExibicao'],
-				'LinkId' => $dados_produtos ['CodigoProduto'],
+				'LinkId' => $dados_produtos ['Nome'],
 				'ListStoreId' => array( 'int' => '1' ),
 				'MetaTagDescription' => $dados_produtos ['DescricaoTag'],
 				'Name' => $dados_produtos ['Nome'],
