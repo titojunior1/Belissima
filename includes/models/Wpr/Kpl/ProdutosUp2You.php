@@ -221,7 +221,7 @@ class Model_Wpr_Kpl_ProdutosUp2You extends Model_Wpr_Kpl_KplWebService {
 				'RealLength' => $dados_produtos ['Comprimento'],
 				'IsActive' => true,
 				'IsAvaiable' => false,
-				'IsKit' => false,				
+				'IsKit' => $dados_produtos ['Kit'],				
 				'ModalId' => '1',
 				'Name' => $dados_produtos ['Nome'],
 // 				'ProductName' => $dados_produtos ['Nome'], // TODO CAUE/ERI				
@@ -283,13 +283,7 @@ class Model_Wpr_Kpl_ProdutosUp2You extends Model_Wpr_Kpl_KplWebService {
 			$array_produtos [0] ['CodigoFamilia'] = $request ['DadosProdutos'] ['CodigoFamilia'];
 			//$array_produtos [0] ['DescricaoTag'] = $request ['DadosProdutos'] ['CaracteristicasComplementares'] ['Rows'] ['DadosCaracteristicasComplementares'] ['Texto'];
 			$array_produtos [0] ['CodigoBarras'] = $request ['DadosProdutos'] ['CodigoBarras'];
-			
-			// verifica se produto é pai ou filho
-			if ( strstr( $request ['DadosProdutos'] ['CodigoProduto'], '-' ) == true ){
-				$array_produtos [0] ['Visibilidade'] = 1; // Não exibir pois é produto Filho 
-			}else{
-				$array_produtos [0] ['Visibilidade'] = 4; // Exibir produto Pai
-			}
+			$array_produtos [0] ['Kit'] = $request ['DadosProdutos'] ['ProdutoKit'];
 		
 		} else {
 			
@@ -318,13 +312,8 @@ class Model_Wpr_Kpl_ProdutosUp2You extends Model_Wpr_Kpl_KplWebService {
 				$array_produtos [$i] ['CodigoFamilia'] = $d ['CodigoFamilia'];
 				//$array_produtos [$i] ['DescricaoTag'] = $d ['CaracteristicasComplementares'] ['Rows'] ['DadosCaracteristicasComplementares'] ['Texto'];
 				$array_produtos [$i] ['CodigoBarras'] = $d ['CodigoBarras'];
+				$array_produtos [$i] ['Kit'] = $d ['ProdutoKit'];
 								
-				// verifica se produto é pai ou filho
-				if ( strstr( $d ['CodigoProduto'], '-' ) == true ){
-					$array_produtos [$i] ['Visibilidade'] = 1; // Não exibir pois é produto Filho
-				}else{
-					$array_produtos [$i] ['Visibilidade'] = 4; // Exibir produto Pai
-				}
 			}
 		}
 		
