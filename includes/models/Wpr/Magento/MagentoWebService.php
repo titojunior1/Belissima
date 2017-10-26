@@ -316,7 +316,7 @@ class Model_Wpr_Magento_MagentoWebService {
 	 * @param unknown $produto
 	 * @return boolean
 	 */
-	public function atualizaStatusPedido( $idPedido, $status, $comentarioStatus){
+	public function atualizaStatusPedido( $idPedido, $status, $comentarioStatus = null ){
 	
 		if($this->_session_valid == false){
 			$this->_iniciaSessao();

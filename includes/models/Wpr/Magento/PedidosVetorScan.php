@@ -371,6 +371,8 @@ class Model_Wpr_Magento_PedidosVetorScan extends Model_Wpr_Magento_MagentoWebSer
 					$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoQtdeParcelas'] = '1';
 					$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoCodigoAutorizacao'] = $infosAdicionaisPedido->payment->cc_last4;
 					//$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['CartaoValidade'] = $infosAdicionaisPedido->payment->cc_exp_month.$infosAdicionaisPedido->payment->cc_exp_year;
+					
+					$dadosPedido [$i] ['StatusPedidoEnvio'] = 'processing';
 				
 					break;
 					
@@ -378,12 +380,16 @@ class Model_Wpr_Magento_PedidosVetorScan extends Model_Wpr_Magento_MagentoWebSer
 					
 						$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['FormaPagamentoCodigo'] = 'mastershopboletobancario';
 						$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['Valor'] = number_format($infosAdicionaisPedido->payment->amount_ordered, 2, '.', '');
+						
+						$dadosPedido [$i] ['StatusPedidoEnvio'] = 'pending_payment';
 					
 						break;
 				case 'mastershopboletobancario2' :
 						
 					$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['FormaPagamentoCodigo'] = 'mastershopboletobancario';
 					$dadosPedido [$i] ['FormasDePagamento'] ['DadosPedidosFormaPgto'] ['Valor'] = number_format($infosAdicionaisPedido->payment->amount_ordered, 2, '.', '');
+					
+					$dadosPedido [$i] ['StatusPedidoEnvio'] = 'pending_payment';
 						
 					break;
 			
@@ -424,8 +430,8 @@ class Model_Wpr_Magento_PedidosVetorScan extends Model_Wpr_Magento_MagentoWebSer
 				$this->_kpl->cadastraPedido( $dadosPedido );
 				echo "Pedido importado com sucesso" . PHP_EOL;
 				
-				echo "Atualizando status de pedido {$dadosPedido [$i] ['NumeroDoPedido']} no ambiente Magento" . PHP_EOL;
-				$this->_magento->atualizaStatusPedidoemSeparacao( $dadosPedido [$i] ['NumeroDoPedido'] );			
+				echo "Atualizando status de pedido {$dadosPedido [$i] ['NumeroDoPedido']} no ambiente Magento" . PHP_EOL;			
+				$this->_magento->atualizaStatusPedido( $dadosPedido [$i] ['NumeroDoPedido'], $dadosPedido [$i] ['StatusPedidoEnvio'] );
 				echo "Status atualizado com sucesso" . PHP_EOL;
 				
 			} catch (Exception $e) {

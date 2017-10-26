@@ -283,7 +283,7 @@ class Model_Wpr_Kpl_ProdutosUp2You extends Model_Wpr_Kpl_KplWebService {
 			$array_produtos [0] ['CodigoFamilia'] = $request ['DadosProdutos'] ['CodigoFamilia'];
 			//$array_produtos [0] ['DescricaoTag'] = $request ['DadosProdutos'] ['CaracteristicasComplementares'] ['Rows'] ['DadosCaracteristicasComplementares'] ['Texto'];
 			$array_produtos [0] ['CodigoBarras'] = $request ['DadosProdutos'] ['CodigoBarras'];
-			$array_produtos [0] ['Kit'] = $request ['DadosProdutos'] ['ProdutoKit'];
+			$array_produtos [0] ['Kit'] = ( $request ['DadosProdutos'] ['ProdutoKit'] == "true" )? true : false ;
 		
 		} else {
 			
@@ -312,7 +312,7 @@ class Model_Wpr_Kpl_ProdutosUp2You extends Model_Wpr_Kpl_KplWebService {
 				$array_produtos [$i] ['CodigoFamilia'] = $d ['CodigoFamilia'];
 				//$array_produtos [$i] ['DescricaoTag'] = $d ['CaracteristicasComplementares'] ['Rows'] ['DadosCaracteristicasComplementares'] ['Texto'];
 				$array_produtos [$i] ['CodigoBarras'] = $d ['CodigoBarras'];
-				$array_produtos [$i] ['Kit'] = $d ['ProdutoKit'];
+				$array_produtos [$i] ['Kit'] = ( $d ['ProdutoKit'] == "true" )? true : false;
 								
 			}
 		}
