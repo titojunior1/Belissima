@@ -124,7 +124,23 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 	 */
 	private function _adicionaProduto($dados_produtos) {
 		$skuNovoProduto = $dados_produtos ['SKU'];
-		$novoProduto = array ( 'name' => $dados_produtos ['Nome'], 'weight' => $dados_produtos ['Peso'], 'status' => '1', 'url_key' => $dados_produtos ['Nome'], 'visibility' => $dados_produtos ['Visibilidade'], 'price' => $dados_produtos ['ValorVenda'], 'special_price' => $dados_produtos ['ValorCusto'], 'tax_class_id' => 1, 'meta_title' => $dados_produtos ['Nome'] );
+		$novoProduto = array ( 
+								'name' => $dados_produtos ['Nome'], 
+								'weight' => $dados_produtos ['Peso'], 
+								'status' => '1', 
+								'url_key' => $dados_produtos ['Nome'], 
+								'visibility' => $dados_produtos ['Visibilidade'], 
+								'price' => $dados_produtos ['ValorVenda'], 
+								'special_price' => $dados_produtos ['ValorCusto'], 
+								'tax_class_id' => 1, 
+								'meta_title' => $dados_produtos ['Nome'], 
+								'additional_attributes' => array(
+							        'single_data' => array(
+							            array('key' => 'gtin', 'value' => $dados_produtos ['EanProprio'])
+							        )
+								),
+								'categories' => array($dados_produtos ['Categoria'])
+						);
 		
 		$this->_magento->cadastraProduto ( $skuNovoProduto, $novoProduto );
 	}
@@ -138,10 +154,21 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 	 */
 	private function _atualizaProduto($dados_produtos) {
 		$idProduto = $dados_produtos ['product_id'];
-		$produto = array ( 'name' => $dados_produtos ['Nome'], 'weight' => $dados_produtos ['Peso'], 'status' => '1', 'url_key' => $dados_produtos ['Nome'], 'visibility' => $dados_produtos ['Visibilidade'], 
-				//'price' => $dados_produtos ['ValorVenda'],
-				//'special_price' => $dados_produtos ['ValorCusto'],
-				'tax_class_id' => 1, 'meta_title' => $dados_produtos ['Nome'] );
+		$produto = array ( 
+							'name' => $dados_produtos ['Nome'], 
+							'weight' => $dados_produtos ['Peso'], 
+							'status' => '1', 
+							'url_key' => $dados_produtos ['Nome'], 
+							'visibility' => $dados_produtos ['Visibilidade'], 
+							'tax_class_id' => 1, 
+							'meta_title' => $dados_produtos ['Nome'],
+							'additional_attributes' => array(
+									        'single_data' => array(
+									            array('key' => 'gtin', 'value' => $dados_produtos ['EanProprio'])
+									        )
+										),
+							'categories' => array($dados_produtos ['Categoria'])
+				 );
 		
 		$this->_magento->atualizaProduto ( $idProduto, $produto );
 	}
@@ -191,7 +218,11 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 		if (! is_array ( $request ['DadosProdutos'] [0] )) {
 			
 			$array_produtos [0] ['ProtocoloProduto'] = $request ['DadosProdutos'] ['ProtocoloProduto'];
-			$array_produtos [0] ['Categoria'] = isset ( $request ['DadosProdutos'] ['Categoria'] ) ? $request ['DadosProdutos'] ['Categoria'] : '';
+			$qtdCategorias = count( $request ['DadosProdutos'] ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] );						
+			$array_produtos [0] ['Categoria'] = $request ['DadosProdutos'] ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] [$qtdCategorias - 1] ['CodigoExternoCategoria'];
+			if ($array_produtos [0] ['Categoria'] == null){
+				$array_produtos [0] ['Categoria'] = $request ['DadosProdutos'] ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] ['CodigoExternoCategoria'];
+			}
 			$array_produtos [0] ['Nome'] = utf8_encode ( $request ['DadosProdutos'] ['NomeProduto'] );
 			$array_produtos [0] ['Classificacao'] = isset ( $request ['DadosProdutos'] ['Classificacao'] ) ? $request ['DadosProdutos'] ['Classificacao'] : '';
 			$array_produtos [0] ['Altura'] = $request ['DadosProdutos'] ['Altura'];
@@ -220,7 +251,8 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 				
 				//Nome do campo no wms  =  Nome do campo no Kpl
 				$array_produtos [$i] ['ProtocoloProduto'] = $d ['ProtocoloProduto'];
-				$array_produtos [$i] ['Categoria'] = isset ( $d ['Categoria'] ) ? $d ['Categoria'] : '';
+				$qtdCategorias = count( $d ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] );				
+				$array_produtos [$i] ['Categoria'] = $d ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] [$qtdCategorias - 1] ['CodigoExternoCategoria'];
 				$array_produtos [$i] ['Nome'] = utf8_encode ( $d ['NomeProduto'] );
 				$array_produtos [$i] ['Classificacao'] = isset ( $d ['Classificacao'] ) ? $d ['Classificacao'] : '';
 				$array_produtos [$i] ['Altura'] = $d ['Altura'];
@@ -279,12 +311,12 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 					$produto = $this->buscaProduto ( $dados_produtos ['SKU'] );
 					if ($produto == false) {
 						echo "Adicionando produto " . $dados_produtos ['SKU'] . " na loja Magento" . PHP_EOL;
-						//$this->_adicionaProduto ( $dados_produtos );
+						$this->_adicionaProduto ( $dados_produtos );
 						echo "Produto adicionado. " . PHP_EOL;
 					} else {
 						echo "Atualizando produto " . $dados_produtos ['SKU'] . " na loja Magento" . PHP_EOL;
 						$dados_produtos ['product_id'] = $produto; // ID do Produto na Loja Magento
-						//$this->_atualizaProduto ( $dados_produtos );
+						$this->_atualizaProduto ( $dados_produtos );
 						echo "Produto atualizado. " . PHP_EOL;
 					}
 					

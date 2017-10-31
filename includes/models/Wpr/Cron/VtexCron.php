@@ -99,6 +99,21 @@ class Model_Wpr_Cron_VtexCron {
 					}
 					
 					break;
+					case 'PetLuni' :
+							
+						echo "- importando pedidos de saida do cliente {$cliente} - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
+									
+						try {
+					
+						$vtex = new Model_Wpr_Vtex_Pedido ( $dadosCliente ['VTEX_WSDL'], $dadosCliente ['VTEX_USUARIO'], $dadosCliente ['VTEX_SENHA'], $dadosCliente ['VTEX_API_URL'], $dadosCliente ['VTEX_API_KEY'], $dadosCliente ['VTEX_API_TOKEN'] );
+						$vtex->importarPedidosStatusQuantidade ( $status_pedido_vtex, $qtd_pedidos, $dadosCliente );
+					
+											echo "Pedidos do cliente {$cliente} importados - " . date ( "d/m/Y H:i:s" ) . PHP_EOL;
+					} catch ( Exception $e ) {
+						echo "Erros ao importar os pedidos do cliente {$cliente}: " . $e->getMessage () . PHP_EOL;
+						}
+							
+						break;
 			}
 		}
 		echo PHP_EOL;
