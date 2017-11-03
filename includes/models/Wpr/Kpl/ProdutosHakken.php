@@ -46,35 +46,33 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 
 	/**
 	 * Metodo que busca as categorias de um produto e faz a relação com a categoria VTEX
-	 * @param string $descricaoCategoria
+	 * @param array $categorias
 	 *
 	 */
-	private function _getCategoriaProduto($descricaoCategoria) {
-		if (! is_string ( $descricaoCategoria )) {
+	private function _getCategoriaProduto($categorias) {
+		
+		if (! is_array( $categorias )) {
 			throw new InvalidArgumentException ( 'Categoria não informada ou Invalida' );
 		}
 		
-		$categorias = array ();
-		
-		if (! is_array ( $this->_categorias ['DadosCategoriasProduto'] [0] )) {
-			$categorias [0] ['Nome'] = $this->_categorias ['DadosCategoriasProduto'] ['Nome'];
-			$categorias [0] ['CodigoExternoCategoriaProduto'] = $this->_categorias ['DadosCategoriasProduto'] ['CodigoExternoCategoriaProduto'];
-		} else {
+		$qtdCategorias = count( $categorias );
+
+		if ( $qtdCategorias > 1 ){
 			
-			foreach ( $this->_categorias ["DadosCategoriasProduto"] as $i => $d ) {
-				$categorias [$i] ['Nome'] = $d ['Nome'];
-				$categorias [$i] ['CodigoExternoCategoriaProduto'] = $d ['CodigoExternoCategoriaProduto'];
+			foreach ( $categorias as $i => $categoria ){
+				$idsCategoriaProduto[$i] = $categoria['CodigoExternoCategoria'];					
 			}
+			
+			$idsCategoria = $idsCategoriaProduto;
+			
+		}else{
+			
+			$idsCategoria = $categorias['CodigoExternoCategoria'];
+			
 		}
 		
-		foreach ( $categorias as $categoria ) {
-			if (trim ( $categoria ['Nome'] ) == trim ( $descricaoCategoria )) {
-				return $categoria ['CodigoExternoCategoriaProduto'];
-			}
-		}
+		return $idsCategoria;
 		
-		return 0;
-		//throw new InvalidArgumentException( "Descricao {$descricaoCategoria} de Categoria nao encontrada na KPL" );
 	}
 
 	/**
@@ -139,7 +137,7 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 							            array('key' => 'gtin', 'value' => $dados_produtos ['EanProprio'])
 							        )
 								),
-								'categories' => array($dados_produtos ['Categoria'])
+								'categories' => $dados_produtos ['Categoria']
 						);
 		
 		$this->_magento->cadastraProduto ( $skuNovoProduto, $novoProduto );
@@ -167,7 +165,7 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 									            array('key' => 'gtin', 'value' => $dados_produtos ['EanProprio'])
 									        )
 										),
-							'categories' => array($dados_produtos ['Categoria'])
+							'categories' => $dados_produtos ['Categoria']
 				 );
 		
 		$this->_magento->atualizaProduto ( $idProduto, $produto );
@@ -215,14 +213,16 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 		$array_erro_principal = array ();
 		$array_produtos = array ();
 		
-		if (! is_array ( $request ['DadosProdutos'] [0] )) {
+		if (! is_array ( $request ['DadosProdutos'] [0] )) {			
 			
+			//$qtdCategorias = count( $request ['DadosProdutos'] ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] );						
+			//$array_produtos [0] ['Categoria'] = $request ['DadosProdutos'] ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] [$qtdCategorias - 1] ['CodigoExternoCategoria'];
+// 			if ($array_produtos [0] ['Categoria'] == null){
+// 				$array_produtos [0] ['Categoria'] = $request ['DadosProdutos'] ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] ['CodigoExternoCategoria'];
+// 			}
+
 			$array_produtos [0] ['ProtocoloProduto'] = $request ['DadosProdutos'] ['ProtocoloProduto'];
-			$qtdCategorias = count( $request ['DadosProdutos'] ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] );						
-			$array_produtos [0] ['Categoria'] = $request ['DadosProdutos'] ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] [$qtdCategorias - 1] ['CodigoExternoCategoria'];
-			if ($array_produtos [0] ['Categoria'] == null){
-				$array_produtos [0] ['Categoria'] = $request ['DadosProdutos'] ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] ['CodigoExternoCategoria'];
-			}
+			$array_produtos [0] ['Categoria'] = $this->_getCategoriaProduto( $request ['DadosProdutos'] ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] );			
 			$array_produtos [0] ['Nome'] = utf8_encode ( $request ['DadosProdutos'] ['NomeProduto'] );
 			$array_produtos [0] ['Classificacao'] = isset ( $request ['DadosProdutos'] ['Classificacao'] ) ? $request ['DadosProdutos'] ['Classificacao'] : '';
 			$array_produtos [0] ['Altura'] = $request ['DadosProdutos'] ['Altura'];
@@ -233,9 +233,7 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 			$array_produtos [0] ['SKU'] = $request ['DadosProdutos'] ['CodigoProduto'];
 			$array_produtos [0] ['EanProprio'] = $request ['DadosProdutos'] ['CodigoBarras'];
 			$array_produtos [0] ['EstoqueMinimo'] = $request ['DadosProdutos'] ['QtdeMinimaEstoque'];
-			//$array_produtos [0] ['ValorVenda'] = '0.00';
 			$array_produtos [0] ['Descricao'] = utf8_encode ( empty ( $request ['DadosProdutos'] ['Descricao'] ) ? $request ['DadosProdutos'] ['NomeProduto'] : str_replace ( '<BR>', '', $request ['DadosProdutos'] ['Descricao'] ) );
-			//$array_produtos [0] ['ValorCusto'] = isset($request ['DadosProdutos'] ['ValorCusto']) ? $request ['DadosProdutos'] ['ValorCusto']: '';
 			$array_produtos [0] ['CodigoProdutoPai'] = isset ( $request ['DadosProdutos'] ['CodigoProdutoPai'] ) ? $request ['DadosProdutos'] ['CodigoProdutoPai'] : '';
 			$array_produtos [0] ['Unidade'] = isset ( $request ['DadosProdutos'] ['Unidade'] ) ? $request ['DadosProdutos'] ['Unidade'] : '';
 			
@@ -247,12 +245,13 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 			}
 		} else {
 			
-			foreach ( $request ["DadosProdutos"] as $i => $d ) {
+			foreach ( $request ["DadosProdutos"] as $i => $d ) {				
 				
-				//Nome do campo no wms  =  Nome do campo no Kpl
+// 				$qtdCategorias = count( $d ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] );				
+// 				$array_produtos [$i] ['Categoria'] = $d ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] [$qtdCategorias - 1] ['CodigoExternoCategoria'];
+
 				$array_produtos [$i] ['ProtocoloProduto'] = $d ['ProtocoloProduto'];
-				$qtdCategorias = count( $d ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] );				
-				$array_produtos [$i] ['Categoria'] = $d ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] [$qtdCategorias - 1] ['CodigoExternoCategoria'];
+				$array_produtos [$i] ['Categoria'] = $this->_getCategoriaProduto( $d ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] );				
 				$array_produtos [$i] ['Nome'] = utf8_encode ( $d ['NomeProduto'] );
 				$array_produtos [$i] ['Classificacao'] = isset ( $d ['Classificacao'] ) ? $d ['Classificacao'] : '';
 				$array_produtos [$i] ['Altura'] = $d ['Altura'];
@@ -263,9 +262,7 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 				$array_produtos [$i] ['SKU'] = $d ['CodigoProduto'];
 				$array_produtos [$i] ['EanProprio'] = $d ['CodigoBarras'];
 				$array_produtos [$i] ['EstoqueMinimo'] = $d ['QtdeMinimaEstoque'];
-				//$array_produtos [$i] ['ValorVenda'] = '0.00';
 				$array_produtos [$i] ['Descricao'] = utf8_encode ( empty ( $d ['Descricao'] ) ? $d ['NomeProduto'] : str_replace ( '<BR>', '', $d ['Descricao'] ) );
-				//$array_produtos [$i] ['ValorCusto'] = isset($d ['ValorCusto']) ? $d ['ValorCusto']: '';
 				$array_produtos [$i] ['CodigoProdutoPai'] = isset ( $d ['CodigoProdutoPai'] ) ? $d ['CodigoProdutoPai'] : '';
 				$array_produtos [$i] ['Unidade'] = isset ( $d ['Unidade'] ) ? $d ['Unidade'] : '';
 				
