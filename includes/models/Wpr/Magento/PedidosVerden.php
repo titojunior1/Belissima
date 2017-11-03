@@ -179,9 +179,9 @@ class Model_Wpr_Magento_PedidosVerden extends Model_Wpr_Magento_MagentoWebServic
 	 * Processar cadastro de clientes via webservice.
 	 * @param array $request
 	 */
-	function ProcessaPedidosWebservice($request) {
+	function ProcessaPedidosWebservice($request, $dadosCliente) {
 		echo "Conectando ao WebService Kpl... " . PHP_EOL;
-		$this->_kpl = new Model_Wpr_Kpl_Clientes ();
+		$this->_kpl = new Model_Wpr_Kpl_Clientes( $dadosCliente['KPL_WSDL'], $dadosCliente['KPL_KEY'] );
 		echo "Conectado!" . PHP_EOL;
 		echo PHP_EOL;
 		
