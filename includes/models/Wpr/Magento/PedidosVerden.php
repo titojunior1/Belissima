@@ -181,7 +181,7 @@ class Model_Wpr_Magento_PedidosVerden extends Model_Wpr_Magento_MagentoWebServic
 	 */
 	function ProcessaPedidosWebservice($request) {
 		echo "Conectando ao WebService Kpl... " . PHP_EOL;
-		$this->_kpl = new Model_Verden_Kpl_Clientes ();
+		$this->_kpl = new Model_Wpr_Kpl_Clientes ();
 		echo "Conectado!" . PHP_EOL;
 		echo PHP_EOL;
 		
