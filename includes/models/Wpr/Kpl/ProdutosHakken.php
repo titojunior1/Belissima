@@ -130,7 +130,7 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 								'visibility' => $dados_produtos ['Visibilidade'], 
 								'price' => $dados_produtos ['ValorVenda'], 
 								'special_price' => $dados_produtos ['ValorCusto'], 
-								'tax_class_id' => 1, 
+								//'tax_class_id' => 1, 
 								'meta_title' => $dados_produtos ['Nome'], 
 								'additional_attributes' => array(
 							        'single_data' => array(
@@ -158,7 +158,7 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 							'status' => '1', 
 							'url_key' => $dados_produtos ['Nome'], 
 							'visibility' => $dados_produtos ['Visibilidade'], 
-							'tax_class_id' => 1, 
+							//'tax_class_id' => 1, 
 							'meta_title' => $dados_produtos ['Nome'],
 							'additional_attributes' => array(
 									        'single_data' => array(
