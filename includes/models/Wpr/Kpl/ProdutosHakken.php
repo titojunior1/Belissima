@@ -236,16 +236,17 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 			$array_produtos [0] ['EanProprio'] = $request ['DadosProdutos'] ['CodigoBarras'];
 			$array_produtos [0] ['EstoqueMinimo'] = $request ['DadosProdutos'] ['QtdeMinimaEstoque'];
 			$array_produtos [0] ['Descricao'] = utf8_encode ( empty ( $request ['DadosProdutos'] ['Descricao'] ) ? $request ['DadosProdutos'] ['NomeProduto'] : str_replace ( '<BR>', '', $request ['DadosProdutos'] ['Descricao'] ) );
-			$array_produtos [0] ['CodigoProdutoPai'] = isset ( $request ['DadosProdutos'] ['CodigoProdutoPai'] ) ? $request ['DadosProdutos'] ['CodigoProdutoPai'] : '';
 			$array_produtos [0] ['Unidade'] = isset ( $request ['DadosProdutos'] ['Unidade'] ) ? $request ['DadosProdutos'] ['Unidade'] : '';
 			
 			// verifica se produto é pai ou filho
-			if (strstr ( $request ['DadosProdutos'] ['CodigoProduto'], '-' ) == true) {
+			if ( ! isset ( $request ['DadosProdutos'] ['CodigoProdutoPai'] ) ) {
 				$array_produtos [0] ['Visibilidade'] = 1; // Não exibir pois é produto Filho
 				$array_produtos [0] ['Tipo'] = 'simple'; 
+				$array_produtos [0] ['CodigoProdutoPai'] = '';
 			} else {
 				$array_produtos [0] ['Visibilidade'] = 4; // Exibir produto Pai
 				$array_produtos [0] ['Tipo'] = 'configurable';
+				$array_produtos [0] ['CodigoProdutoPai'] = $request ['DadosProdutos'] ['CodigoProdutoPai'];
 			}
 		} else {
 			
@@ -267,17 +268,18 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 				$array_produtos [$i] ['EanProprio'] = $d ['CodigoBarras'];
 				$array_produtos [$i] ['EstoqueMinimo'] = $d ['QtdeMinimaEstoque'];
 				$array_produtos [$i] ['Descricao'] = utf8_encode ( empty ( $d ['Descricao'] ) ? $d ['NomeProduto'] : str_replace ( '<BR>', '', $d ['Descricao'] ) );
-				$array_produtos [$i] ['CodigoProdutoPai'] = isset ( $d ['CodigoProdutoPai'] ) ? $d ['CodigoProdutoPai'] : '';
 				$array_produtos [$i] ['Unidade'] = isset ( $d ['Unidade'] ) ? $d ['Unidade'] : '';
 				
 				// verifica se produto é pai ou filho
-				if (strstr ( $d ['CodigoProduto'], '-' ) == true) {
+				if ( ! isset ( $d ['CodigoProdutoPai'] )) {
 					$array_produtos [$i] ['Visibilidade'] = 1; // Não exibir pois é produto Filho
 					$array_produtos [$i] ['Tipo'] = 'simple';
+					$array_produtos [$i] ['CodigoProdutoPai'] = '';
 					
 				} else {
 					$array_produtos [$i] ['Visibilidade'] = 4; // Exibir produto Pai
 					$array_produtos [$i] ['Tipo'] = 'configurable';
+					$array_produtos [$i] ['CodigoProdutoPai'] = $d ['CodigoProdutoPai'];
 				}
 			}
 		}
