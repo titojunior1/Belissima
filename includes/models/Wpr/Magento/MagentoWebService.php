@@ -238,7 +238,7 @@ class Model_Wpr_Magento_MagentoWebService {
 	
 	}
 	
-	public function cadastraProduto( $sku, $produto ){
+	public function cadastraProduto( $sku, $produto, $tipoProduto = 'simple' ){
 		
 		if($this->_session_valid == false){
 			$this->_iniciaSessao();	
@@ -250,7 +250,7 @@ class Model_Wpr_Magento_MagentoWebService {
 			$attributeSets = $this->_webservice->catalogProductAttributeSetList($this->_session);
 			$attributeSet = current($attributeSets);
 			
-			$result = $this->_webservice->catalogProductCreate($this->_session, 'simple', $attributeSet->set_id, $sku, $produto);			
+			$result = $this->_webservice->catalogProductCreate($this->_session, $tipoProduto, $attributeSet->set_id, $sku, $produto);			
 		
 		} catch ( Exception $e ) {
 			throw new RuntimeException( 'Erro ao cadastrar Produto ' . $sku . ' - ' . $e->getMessage() );

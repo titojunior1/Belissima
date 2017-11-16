@@ -130,8 +130,7 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 								'visibility' => $dados_produtos ['Visibilidade'], 
 								'price' => $dados_produtos ['ValorVenda'], 
 								'special_price' => $dados_produtos ['ValorCusto'], 
-								//'tax_class_id' => 1, 
-								'type' => $dados_produtos['Tipo'],
+								//'tax_class_id' => 1,
 								'meta_title' => $dados_produtos ['Nome'], 
 								'additional_attributes' => array(
 							        'single_data' => array(
@@ -141,7 +140,7 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 								'categories' => $dados_produtos ['Categoria']
 						);
 		
-		$this->_magento->cadastraProduto ( $skuNovoProduto, $novoProduto );
+		$this->_magento->cadastraProduto ( $skuNovoProduto, $novoProduto, $dados_produtos['Tipo'] );
 	}
 
 	/**
@@ -160,7 +159,7 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 							'url_key' => $dados_produtos ['Nome'], 
 							'visibility' => $dados_produtos ['Visibilidade'], 
 							//'tax_class_id' => 1, 
-							'type' => $dados_produtos['Tipo'],
+							//'type' => $dados_produtos['Tipo'],
 							'meta_title' => $dados_produtos ['Nome'],
 							'additional_attributes' => array(
 									        'single_data' => array(
