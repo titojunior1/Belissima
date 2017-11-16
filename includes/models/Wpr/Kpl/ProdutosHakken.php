@@ -239,14 +239,18 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 			$array_produtos [0] ['Unidade'] = isset ( $request ['DadosProdutos'] ['Unidade'] ) ? $request ['DadosProdutos'] ['Unidade'] : '';
 			
 			// verifica se produto é pai ou filho
-			if ( ! isset ( $request ['DadosProdutos'] ['CodigoProdutoPai'] ) ) {
-				$array_produtos [0] ['Visibilidade'] = 1; // Não exibir pois é produto Filho
-				$array_produtos [0] ['Tipo'] = 'simple'; 
-				$array_produtos [0] ['CodigoProdutoPai'] = '';
-			} else {
+			if ( empty ( $request ['DadosProdutos'] ['CodigoProdutoPai'] ) ) {
+				
 				$array_produtos [0] ['Visibilidade'] = 4; // Exibir produto Pai
 				$array_produtos [0] ['Tipo'] = 'configurable';
 				$array_produtos [0] ['CodigoProdutoPai'] = $request ['DadosProdutos'] ['CodigoProdutoPai'];
+				
+			} else {
+				
+				$array_produtos [0] ['Visibilidade'] = 1; // Não exibir pois é produto Filho
+				$array_produtos [0] ['Tipo'] = 'simple';
+				$array_produtos [0] ['CodigoProdutoPai'] = '';
+				
 			}
 		} else {
 			
@@ -271,15 +275,18 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 				$array_produtos [$i] ['Unidade'] = isset ( $d ['Unidade'] ) ? $d ['Unidade'] : '';
 				
 				// verifica se produto é pai ou filho
-				if ( ! isset ( $d ['CodigoProdutoPai'] )) {
+				if ( empty ( $d ['CodigoProdutoPai'] )) {
+					
+					$array_produtos [$i] ['Visibilidade'] = 4; // Exibir produto Pai
+					$array_produtos [$i] ['Tipo'] = 'configurable';
+					$array_produtos [$i] ['CodigoProdutoPai'] = $d ['CodigoProdutoPai'];		
+					
+				} else {
+					
 					$array_produtos [$i] ['Visibilidade'] = 1; // Não exibir pois é produto Filho
 					$array_produtos [$i] ['Tipo'] = 'simple';
 					$array_produtos [$i] ['CodigoProdutoPai'] = '';
 					
-				} else {
-					$array_produtos [$i] ['Visibilidade'] = 4; // Exibir produto Pai
-					$array_produtos [$i] ['Tipo'] = 'configurable';
-					$array_produtos [$i] ['CodigoProdutoPai'] = $d ['CodigoProdutoPai'];
 				}
 			}
 		}
