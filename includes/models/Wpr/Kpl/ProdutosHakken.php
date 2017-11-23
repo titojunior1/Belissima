@@ -224,7 +224,7 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 
 			$array_produtos [0] ['ProtocoloProduto'] = $request ['DadosProdutos'] ['ProtocoloProduto'];
 			$array_produtos [0] ['Categoria'] = $this->_getCategoriaProduto( $request ['DadosProdutos'] ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] );			
-			$array_produtos [0] ['Nome'] = utf8_encode ( $request ['DadosProdutos'] ['NomeProduto'] );
+			$array_produtos [0] ['Nome'] = $request ['DadosProdutos'] ['NomeProduto'];
 			$array_produtos [0] ['Classificacao'] = isset ( $request ['DadosProdutos'] ['Classificacao'] ) ? $request ['DadosProdutos'] ['Classificacao'] : '';
 			$array_produtos [0] ['Altura'] = $request ['DadosProdutos'] ['Altura'];
 			$array_produtos [0] ['Largura'] = $request ['DadosProdutos'] ['Largura'];
@@ -260,7 +260,7 @@ class Model_Wpr_Kpl_ProdutosHakken extends Model_Wpr_Kpl_KplWebService {
 
 				$array_produtos [$i] ['ProtocoloProduto'] = $d ['ProtocoloProduto'];
 				$array_produtos [$i] ['Categoria'] = $this->_getCategoriaProduto( $d ['CategoriasDoSite'] ['Rows'] ['DadosCategoriasDoSite'] );				
-				$array_produtos [$i] ['Nome'] = utf8_encode ( $d ['NomeProduto'] );
+				$array_produtos [$i] ['Nome'] = $d ['NomeProduto'];
 				$array_produtos [$i] ['Classificacao'] = isset ( $d ['Classificacao'] ) ? $d ['Classificacao'] : '';
 				$array_produtos [$i] ['Altura'] = $d ['Altura'];
 				$array_produtos [$i] ['Largura'] = $d ['Largura'];
