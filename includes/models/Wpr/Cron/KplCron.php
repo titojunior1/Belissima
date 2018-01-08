@@ -10,6 +10,7 @@
  *
  *
  *
+ *
  * Cron para processar integração com sistema ERP KPL - Ábacos via webservice
  * @author Tito Junior <titojunior1@gmail.com>
  *        
@@ -17,6 +18,7 @@
 class Model_Wpr_Cron_KplCron {
 	
 	/**
+	 *
 	 *
 	 *
 	 *
@@ -41,6 +43,7 @@ class Model_Wpr_Cron_KplCron {
 	 *
 	 *
 	 *
+	 *
 	 * Array com clientes encontrados
 	 * @var array
 	 */
@@ -56,8 +59,10 @@ class Model_Wpr_Cron_KplCron {
 	 *
 	 *
 	 *
+	 *
 	 * Construtor
 	 * @param
+	 *
 	 *
 	 *
 	 *
@@ -215,7 +220,7 @@ class Model_Wpr_Cron_KplCron {
 							}
 						}
 						break;
-						
+					
 					case 'PetLuni' :
 						
 						if (! is_array ( $estoques ['EstoquesDisponiveisResult'] )) {
@@ -232,6 +237,43 @@ class Model_Wpr_Cron_KplCron {
 							}
 						}
 						break;
+					case 'QuatroPatas' :
+						
+						if (! is_array ( $estoques ['EstoquesDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar Estoque - ' . $estoques );
+						}
+						if ($estoques ['EstoquesDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem estoques disponiveis para integracao" . PHP_EOL;
+						} else {
+							
+							$kpl_estoques = new Model_Wpr_Kpl_EstoqueKplQuatroPatas ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl_estoques->ProcessaEstoqueWebservice ( $estoques ['EstoquesDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// ERRO
+							}
+						}
+						break;
+						
+					default:
+						
+						if (! is_array ( $estoques ['EstoquesDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar Estoque - ' . $estoques );
+						}
+						if ($estoques ['EstoquesDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem estoques disponiveis para integracao" . PHP_EOL;
+						} else {
+							
+							$classe = "Model_Wpr_Kpl_EstoqueKpl" . "{$cliente}";
+															
+							$kpl_estoques = new $classe ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl_estoques->ProcessaEstoqueWebservice ( $estoques ['EstoquesDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// ERRO
+							}
+							
+						}
+
+						break;
 				}
 				
 				echo "- importacao de estoque do cliente {$cliente} realizada com sucesso" . PHP_EOL;
@@ -246,6 +288,7 @@ class Model_Wpr_Cron_KplCron {
 	}
 
 	/**
+	 *
 	 *
 	 *
 	 *
@@ -393,23 +436,59 @@ class Model_Wpr_Cron_KplCron {
 							}
 						}
 						break;
+					
+					case 'PetLuni' :
 						
-						case 'PetLuni' :
+						if (! is_array ( $precos ['PrecosDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar Preços - ' . $precos );
+						}
+						if ($precos ['PrecosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem precos disponiveis para integracao" . PHP_EOL;
+						} else {
+							
+							$kpl_preços = new Model_Wpr_Kpl_PrecosPetLuni ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'], $dadosCliente ['VTEX_API_URL'], $dadosCliente ['VTEX_API_KEY'], $dadosCliente ['VTEX_API_TOKEN'] );
+							$retorno = $kpl_preços->ProcessaPrecosWebservice ( $precos ['PrecosDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// ERRO
+							}
+						}
+						break;
+					case 'QuatroPatas' :
 						
-							if (! is_array ( $precos ['PrecosDisponiveisResult'] )) {
-								throw new Exception ( 'Erro ao buscar Preços - ' . $precos );
+						if (! is_array ( $precos ['PrecosDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar Preços - ' . $precos );
+						}
+						if ($precos ['PrecosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem precos disponiveis para integracao" . PHP_EOL;
+						} else {
+							
+							$kpl_preços = new Model_Wpr_Kpl_PrecosQuatroPatas ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'], $dadosCliente ['VTEX_API_URL'], $dadosCliente ['VTEX_API_KEY'], $dadosCliente ['VTEX_API_TOKEN'] );
+							$retorno = $kpl_preços->ProcessaPrecosWebservice ( $precos ['PrecosDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// ERRO
 							}
-							if ($precos ['PrecosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
-								echo "Nao existem precos disponiveis para integracao" . PHP_EOL;
-							} else {
-									
-								$kpl_preços = new Model_Wpr_Kpl_PrecosPetLuni ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'], $dadosCliente ['VTEX_API_URL'], $dadosCliente ['VTEX_API_KEY'], $dadosCliente ['VTEX_API_TOKEN'] );
-								$retorno = $kpl_preços->ProcessaPrecosWebservice ( $precos ['PrecosDisponiveisResult'] ['Rows'], $dadosCliente );
-								if (is_array ( $retorno )) {
-									// ERRO
-								}
+						}
+						
+						break;
+					default:
+						
+						if (! is_array ( $precos ['PrecosDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar Preços - ' . $precos );
+						}
+						if ($precos ['PrecosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem precos disponiveis para integracao" . PHP_EOL;
+						} else {
+							
+							$classe = "Model_Wpr_Kpl_Precos" . "{$cliente}";		
+							$kpl_preços = new $classe ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'], $dadosCliente ['VTEX_API_URL'], $dadosCliente ['VTEX_API_KEY'], $dadosCliente ['VTEX_API_TOKEN'] );
+							$retorno = $kpl_preços->ProcessaPrecosWebservice ( $precos ['PrecosDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// ERRO
 							}
-							break;
+							
+						}
+						
+					break;	
 				}
 				
 				echo "- importacao de precos do cliente {$cliente} realizada com sucesso" . PHP_EOL;
@@ -547,22 +626,59 @@ class Model_Wpr_Cron_KplCron {
 							}
 						}
 						break;
-						case 'PetLuni' :
+					case 'PetLuni' :
 						
-							if (! is_array ( $status_disponiveis ['StatusPedidoDisponiveisResult'] )) {
-								throw new Exception ( 'Erro ao buscar status dos pedidos' );
+						if (! is_array ( $status_disponiveis ['StatusPedidoDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar status dos pedidos' );
+						}
+						if ($status_disponiveis ['StatusPedidoDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem status disponiveis para integracao " . PHP_EOL;
+						} else {
+							$kpl = new Model_Wpr_Kpl_StatusPedidoPetLuni ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl->ProcessaStatusWebservice ( $status_disponiveis ['StatusPedidoDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// gravar logs de erro
+								//$this->_log->gravaLogErros ( $retorno );
 							}
-							if ($status_disponiveis ['StatusPedidoDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
-								echo "Nao existem status disponiveis para integracao " . PHP_EOL;
-							} else {
-								$kpl = new Model_Wpr_Kpl_StatusPedidoPetLuni ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
-								$retorno = $kpl->ProcessaStatusWebservice ( $status_disponiveis ['StatusPedidoDisponiveisResult'] ['Rows'], $dadosCliente );
-								if (is_array ( $retorno )) {
-									// gravar logs de erro
-									//$this->_log->gravaLogErros ( $retorno );
-								}
+						}
+						break;
+					case 'QuatroPatas' :
+						
+						if (! is_array ( $status_disponiveis ['StatusPedidoDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar status dos pedidos' );
+						}
+						if ($status_disponiveis ['StatusPedidoDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem status disponiveis para integracao " . PHP_EOL;
+						} else {
+							$kpl = new Model_Wpr_Kpl_StatusPedidoQuatroPatas ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl->ProcessaStatusWebservice ( $status_disponiveis ['StatusPedidoDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// gravar logs de erro
+								//$this->_log->gravaLogErros ( $retorno );
 							}
-							break;
+						}
+						break;
+					default:
+						
+						if (! is_array ( $status_disponiveis ['StatusPedidoDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar status dos pedidos' );
+						}
+						if ($status_disponiveis ['StatusPedidoDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem status disponiveis para integracao " . PHP_EOL;
+						} else {
+							
+							$classe = "Model_Wpr_Kpl_StatusPedido" . "{$cliente}";
+							
+							$kpl = new $classe ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl->ProcessaStatusWebservice ( $status_disponiveis ['StatusPedidoDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// gravar logs de erro
+								//$this->_log->gravaLogErros ( $retorno );
+							}
+							
+						}
+						
+						break;	
 				}
 				
 				echo "- importacao de status de pedidos do cliente {$cliente} realizada com sucesso " . PHP_EOL;
@@ -576,6 +692,7 @@ class Model_Wpr_Cron_KplCron {
 	}
 
 	/**
+	 *
 	 *
 	 *
 	 *
@@ -723,21 +840,56 @@ class Model_Wpr_Cron_KplCron {
 							}
 						}
 						break;
-						case 'PetLuni' :
+					case 'PetLuni' :
 						
-							if (! is_array ( $produtos ['ProdutosDisponiveisResult'] )) {
-								throw new Exception ( 'Erro ao buscar Produtos - ' . $produtos );
+						if (! is_array ( $produtos ['ProdutosDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar Produtos - ' . $produtos );
+						}
+						if ($produtos ['ProdutosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem produtos disponiveis para integracao" . PHP_EOL;
+						} else {
+							$kpl_produtos = new Model_Wpr_Kpl_ProdutosPetLuni ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl_produtos->ProcessaProdutosWebservice ( $produtos ['ProdutosDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// ERRO
 							}
-							if ($produtos ['ProdutosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
-								echo "Nao existem produtos disponiveis para integracao" . PHP_EOL;
-							} else {
-								$kpl_produtos = new Model_Wpr_Kpl_ProdutosPetLuni ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
-								$retorno = $kpl_produtos->ProcessaProdutosWebservice ( $produtos ['ProdutosDisponiveisResult'] ['Rows'], $dadosCliente );
-								if (is_array ( $retorno )) {
-									// ERRO
-								}
+						}
+						break;
+					case 'QuatroPatas' :
+						
+						if (! is_array ( $produtos ['ProdutosDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar Produtos - ' . $produtos );
+						}
+						if ($produtos ['ProdutosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem produtos disponiveis para integracao" . PHP_EOL;
+						} else {
+							$kpl_produtos = new Model_Wpr_Kpl_ProdutosQuatroPatas ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl_produtos->ProcessaProdutosWebservice ( $produtos ['ProdutosDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// ERRO
 							}
-							break;
+						}
+						break;
+					default:
+						
+						if (! is_array ( $produtos ['ProdutosDisponiveisResult'] )) {
+							throw new Exception ( 'Erro ao buscar Produtos - ' . $produtos );
+						}
+						if ($produtos ['ProdutosDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
+							echo "Nao existem produtos disponiveis para integracao" . PHP_EOL;
+						} else {
+							
+							$classe = "Model_Wpr_Kpl_Produtos" . "{$cliente}";
+							
+							$kpl_produtos = new $classe ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$retorno = $kpl_produtos->ProcessaProdutosWebservice ( $produtos ['ProdutosDisponiveisResult'] ['Rows'], $dadosCliente );
+							if (is_array ( $retorno )) {
+								// ERRO
+							}
+							
+						}
+						
+						break;	
 				}
 				
 				echo PHP_EOL;
