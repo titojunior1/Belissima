@@ -295,13 +295,32 @@ class Model_Wpr_Vtex_Pedido {
 			$array_transportadoras = array();
 			
 			echo PHP_EOL;
-				
+			echo "Buscando dados do pedido: " . $d->orderId . PHP_EOL;
+
+            $url = sprintf($this->_url, 'oms/pvt/orders/');
+            $url = $url . $d->orderId;
+
+            $headers = array(
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'X-VTEX-API-AppKey' => $this->_key,
+                'X-VTEX-API-AppToken' => $this->_token
+            );
+
+            $request = Requests::get($url, $headers);
+
+            if (! $request->success) {
+                throw new RuntimeException('Falha ao buscar dados do Pedido. [' . $request->body . ']');
+            }
+
+            $pedidoCompleto = json_decode($request->body);
+
 			// formatar CPF
-			$cpfFormatado = $this->Numeros($d->Client->CpfCnpj);
+			$cpfFormatado = $this->Numeros($pedidoCompleto->clientProfileData->document);
 			echo "Tratando dados para cadastro de cliente codigo: " . $cpfFormatado . PHP_EOL;
 				
 			// formata sexo
-			if ( empty ( $d->Client->Gender ) ){
+			if ( empty ($pedidoCompleto->clientProfileData->gender ) ){
 				$sexoCliente = 'tseMasculino';
 				$sexoClientePedido = 'M';
 			}else{
@@ -310,7 +329,7 @@ class Model_Wpr_Vtex_Pedido {
 			}
 				
 			//Manipulando dados para cadastro/atualização de cliente
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Email'] = $d->Client->Email;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Email'] = $pedidoCompleto->clientProfileData->email;
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['CPFouCNPJ'] = $cpfFormatado;
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Codigo'] = $cpfFormatado;
 				
@@ -324,38 +343,38 @@ class Model_Wpr_Vtex_Pedido {
 				
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['TipoPessoa']	= $tipoPessoa;
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Documento'] = '';
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Nome'] = $d->Address->ReceiverName;
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['NomeReduzido'] = $d->Address->ReceiverName;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Nome'] = $pedidoCompleto->shippingData->address->receiverName;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['NomeReduzido'] = $pedidoCompleto->shippingData->address->receiverName;
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Sexo'] = $sexoCliente;
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['DataNascimento'] = '';
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Telefone'] = substr ( $d->Address->Phone, 5, strlen ( $d->Address->Phone ) );
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Telefone'] = substr ( $pedidoCompleto->clientProfileData->phone, 5, strlen ( $pedidoCompleto->clientProfileData->phone ) );
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Celular'] = '';
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['DataCadastro'] = '';
 				
 			//$infosAdicionaisPedido = $this->_magento->buscaInformacoesAdicionaisPedido($d->increment_id);
 		
-			$cepEntregaFormatado = $this->Numeros($d->Address->ZipCode);
-			$cepCobrancaFormatado = $this->Numeros($d->Address->ZipCode);
+			$cepEntregaFormatado = $this->Numeros($pedidoCompleto->shippingData->address->postalCode);
+			$cepCobrancaFormatado = $this->Numeros($pedidoCompleto->shippingData->address->postalCode);
 				
 			// Dados do Endereço
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['Logradouro'] = $d->Address->Street;
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['NumeroLogradouro'] = $d->Address->Number;
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['ComplementoEndereco'] = $d->Address->More;
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['Bairro'] = substr ( $d->Address->Neighborhood, 0, 40 );
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['Municipio'] = $d->Address->City;
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['Estado'] = $d->Address->State;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['Logradouro'] = $pedidoCompleto->shippingData->address->street;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['NumeroLogradouro'] = $pedidoCompleto->shippingData->address->number;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['ComplementoEndereco'] = $pedidoCompleto->shippingData->address->complement;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['Bairro'] = substr ( $pedidoCompleto->shippingData->address->neighborhood, 0, 40 );
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['Municipio'] = $pedidoCompleto->shippingData->address->city;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['Estado'] = $pedidoCompleto->shippingData->address->state;
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['Cep'] = $cepEntregaFormatado;
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['TipoLocalEntrega'] = 'tleeDesconhecido'; // informação não vem da magento
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['ReferenciaEndereco'] = '';
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['Pais'] = 'BR';
 			// Dados do Endereço de Cobrança
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['Logradouro'] = $d->Address->Street;
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['NumeroLogradouro'] = $d->Address->Number;
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['ComplementoEndereco'] = $d->Address->More;
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['Bairro'] = substr ( $d->Address->Neighborhood, 0, 40 );
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['Logradouro'] = $pedidoCompleto->shippingData->address->street;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['NumeroLogradouro'] = $pedidoCompleto->shippingData->address->number;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['ComplementoEndereco'] = $pedidoCompleto->shippingData->address->complement;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['Bairro'] = substr ( $pedidoCompleto->shippingData->address->neighborhood, 0, 40 );
 			
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['Municipio'] = $d->Address->City;
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['Estado'] = $d->Address->State;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['Municipio'] = $pedidoCompleto->shippingData->address->city;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['Estado'] = $pedidoCompleto->shippingData->address->state;
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['Cep'] = $cepCobrancaFormatado;
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['TipoLocalEntrega'] = 'tleeDesconhecido';
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndCobranca'] ['ReferenciaEndereco'] = '';
@@ -366,8 +385,8 @@ class Model_Wpr_Vtex_Pedido {
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndEntrega'] ['ComplementoEndereco'] = $dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['ComplementoEndereco'];
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndEntrega'] ['Bairro'] = $dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['Endereco'] ['Bairro'];
 			
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndEntrega'] ['Municipio'] = $d->Address->City;
-			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndEntrega'] ['Estado'] = $d->Address->State;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndEntrega'] ['Municipio'] = $pedidoCompleto->shippingData->address->city;
+			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndEntrega'] ['Estado'] = $pedidoCompleto->shippingData->address->state;
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndEntrega'] ['Cep'] = $cepEntregaFormatado;
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndEntrega'] ['TipoLocalEntrega'] = 'tleeDesconhecido';
 			$dadosCliente [$i] ['Cliente'] ['DadosClientes'] ['EndEntrega'] ['ReferenciaEndereco'] = '';
@@ -389,9 +408,9 @@ class Model_Wpr_Vtex_Pedido {
 			echo "Tratando dados para cadastro de pedido: " . $d->Id . PHP_EOL;
 			
 			//Seguindo com criação de Pedidos
-			$dadosPedido [$i] ['NumeroDoPedido'] = $d->IdV3;
-			$dadosPedido [$i] ['NumeroDoPedidoV3'] = $d->IdV3;
-			$dadosPedido [$i] ['EMail'] = $d->Client->Email;
+			$dadosPedido [$i] ['NumeroDoPedido'] = $d->orderId;
+			$dadosPedido [$i] ['NumeroDoPedidoV3'] = $d->orderId;
+			$dadosPedido [$i] ['EMail'] = $pedidoCompleto->clientProfileData->email;
 			$dadosPedido [$i] ['CPFouCNPJ'] = $cpfFormatado;
 			$dadosPedido [$i] ['CodigoCliente'] = $cpfFormatado;
 			//$dadosPedido [$i] ['CondicaoPagamento'] = 'COMPRAS'; //Validar			
@@ -401,7 +420,7 @@ class Model_Wpr_Vtex_Pedido {
 			$dadosPedido [$i] ['ValorTrocoEntrega'] = '0.00'; // PENDENTE
 			
 			//Tratamento específico pra data
-			list($data, $hora) = explode('T',  $d->PurchaseDate);
+			list($data, $hora) = explode('T',  $d->creationDate);
 			list($horaNova, $horaAdicional) = explode('.',  $hora);
 			
 			list($ano, $mes, $dia) = explode('-', $data);
@@ -409,25 +428,27 @@ class Model_Wpr_Vtex_Pedido {
 			
 			$dadosPedido [$i] ['DataVenda'] = $dataFormatada;
 			
-			$array_transportadoras = $this->_vtex->trataArrayDto ( (array) $d->OrderDeliveries->OrderDeliveryDTO );
+			$array_transportadoras = $this->_vtex->trataArrayDto ( (array) $pedidoCompleto->shippingData->logisticsInfo );
+            $valor_total_frete = number_format ($pedidoCompleto->totals[2]->value/100, 2, '.', '' );
+            $array_transportadoras = $this->_vtex->trataArrayDto ( (array) $array_transportadoras[0]->deliveryIds );
 
-			$dadosPedido [$i] ['Transportadora'] = $array_transportadoras[0]['FreightIdV3'];
+			$dadosPedido [$i] ['Transportadora'] = $array_transportadoras[0]->courierId;
 			$dadosPedido [$i] ['EmitirNotaSimbolica'] = 0; //Boolean
 			$dadosPedido [$i] ['Lote'] = 1; // Cadastrar um Padrão KPL
-			$dadosPedido [$i] ['DestNome'] = $d->Address->ReceiverName;
+			$dadosPedido [$i] ['DestNome'] = $pedidoCompleto->shippingData->address->receiverName;
 			$dadosPedido [$i] ['DestSexo'] = $sexoClientePedido;
-			$dadosPedido [$i] ['DestEmail'] = $d->Client->Email;
-			$dadosPedido [$i] ['DestTelefone'] = substr ( $d->Address->Phone, 5, strlen ( $d->Address->Phone ) );
+			$dadosPedido [$i] ['DestEmail'] = $pedidoCompleto->clientProfileData->email;
+			$dadosPedido [$i] ['DestTelefone'] = substr ( $pedidoCompleto->clientProfileData->phone, 5, strlen ( $pedidoCompleto->clientProfileData->phone ) );
 			
 			// Dados do Endereço
-			$dadosPedido [$i] ['DestLogradouro'] = $d->Address->Street;
-			$dadosPedido [$i] ['DestNumeroLogradouro'] = $d->Address->Number;
-			$dadosPedido [$i] ['DestComplementoEndereco'] = $d->Address->More;
-			$dadosPedido [$i] ['DestBairro'] = substr ( $d->Address->Neighborhood, 0, 40 );;
+			$dadosPedido [$i] ['DestLogradouro'] = $pedidoCompleto->shippingData->address->street;
+			$dadosPedido [$i] ['DestNumeroLogradouro'] = $pedidoCompleto->shippingData->address->number;
+			$dadosPedido [$i] ['DestComplementoEndereco'] = $pedidoCompleto->shippingData->address->complement;
+			$dadosPedido [$i] ['DestBairro'] = substr ( $pedidoCompleto->shippingData->address->neighborhood, 0, 40 );;
 			
-			$dadosPedido [$i] ['DestMunicipio'] = $d->Address->City;
-			$dadosPedido [$i] ['DestEstado'] = $d->Address->State;
-			$dadosPedido [$i] ['DestCep'] = $d->Address->ZipCode;
+			$dadosPedido [$i] ['DestMunicipio'] = $pedidoCompleto->shippingData->address->city;
+			$dadosPedido [$i] ['DestEstado'] = $pedidoCompleto->shippingData->address->state;
+			$dadosPedido [$i] ['DestCep'] = $cepEntregaFormatado;
 			$dadosPedido [$i] ['DestTipoLocalEntrega'] = 'tleeDesconhecido';
 			$dadosPedido [$i] ['DestPais'] = 'BR';
 			$dadosPedido [$i] ['DestCPF'] = $cpfFormatado;
@@ -443,36 +464,35 @@ class Model_Wpr_Vtex_Pedido {
 			// 			//$dadosPedido [$i] ['CartaoPresenteBrinde'] = 1;			
 			
 			// Itens			
-			$dados_item = $this->_vtex->trataArrayDto ( (array) $d->OrderDeliveries->OrderDeliveryDTO->OrderItems->OrderItemDTO );
+			$dados_item = $this->_vtex->trataArrayDto ( (array) $pedidoCompleto->items );
 
 			foreach ($dados_item as $it => $item){
 				
 				$item = (object) $item;
 				
 				//Verificar se o item atual é o mesmo sku do item anterior
-				if ($item->ProductId == $dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it -1] ['CodigoProduto']){
+				if ($item->productId == $dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it -1] ['CodigoProduto']){
 					continue;
 				}
 				//não importar item que é kit
 				if ( $item->IsKit == "true" ) {
 					continue;
 				}
-				$valor_total_produtos += (($item->Cost) - ((($item->Cost - $item->CostOff))));
-				$valor_total_frete += $item->ShippingCostOff;
-				$valor_total_desconto += number_format ( ($item->Cost - $item->CostOff) + $item->CupomValue, 2, '.', '' );
+				$valor_total_produtos += number_format ((($item->price) - ((($item->Cost - $item->CostOff))))/100, 2, '.', '' );;
+				$valor_total_desconto += number_format ( (($item->Cost - $item->CostOff) + $item->CupomValue)/100, 2, '.', '' );
 				
 				try {
 						
-					$dadosItemProduto = $this->_getDadosProduto($item->ItemId);
+					$dadosItemProduto = $this->_getDadosProduto($item->id);
 						
 				} catch (Exception $e) {
-					echo "Erro ao buscar Produto " . $item->ItemId . ' - ' . $e->getMessage() . PHP_EOL;
+					echo "Erro ao buscar Produto " . $item->id . ' - ' . $e->getMessage() . PHP_EOL;
 					continue;
 				}
 								
 				$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['CodigoProduto'] = $dadosItemProduto->RefId;
 				$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['QuantidadeProduto'] = (int) 1;
-				$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['PrecoUnitario'] = number_format ( $item->Cost, 2, '.', '' ); // valor unitário
+				$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['PrecoUnitario'] = number_format ( $item->price/100, 2, '.', '' ); // valor unitário
 				//$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['MensagemPresente'] = $item->gift_message_available;
 				//$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['PrecoUnitarioBruto'] = number_format($item->price, 2, '.', '');
 				//$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['Brinde'] = '';
@@ -540,7 +560,27 @@ class Model_Wpr_Vtex_Pedido {
 		}
 		
 		try {
-			$pedidos = $this->_client->OrderGetByStatusByQuantity ( $status, $quantidade );
+
+            $url = sprintf($this->_url, 'oms/pvt/orders?f_status=');
+            $url = $url . $status;
+            //$url = 'http://piushop.vtexcommercestable.com.br/api/oms/pvt/orders/831202694463-01';
+
+
+            $headers = array(
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'X-VTEX-API-AppKey' => $this->_key,
+                'X-VTEX-API-AppToken' => $this->_token
+            );
+
+            $request = Requests::get($url, $headers);
+
+            if (! $request->success) {
+                throw new RuntimeException('Falha na comunicação com o webservice. [' . $request->body . ']');
+            }
+
+            $pedidos = json_decode($request->body);
+			//$pedidos = $this->_client->OrderGetByStatusByQuantity ( $status, $quantidade );
 		} catch ( Exception $e ) {
 			throw new RuntimeException ( 'Erro ao consultar Pedidos por status' );
 		}
@@ -548,16 +588,15 @@ class Model_Wpr_Vtex_Pedido {
 			throw new DomainException ( 'Nenhum pedido pendente neste status - '. $pedidos );
 		}
 		
-		if ( empty ( $pedidos->OrderGetByStatusByQuantityResult->OrderDTO ) ) {
+		if ( empty ( $pedidos->list ) && empty ( $pedidos->orderId ) ) {
 			throw new DomainException ( 'Nenhum pedido pendente neste status' );
 		}
 		
-		if( $pedidos->OrderGetByStatusByQuantityResult->OrderDTO->Id != null ){
-			$pedidos1->OrderGetByStatusByQuantityResult->OrderDTO [] = $pedidos->OrderGetByStatusByQuantityResult->OrderDTO;
+		if( $pedidos->orderId != null ){
+			$pedidos1->OrderGetByStatusByQuantityResult->OrderDTO [] = $pedidos;
 		}else{
-			$pedidos1->OrderGetByStatusByQuantityResult->OrderDTO = $pedidos->OrderGetByStatusByQuantityResult->OrderDTO;
+			$pedidos1->OrderGetByStatusByQuantityResult->OrderDTO = $pedidos->list;
 		}
-		
 		
 		$dados_pedidos = $this->_vtex->trataArrayDto ( $pedidos1->OrderGetByStatusByQuantityResult->OrderDTO );
 		
@@ -628,28 +667,6 @@ class Model_Wpr_Vtex_Pedido {
 		if (! $request->success) {
 			throw new RuntimeException('Falha na comunicação com o webservice. [' . $request->body . ']');
 		}
-		
-		/*if(empty($order_id)){
-			throw new InvalidArgumentException ( 'ID do pedido inválido' );
-		}
-		if ( empty ( $status ) ) {
-			$status = 'ERP';
-		}
-		
-		try {
-			// atualiza status do pedido
-			$retorno_status = $this->_client->OrderChangeStatus ( $order_id, $status );
-			
-			if ( ! $retorno_status == FALSE ) {
-				if ( ! is_array ( $retorno_status ) || (is_array ( $retorno_status ) && ! empty ( $retorno_status ['faultcode'] )) ) {
-					throw new RuntimeException ( 'Erro ao tentar alterar status do pedido' );
-				}
-			}
-		} catch ( Exception $e ) {			
-			$this->_vtex->setErro ( array ( "Id" => $order_id, "Metodo" => "_mudarStatusPedido", "DescricaoErro" => $e->getMessage () ), "Pedido_Saida" );
-			throw new RuntimeException ( 'Erro ao tentar alterar status do pedido - ' . $e->getMessage() );
-		}
-		*/
 	}
 
 	/**
