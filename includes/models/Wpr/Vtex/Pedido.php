@@ -563,7 +563,7 @@ class Model_Wpr_Vtex_Pedido {
 
             $url = sprintf($this->_url, 'oms/pvt/orders?f_status=');
             $url = $url . $status;
-            //$url = 'http://piushop.vtexcommercestable.com.br/api/oms/pvt/orders/831202694463-01';
+            //$url = 'http://piushop.vtexcommercestable.com.br/api/oms/pvt/orders/830982790933-01';
 
 
             $headers = array(
