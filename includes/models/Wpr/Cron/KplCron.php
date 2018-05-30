@@ -669,7 +669,7 @@ class Model_Wpr_Cron_KplCron {
 							
 							$classe = "Model_Wpr_Kpl_StatusPedido" . "{$cliente}";
 							
-							$kpl = new $classe ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$kpl = new $classe ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'], $dadosCliente['VTEX_API_URL'], $dadosCliente['VTEX_API_KEY'], $dadosCliente['VTEX_API_TOKEN'] );
 							$retorno = $kpl->ProcessaStatusWebservice ( $status_disponiveis ['StatusPedidoDisponiveisResult'] ['Rows'], $dadosCliente );
 							if (is_array ( $retorno )) {
 								// gravar logs de erro

@@ -26,8 +26,25 @@ class Model_Wpr_Vtex_Status{
 	 * @param string $login Login de Conexão do Webservice.
 	 * @param string $pass Senha de Conexão do Webservice.
 	 */
-	public function __construct ( $ws, $login, $pass ) {
-		$this->_initVtex ( $ws, $login, $pass );
+    /*
+    *  URL para integração via REST VTEX
+    */
+    private $_url;
+
+    /*
+    *  Token para integração via REST VTEX
+    */
+    private $_token;
+
+    /*
+     *  Chave para integração via REST VTEX
+    */
+    private $_key;
+	public function __construct ( $url, $key, $token ) {
+		//$this->_initVtex ( $ws, $login, $pass );
+        $this->_url = $url;
+        $this->_key = $key;
+        $this->_token = $token;
 	}
 	
 	/**
@@ -56,4 +73,83 @@ class Model_Wpr_Vtex_Status{
 		return $result;
 	
 	}
+
+    /**
+     * Método que faz o cancelamento de um pedido
+     */
+    public function _cancelaPedido( $dados_pedido ){
+
+        $idPedido = $dados_pedido['NumeroPedido'];
+        $comentarioStatus = $dados_pedido['ComentarioStatus'];
+
+        $url = sprintf($this->_url, "oms/pvt/orders/{$idPedido}/cancel");
+        $headers = array(
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+            'X-VTEX-API-AppKey' => $this->_key,
+            'X-VTEX-API-AppToken' => $this->_token
+        );
+
+        $request = Requests::post($url, $headers);
+
+        if (! $request->success) {
+            throw new RuntimeException('Falha na comunicação com o webservice. [' . $request->body . ']');
+        }
+
+    }
+
+    /**
+     * Método que faz muda o status de um pedido para faturado
+     */
+    public function _faturaPedido( $dados_pedido ){
+
+        $idPedido = $dados_pedido['NumeroPedido'];
+        $comentarioStatus = $dados_pedido['ComentarioStatus'];
+
+        $url = sprintf($this->_url, "oms/pvt/orders/{$idPedido}/invoiced");
+        $headers = array(
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+            'X-VTEX-API-AppKey' => $this->_key,
+            'X-VTEX-API-AppToken' => $this->_token
+        );
+
+        $request = Requests::post($url, $headers);
+
+        if (! $request->success) {
+            throw new RuntimeException('Falha na comunicação com o webservice. [' . $request->body . ']');
+        }
+
+    }
+
+    /**
+     * Método que faz muda o status de um pedido para faturado
+     */
+    public function _atualizaTracking( $dados_pedido ){
+
+        $idPedido = $dados_pedido['NumeroPedido'];
+        $comentarioStatus = $dados_pedido['ComentarioStatus'];
+        $trackingNumber = $dados_pedido['NumeroObjeto'];
+        $nota = $dados_pedido['NumeroNota'];
+
+        $url = sprintf($this->_url, "oms/pvt/orders/{$idPedido}/invoice");
+        $headers = array(
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+            'X-VTEX-API-AppKey' => $this->_key,
+            'X-VTEX-API-AppToken' => $this->_token
+        );
+        $data = array(
+            'trackingNumber' => $trackingNumber,
+            'invoiceNumber' => $nota,
+            'issuanceDate'=> date('%Y-%m-%d' )
+        );
+
+        $request = Requests::post($url, $headers, $data);
+
+        if (! $request->success) {
+            throw new RuntimeException('Falha na comunicação com o webservice. [' . $request->body . ']');
+        }
+
+    }
 }

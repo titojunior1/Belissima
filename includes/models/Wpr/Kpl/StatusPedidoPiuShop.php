@@ -20,67 +20,35 @@ class Model_Wpr_Kpl_StatusPedidoPiuShop extends Model_Wpr_Kpl_KplWebService {
 	 *	 
 	 */
 	private $_vtex;
+
+    /*
+     *  URL para integração via REST VTEX
+    */
+    private $_url;
+
+    /*
+    *  Token para integração via REST VTEX
+    */
+    private $_token;
+
+    /*
+     *  Chave para integração via REST VTEX
+    */
+    private $_key;
 	
 	/**
 	 * Construtor.
 	 * @param string $ws
 	 * @param String $key	  
 	 */
-	public function __construct( $ws, $key ) {		
+	public function __construct( $ws, $key, $url, $key, $token ) {
 		
 		if (empty ( $this->_kpl )) {
 			$this->_kpl = new Model_Wpr_Kpl_KplWebService ( $ws, $key );
 		}
-	
-	}	
-	
-	/**
-	 * Método que faz o cancelamento de um pedido
-	 */
-	private function _cancelaPedido( $dados_pedido ){
-	
-		$idPedido = $dados_pedido['NumeroPedido'];
-		$comentarioStatus = $dados_pedido['ComentarioStatus'];
-		$statusPedido = $dados_pedido['StatusEnvio'];
-	
-		$url = sprintf($this->_url, "oms/pvt/orders/{$idPedido}/cancel");
-		$headers = array(
-				'Content-Type' => 'application/json',
-				'Accept' => 'application/json',
-				'X-VTEX-API-AppKey' => $this->_key,
-				'X-VTEX-API-AppToken' => $this->_token
-		);
-	
-		$request = Requests::post($url, $headers);
-	
-		if (! $request->success) {
-			throw new RuntimeException('Falha na comunicação com o webservice. [' . $request->body . ']');
-		}	
-	
-	}
-	
-	/**
-	 * Método que faz muda o status de um pedido para faturado
-	 */
-	private function _faturaPedido( $dados_pedido ){
-	
-		$idPedido = $dados_pedido['NumeroPedido'];
-		$comentarioStatus = $dados_pedido['ComentarioStatus'];
-		$statusPedido = $dados_pedido['StatusEnvio'];
-	
-		$url = sprintf($this->_url, "oms/pvt/orders/{$idPedido}/cancel");
-		$headers = array(
-				'Content-Type' => 'application/json',
-				'Accept' => 'application/json',
-				'X-VTEX-API-AppKey' => $this->_key,
-				'X-VTEX-API-AppToken' => $this->_token
-		);
-	
-		$request = Requests::post($url, $headers);
-	
-		if (! $request->success) {
-			throw new RuntimeException('Falha na comunicação com o webservice. [' . $request->body . ']');
-		}
+		$this->_url = $url;
+		$this->_key = $key;
+		$this->_token = $token;
 	
 	}
 	
@@ -92,10 +60,26 @@ class Model_Wpr_Kpl_StatusPedidoPiuShop extends Model_Wpr_Kpl_KplWebService {
 		if ( empty( $idTransacaoPedido ) ){
 			throw new InvalidArgumentException( "Id {$idTransacaoPedido} invalido." );
 		}
+
+        $url = sprintf($this->_url, 'oms/pvt/orders/');
+        $url = $url . $idTransacaoPedido;
+
+        $headers = array(
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+            'X-VTEX-API-AppKey' => $this->_key,
+            'X-VTEX-API-AppToken' => $this->_token
+        );
+
+        $request = Requests::get($url, $headers);
+
+        if (! $request->success) {
+            throw new RuntimeException('Falha ao buscar dados do Pedido. [' . $request->body . ']');
+        }
+
+        $pedido = json_decode($request->body);
 		
-		$result = $this->_vtex->_client->OrderGetV3( $idTransacaoPedido );
-		
-		$idPedido = $result->OrderGetV3Result->Id;
+		$idPedido = $pedido->sequence;
 
 		return $idPedido;
 	
@@ -116,29 +100,33 @@ class Model_Wpr_Kpl_StatusPedidoPiuShop extends Model_Wpr_Kpl_KplWebService {
 		$array_status = array ();
 		
 		echo "Conectando ao WebService Vtex... " . PHP_EOL;
-		$this->_vtex = new Model_Wpr_Vtex_Status( $dadosCliente['VTEX_WSDL'], $dadosCliente['VTEX_USUARIO'], $dadosCliente['VTEX_SENHA'] );
+		$this->_vtex = new Model_Wpr_Vtex_Status( $dadosCliente['VTEX_API_URL'], $dadosCliente['VTEX_API_KEY'], $dadosCliente['VTEX_API_TOKEN'] );
 		echo "Conectado!" . PHP_EOL;
 		echo PHP_EOL;
 		
 		if ( ! is_array ( $request ['DadosStatusPedido'] [0] ) ) {
 					
 			$array_status [0] ['ProtocoloStatusPedido'] = $request ['DadosStatusPedido'] ['ProtocoloStatusPedido'];
-			$array_status [0] ['NumeroPedido'] = $this->_getNumeroTransacaoPedido( $request ['DadosStatusPedido'] ['NumeroPedido'] );
+			$array_status [0] ['NumeroPedido'] = $request ['DadosStatusPedido'] ['NumeroPedido'];
 			$array_status [0] ['CodigoStatus'] = $request ['DadosStatusPedido'] ['CodigoStatus'];
 			$array_status [0] ['StatusPedido'] = $request ['DadosStatusPedido'] ['StatusPedido'];
 			$array_status [0] ['CodigoMotivoCancelamento'] = $request ['DadosStatusPedido'] ['CodigoMotivoCancelamento'];
 			$array_status [0] ['MotivoCancelamento'] = $request ['DadosStatusPedido'] ['MotivoCancelamento'];
+            $array_status [0] ['NumeroObjeto'] = $request ['DadosStatusPedido'] ['NumeroObjeto'];
+            $array_status [0] ['NumeroNota'] = $request ['DadosStatusPedido'] ['NumeroNota'];
 			
 		} else {
 			
 			foreach ( $request ["DadosStatusPedido"] as $i => $d ) {
 				
 				$array_status [$i] ['ProtocoloStatusPedido'] = $d ['ProtocoloStatusPedido'];
-				$array_status [$i] ['NumeroPedido'] = $this->_getNumeroTransacaoPedido( $d ['NumeroPedido'] );
+				$array_status [$i] ['NumeroPedido'] = $d ['NumeroPedido'];
 				$array_status [$i] ['CodigoStatus'] = $d ['CodigoStatus'];
 				$array_status [$i] ['StatusPedido'] = $d ['StatusPedido'];
 				$array_status [$i] ['CodigoMotivoCancelamento'] = $d ['CodigoMotivoCancelamento'];
 				$array_status [$i] ['MotivoCancelamento'] = $d ['MotivoCancelamento'];
+                $array_status [$i] ['NumeroObjeto'] = $d ['NumeroObjeto'];
+                $array_status [$i] ['NumeroNota'] = $d ['NumeroNota'];
 
 			}
 		}
@@ -181,8 +169,16 @@ class Model_Wpr_Kpl_StatusPedidoPiuShop extends Model_Wpr_Kpl_KplWebService {
 							$dados_status['StatusEnvio'] = 'CAN';
 							$dados_status['ComentarioStatus'] = utf8_decode( $dados_status['MotivoCancelamento'] );
 							echo "Cancelando pedido " . $dados_status['NumeroPedido'] . PHP_EOL;
-							$this->_vtex->_atualizaStatusPedido($dados_status);
+							$this->_vtex->_cancelaPedido($dados_status);
 							echo "Pedido Cancelado. " . PHP_EOL;
+                        case '7': // Cadastrado
+                            $dados_status['StatusEnvio'] = 'CAN';
+                            $dados_status['ComentarioStatus'] = utf8_decode( $dados_status['MotivoCancelamento'] );
+                            if(!empty($dados_status['NumeroObjeto'])){
+                                echo "Atualizando Tracking " . $dados_status['NumeroPedido'] . PHP_EOL;
+                                $this->_vtex->_atualizaTracking($dados_status);
+                                echo "Tracking Atualizado. " . PHP_EOL;
+                            }
 						break;
 						
 					}
