@@ -42,10 +42,10 @@ class Model_Wpr_Kpl_StatusPedidoBelissima extends Model_Wpr_Kpl_KplWebService {
      * @param string $ws
      * @param String $key
      */
-    public function __construct( $ws, $key, $url, $key, $token ) {
+    public function __construct( $ws, $chave, $url, $key, $token ) {
 
         if (empty ( $this->_kpl )) {
-            $this->_kpl = new Model_Wpr_Kpl_KplWebService ( $ws, $key );
+            $this->_kpl = new Model_Wpr_Kpl_KplWebService ( $ws, $chave );
         }
         $this->_url = $url;
         $this->_key = $key;
