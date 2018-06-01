@@ -535,7 +535,7 @@ class Model_Wpr_Cron_KplCron {
 						if ($status_disponiveis ['StatusPedidoDisponiveisResult'] ['ResultadoOperacao'] ['Codigo'] == 200003) {
 							echo "Nao existem status disponiveis para integracao " . PHP_EOL;
 						} else {
-							$kpl = new Model_Wpr_Kpl_StatusPedido ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'] );
+							$kpl = new Model_Wpr_Kpl_StatusPedidoBelissima ( $dadosCliente ['KPL_WSDL'], $dadosCliente ['KPL_KEY'], $dadosCliente['VTEX_API_URL'], $dadosCliente['VTEX_API_KEY'], $dadosCliente['VTEX_API_TOKEN'] );
 							$retorno = $kpl->ProcessaStatusWebservice ( $status_disponiveis ['StatusPedidoDisponiveisResult'] ['Rows'], $dadosCliente );
 							if (is_array ( $retorno )) {
 								// gravar logs de erro

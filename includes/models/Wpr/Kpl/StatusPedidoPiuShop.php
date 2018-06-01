@@ -136,6 +136,11 @@ class Model_Wpr_Kpl_StatusPedidoPiuShop extends Model_Wpr_Kpl_KplWebService {
 		echo PHP_EOL;
 		echo "Status encontrados para integracao: " . $qtdStatus . PHP_EOL;
 		echo PHP_EOL;
+
+        echo "Conectando ao WebService Vtex... " . PHP_EOL;
+        $this->_vtex = new Model_Wpr_Vtex_Status( $dadosCliente['VTEX_WSDL'], $dadosCliente['VTEX_USUARIO'], $dadosCliente['VTEX_SENHA'] );
+        echo "Conectado!" . PHP_EOL;
+        echo PHP_EOL;
 		
 		// Percorrer array de preços
 		foreach ( $array_status as $indice => $dados_status ) {
