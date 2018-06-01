@@ -162,7 +162,7 @@ class Model_Wpr_Kpl_StatusPedidoBelissima extends Model_Wpr_Kpl_KplWebService {
 						case '8415': //Faturado
 							$dados_status['StatusEnvio'] = 'ETR';
 							echo "Faturando pedido " . $dados_status['NumeroPedido'] . PHP_EOL;
-                            $this->_vtex->_atualizaStatusPedido($dados_status);
+                            $this->_vtex->_faturaPedido($dados_status);
 							echo "Pedido faturado. " . PHP_EOL;							
 						break;
 						case '6708': // Cancelado
