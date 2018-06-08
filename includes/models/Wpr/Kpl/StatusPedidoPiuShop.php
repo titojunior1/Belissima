@@ -172,14 +172,11 @@ class Model_Wpr_Kpl_StatusPedidoPiuShop extends Model_Wpr_Kpl_KplWebService {
 							$this->_vtex->_cancelaPedido($dados_status);
 							echo "Pedido Cancelado. " . PHP_EOL;
                         case '7': // Cadastrado
-                            $dados_status['StatusEnvio'] = 'CAN';
-                            $dados_status['ComentarioStatus'] = utf8_decode( $dados_status['MotivoCancelamento'] );
-                            if(!empty($dados_status['NumeroObjeto'])){
-                                echo "Atualizando Tracking " . $dados_status['NumeroPedido'] . PHP_EOL;
-                                $this->_vtex->_atualizaTracking($dados_status);
-                                echo "Tracking Atualizado. " . PHP_EOL;
-                            }
-						break;
+                            $dados_status['StatusEnvio'] = 'ETR';
+                            echo "Faturando pedido " . $dados_status['NumeroPedido'] . PHP_EOL;
+                            $this->_vtex->_faturaPedido($dados_status);
+                            echo "Pedido faturado. " . PHP_EOL;
+                            break;
 						
 					}
 										

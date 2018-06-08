@@ -105,30 +105,6 @@ class Model_Wpr_Vtex_Status{
 
         $idPedido = $dados_pedido['NumeroPedido'];
         $comentarioStatus = $dados_pedido['ComentarioStatus'];
-
-        $url = sprintf($this->_url, "oms/pvt/orders/{$idPedido}/invoiced");
-        $headers = array(
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-            'X-VTEX-API-AppKey' => $this->_key,
-            'X-VTEX-API-AppToken' => $this->_token
-        );
-
-        $request = Requests::post($url, $headers);
-
-        if (! $request->success) {
-            throw new RuntimeException('Falha na comunicação com o webservice. [' . $request->body . ']');
-        }
-
-    }
-
-    /**
-     * Método que faz muda o status de um pedido para faturado
-     */
-    public function _atualizaTracking( $dados_pedido ){
-
-        $idPedido = $dados_pedido['NumeroPedido'];
-        $comentarioStatus = $dados_pedido['ComentarioStatus'];
         $trackingNumber = $dados_pedido['NumeroObjeto'];
         $nota = $dados_pedido['NumeroNota'];
 
@@ -140,12 +116,13 @@ class Model_Wpr_Vtex_Status{
             'X-VTEX-API-AppToken' => $this->_token
         );
         $data = array(
-            'trackingNumber' => $trackingNumber,
+            'issuanceDate'=> date('Y-m-d' ),
             'invoiceNumber' => $nota,
-            'issuanceDate'=> date('%Y-%m-%d' )
+            //'invoiceValue' => $nota,
+            'trackingNumber' => $trackingNumber
         );
 
-        $request = Requests::post($url, $headers, $data);
+        $request = Requests::post($url, $headers, json_encode($data));
 
         if (! $request->success) {
             throw new RuntimeException('Falha na comunicação com o webservice. [' . $request->body . ']');

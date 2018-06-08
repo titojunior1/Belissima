@@ -430,6 +430,7 @@ class Model_Wpr_Vtex_Pedido {
 			
 			$array_transportadoras = $this->_vtex->trataArrayDto ( (array) $pedidoCompleto->shippingData->logisticsInfo );
             $valor_total_frete = number_format ($pedidoCompleto->totals[2]->value/100, 2, '.', '' );
+            $valor_total_desconto = abs(number_format ($pedidoCompleto->totals[1]->value/100, 2, '.', '' ));
             $array_transportadoras = $this->_vtex->trataArrayDto ( (array) $array_transportadoras[0]->deliveryIds );
 
 			$dadosPedido [$i] ['Transportadora'] = $array_transportadoras[0]->courierId;
@@ -478,8 +479,7 @@ class Model_Wpr_Vtex_Pedido {
 				if ( $item->IsKit == "true" ) {
 					continue;
 				}
-				$valor_total_produtos += number_format ((($item->price) - ((($item->Cost - $item->CostOff))))/100, 2, '.', '' );;
-				$valor_total_desconto += number_format ( (($item->Cost - $item->CostOff) + $item->CupomValue)/100, 2, '.', '' );
+				$valor_total_produtos += number_format ((($item->price) - ((($item->Cost - $item->CostOff))))/100, 2, '.', '' ) * $item->quantity;
 				
 				try {
 						
@@ -491,7 +491,7 @@ class Model_Wpr_Vtex_Pedido {
 				}
 								
 				$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['CodigoProduto'] = $dadosItemProduto->RefId;
-				$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['QuantidadeProduto'] = (int) 1;
+				$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['QuantidadeProduto'] = (int) $item->quantity;
 				$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['PrecoUnitario'] = number_format ( $item->price/100, 2, '.', '' ); // valor unitário
 				//$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['MensagemPresente'] = $item->gift_message_available;
 				//$dadosPedido [$i] ['Itens'] ['DadosPedidosItem'] [$it] ['PrecoUnitarioBruto'] = number_format($item->price, 2, '.', '');
@@ -563,7 +563,7 @@ class Model_Wpr_Vtex_Pedido {
 
             $url = sprintf($this->_url, 'oms/pvt/orders?f_status=');
             $url = $url . $status;
-            //$url = 'http://piushop.vtexcommercestable.com.br/api/oms/pvt/orders/834231357867-01';
+            //$url = 'http://piushop.vtexcommercestable.com.br/api/oms/pvt/orders/837821710331-01';
 
 
             $headers = array(
