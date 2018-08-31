@@ -191,9 +191,9 @@ class Model_Wpr_Kpl_PrecosLuniVarejo extends Model_Wpr_Kpl_KplWebService {
 					echo "Buscando cadastro do produto " . $dados_precos['CodigoProduto'] . PHP_EOL;
 					$produto = $this->_vtex->buscaCadastroProduto($dados_precos['CodigoProduto']);
 					// Caso não localize a busca do produto filho, tentará através do pai
-					if( empty ( $produto->StockKeepingUnitGetByRefIdResult ) ){
-						$produto = $this->_vtex->buscaCadastroProdutoPai($dados_precos['CodigoProduto']);
-					}					
+//					if( empty ( $produto->StockKeepingUnitGetByRefIdResult ) ){
+//						$produto = $this->_vtex->buscaCadastroProdutoPai($dados_precos['CodigoProduto']);
+//					}
 					
 					if ( !empty ( $produto->StockKeepingUnitGetByRefIdResult ) || !empty ( $produto->ProductGetByRefIdResult ) ) { 
 						
@@ -210,7 +210,7 @@ class Model_Wpr_Kpl_PrecosLuniVarejo extends Model_Wpr_Kpl_KplWebService {
 						echo "Preco atualizado. " . PHP_EOL;
 						
 					}else{
-						throw new RuntimeException( 'Produto não encontrado' );
+						throw new RuntimeException( "Produto Filho {$dados_precos['CodigoProduto']} não encontrado" );
 					} 
 										
 					$this->_kpl->confirmarPrecosDisponiveis ( $dados_precos ['ProtocoloPreco'] );
