@@ -6,7 +6,7 @@
  * @author Tito Junior 
  * 
  */
-class Model_Wpr_Kpl_ProdutosPetLuni extends Model_Wpr_Kpl_KplWebService {
+class Model_Wpr_Kpl_ProdutosQuatroPatas extends Model_Wpr_Kpl_KplWebService {
 	
 	/*
 	 * Instancia Webservice KPL
@@ -27,7 +27,12 @@ class Model_Wpr_Kpl_ProdutosPetLuni extends Model_Wpr_Kpl_KplWebService {
 	 * Marcas do produto
 	 */
 	private $_marcas;
-	
+
+    /*
+ * URL webservice KPL
+ */
+    private $_ws;
+
 	/**
 	 * 
 	 * construtor.	 

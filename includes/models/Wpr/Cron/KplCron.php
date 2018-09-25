@@ -683,12 +683,12 @@ class Model_Wpr_Cron_KplCron {
 				
 				echo "- importacao de status de pedidos do cliente {$cliente} realizada com sucesso " . PHP_EOL;
 			} catch ( Exception $e ) {
-				echo "- erros ao importar os status de pedidos de saída do cliente Belissima: " . $e->getMessage () . PHP_EOL;
+				echo "- erros ao importar os status de pedidos de saída do cliente {$cliente}: " . $e->getMessage () . PHP_EOL;
 			}
 			unset ( $this->_kpl );
 			unset ( $kpl );
 		}
-		echo "- Finalizando cron para atualizar status de pedidos de saída da Kpl do cliente Belissima " . PHP_EOL;
+		echo "- Finalizando cron para atualizar status de pedidos de saída da Kpl do cliente {$cliente} " . PHP_EOL;
 	}
 
 	/**

@@ -27,6 +27,11 @@ class Model_Wpr_Kpl_ProdutosPetLuni extends Model_Wpr_Kpl_KplWebService {
 	 * Marcas do produto
 	 */
 	private $_marcas;
+
+	/*
+	 * URL webservice KPL
+	 */
+	private $_ws;
 	
 	/**
 	 * 
