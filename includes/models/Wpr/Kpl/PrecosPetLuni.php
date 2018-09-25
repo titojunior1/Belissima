@@ -210,7 +210,7 @@ class Model_Wpr_Kpl_PrecosPetLuni extends Model_Wpr_Kpl_KplWebService {
 						echo "Preco atualizado. " . PHP_EOL;
 						
 					}else{
-						throw new RuntimeException( 'Produto não encontrado' );
+                        echo "Produto {$dados_precos['CodigoProduto']} não encontrado, confirmando protocolo de alteração para limpeza de fila";
 					} 
 										
 					$this->_kpl->confirmarPrecosDisponiveis ( $dados_precos ['ProtocoloPreco'] );
